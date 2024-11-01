@@ -6,11 +6,9 @@ import <format>;
 
 std::unique_ptr<Game> Game::m_instance = nullptr;
 
-Game::Game() = default;
-
 Game& Game::getInstance() {
-    if (Game::m_instance == nullptr) {
-        Game::m_instance = std::make_unique<Game>();
+    if (m_instance == nullptr) {
+        m_instance = std::unique_ptr<Game>(new Game());
         std::cout << "[SUCCES] game created" << std::endl;
     }
     else {
