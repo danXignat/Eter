@@ -1,5 +1,7 @@
-#include <iostream>
+import Game;
 
 int main() {
-	std::cout << "Miau!";
+	Game::getInstance();
+	Game::getInstance();
+	Game::getInstance();
 }
