@@ -2,7 +2,8 @@ import Game;
 
 import <iostream>;
 import <memory>;
-import <format>;
+
+using namespace game;
 
 std::unique_ptr<Game> Game::m_instance = nullptr;
 
@@ -16,4 +17,8 @@ Game& Game::getInstance() {
     }
 
     return *m_instance;
+}
+
+void Game::run() {
+    std::cout << "running";
 }
