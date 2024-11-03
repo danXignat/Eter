@@ -137,6 +137,8 @@
     <ClCompile Include="Logger.cpp" />
     <ClCompile Include="Logger.cppm" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Player.cpp" />
+    <ClCompile Include="Player.cppm" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
