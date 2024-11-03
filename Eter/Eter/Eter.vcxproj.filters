@@ -48,5 +48,14 @@
     <ClCompile Include="Player.cppm">
       <Filter>Modules</Filter>
     </ClCompile>
+    <ClCompile Include="MageCardType.cppm">
+      <Filter>Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="MageCard.cppm">
+      <Filter>Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="MageCard.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

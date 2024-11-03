@@ -136,6 +136,9 @@
     <ClCompile Include="Game.cppm" />
     <ClCompile Include="Logger.cpp" />
     <ClCompile Include="Logger.cppm" />
+    <ClCompile Include="MageCard.cpp" />
+    <ClCompile Include="MageCard.cppm" />
+    <ClCompile Include="MageCardType.cppm" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Player.cppm" />
