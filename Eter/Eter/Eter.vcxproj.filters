@@ -33,5 +33,29 @@
     <ClCompile Include="Logger.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CombatCard.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Player.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CombatCard.cppm">
+      <Filter>Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="CombatCardType.cppm">
+      <Filter>Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="Player.cppm">
+      <Filter>Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="MageCardType.cppm">
+      <Filter>Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="MageCard.cppm">
+      <Filter>Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="MageCard.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
