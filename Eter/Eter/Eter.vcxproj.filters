@@ -27,13 +27,10 @@
     <ClCompile Include="Game.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CombatCard.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="Logger.cppm">
+      <Filter>Modules</Filter>
     </ClCompile>
-    <ClCompile Include="CombatCard.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="CombatCardType.cppm">
+    <ClCompile Include="Logger.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

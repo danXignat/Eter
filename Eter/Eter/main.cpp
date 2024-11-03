@@ -1,7 +1,10 @@
 import Game;
+import Logger;
 
 int main() {
-	Game::getInstance();
-	Game::getInstance();
-	Game::getInstance();
+	/*game::Game::getInstance().run();*/
+
+	logger::Logger logger = logger::Logger();
+	
+	logger.log(logger::Level::INFO, "miau {} bau {}", "hau", "bau");
 }

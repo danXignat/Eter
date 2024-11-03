@@ -134,6 +134,8 @@
     <ClCompile Include="CombatCardType.cppm" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Game.cppm" />
+    <ClCompile Include="Logger.cpp" />
+    <ClCompile Include="Logger.cppm" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

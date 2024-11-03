@@ -2,17 +2,20 @@ export module Game;
 
 import <iostream>;
 import <memory>;
-import <format>;
 
-export class Game {
-public:
-	Game(const Game&) = delete;
-	Game& operator=(const Game&) = delete;
-	static Game& getInstance();
+namespace game {
+	export class Game {
+	public:
+		Game(const Game&) = delete;					//delete copy constructor
+		Game& operator=(const Game&) = delete;		//delete assignment operator
+		static Game& getInstance();					//method to access game instance by refference
 
-private:
-	Game() = default;
+		void run();
 
-private:
-	static std::unique_ptr<Game> m_instance;
-};
+	private:
+		Game() = default;							//private constructor -> no outside access to it
+
+	private:
+		static std::unique_ptr<Game> m_instance;	//pointer to instance
+	};
+}
