@@ -8,6 +8,6 @@ namespace base {
 
 	public:
 		CombatCard(CombatCardType type);
-		CombatCardType GetType();
+		CombatCardType getType() const;
 	};
 }
