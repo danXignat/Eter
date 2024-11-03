@@ -8,6 +8,9 @@ namespace base {
 
 	public:
 		CombatCard(CombatCardType type);
-		CombatCardType GetType();
+		CombatCardType getType();
+
+		bool operator<(const CombatCard& other) const;
+		bool operator==(const CombatCard& other)const;
 	};
 }
