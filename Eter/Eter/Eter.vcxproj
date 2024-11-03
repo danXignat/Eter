@@ -129,6 +129,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="CombatCard.cpp" />
+    <ClCompile Include="CombatCard.cppm" />
+    <ClCompile Include="CombatCardType.cppm" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Game.cppm" />
     <ClCompile Include="main.cpp" />
