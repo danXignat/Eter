@@ -1,6 +1,6 @@
 import Player;
-import base.CombatCard;
-import base.CombatCardType;
+import CombatCard;
+import CombatCardType;
 import <string>;
 import <set>;
 import <iostream>;

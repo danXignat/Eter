@@ -60,10 +60,27 @@
     <ClCompile Include="TrainingMode.cppm">
       <Filter>Modules</Filter>
     </ClCompile>
+    <ClCompile Include="TrainingMode.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Board.cppm">
+      <Filter>Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="utils.cppm">
+      <Filter>Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="Board.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="log.txt">
       <Filter>Resource Files</Filter>
     </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="View.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

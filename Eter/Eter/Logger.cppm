@@ -38,6 +38,7 @@ namespace logger {
 
 		if (level >= m_min_priority) {
 			m_log_file << std::format("[{}] {}\n", getLevelToString(level), formatted_message);
+			m_log_file.flush();
 		}
 	}
 }

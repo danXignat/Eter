@@ -13,18 +13,14 @@ namespace logger {
 		{
 			using enum Level;
 
-		case Level::INFO:
+		case INFO:
 			return "INFO";
-			break;
-		case Level::WARNING:
+		case WARNING:
 			return "WARNING";
-			break;
-		case Level::ERROR:
+		case ERROR:
 			return "ERROR";
-			break;
 		default:
 			return "";
-			break;
 		}
 	}
 
