@@ -4,6 +4,7 @@ import <iostream>;
 import <cstdint>;
 import <string_view>;
 import <format>;
+import <fstream>;
 
 namespace logger {
 	export enum class Level : uint8_t {
@@ -16,19 +17,27 @@ namespace logger {
 
 	export class Logger {
 	public:
-		Logger();
+		Logger(const Logger&) = delete;
+		Logger& operator=(const Logger&) = delete;
 
+		static void setMinPriority(Level level);
 		template<typename... Args>
-		void log(Level level, std::string_view message, Args&&... args);
+		static void log(Level level, std::string_view message, Args&&... args);
 
 	private:
+		Logger() = default;
 
+	private:
+		static Level m_min_priority;
+		static std::ofstream m_log_file;
 	};
 
 	template<typename... Args>
 	void Logger::log(Level level, std::string_view message, Args&&... args) {
 		std::string formatted_message = std::vformat(message, std::make_format_args(args...));
 
-		std::cout << std::format("[{}] {}\n", "INFO", formatted_message);
+		if (level >= m_min_priority) {
+			m_log_file << std::format("[{}] {}\n", getLevelToString(level), formatted_message);
+		}
 	}
 }

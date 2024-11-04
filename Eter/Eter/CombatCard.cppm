@@ -1,5 +1,6 @@
-export module base.CombatCard;
-import base.CombatCardType;
+export module CombatCard;
+
+import CombatCardType;
 
 namespace base {
 	export class CombatCard {

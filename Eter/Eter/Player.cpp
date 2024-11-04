@@ -6,7 +6,6 @@ import <set>;
 import <iostream>;
 
 namespace player {
-	Player::Player() = default;
 	Player::~Player() {}
 
 	std::string_view Player::getName() const {
@@ -19,13 +18,6 @@ namespace player {
 
 	void Player::addCard(const base::CombatCard& card) {
 		m_cards.insert(card);
-	}
-
-	void Player::printCard() const {
-		for (const auto& card : m_cards) {
-			std::cout << card.getType() << " ";
-		}
-		std::cout << std::endl;
 	}
 
 	bool Player::hasCard() const {

@@ -4,36 +4,35 @@ import <iostream>;
 import <cstdint>;
 import <string_view>;
 import <format>;
+import <fstream>;
 
-using namespace logger;
+namespace logger {
 
-std::string_view getLevelToString(Level level) {
-	switch (level)
-	{
-	using enum Level;
+	std::string_view getLevelToString(Level level) {
+		switch (level)
+		{
+			using enum Level;
 
-	case Level::INFO:
-		return "INFO";
-		break;
-	case Level::WARNING:
-		return "WARNING";
-		break;
-	case Level::ERROR:
-		return "ERROR";
-		break;
-	default:
-		return "";
-		break;
+		case Level::INFO:
+			return "INFO";
+			break;
+		case Level::WARNING:
+			return "WARNING";
+			break;
+		case Level::ERROR:
+			return "ERROR";
+			break;
+		default:
+			return "";
+			break;
+		}
 	}
-}
 
-Logger::Logger() {
+	Level Logger::m_min_priority{ Level::INFO };
 
-}
+	std::ofstream Logger::m_log_file{ "log.txt", std::ios::out | std::ios::trunc };
 
-template<typename... Args>
-void Logger::log(Level level, std::string_view message, Args&&... args) {
-	std::string formatted_message = std::vformat(message, std::make_format_args(args...));
-
-	std::cout << std::format("[{}] {}\n", "INFO", formatted_message);
+	void Logger::setMinPriority(Level level) {
+		m_min_priority = level;
+	}
 }
