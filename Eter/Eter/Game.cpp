@@ -1,19 +1,21 @@
 import Game;
+import Logger;
 
 import <iostream>;
 import <memory>;
 
 using namespace game;
+using namespace logger;
 
 std::unique_ptr<Game> Game::m_instance = nullptr;
 
 Game& Game::getInstance() {
     if (m_instance == nullptr) {
         m_instance = std::unique_ptr<Game>(new Game());
-        std::cout << "[SUCCES] game created" << std::endl;
+        Logger::log(Level::INFO, "game instance created");
     }
     else {
-        std::cout << "[INFO] game already created" << std::endl;
+        Logger::log(Level::INFO, "game instance already created accessed");
     }
 
     return *m_instance;

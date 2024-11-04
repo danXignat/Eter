@@ -1,4 +1,5 @@
-export module base.CombatCardType;
+export module CombatCardType;
+
 import <cstdint>;
 
 namespace base {
