@@ -15,14 +15,12 @@ namespace base {
 
 	export class Board {
 	public:
-		Board();
 		Board(uint16_t);
 
 		void appendMove(Coord, CardPtr&&);
 		void renderBoard() const;
 
 	private:
-		void _updateBoardBoundry(Coord);
 		void _updateAvailableSpaces(Coord);
 	
 	private:
@@ -30,10 +28,22 @@ namespace base {
 			size_t operator()(const Coord&) const;
 		};
 
+		struct BoundingRect {
+			uint16_t size;
+			Coord corner1, corner2;
+			bool fixed_width, fixed_height;
+
+			BoundingRect(uint16_t);
+			void add(Coord);
+			void remove(Coord);
+			bool withinWidth(Coord) const;
+			bool withinHeight(Coord) const;
+			bool within(Coord) const;
+		};
+
 	private:
 		uint16_t m_size;
-		int16_t m_row_min, m_row_max;
-		int16_t m_col_min, m_col_max;
+		BoundingRect m_bounding_rect;
 
 		std::unordered_map<Coord, std::vector<CardPtr>, CoordFunctor> m_combat_cards;
 		std::unordered_set<Coord, CoordFunctor> m_available_spaces;
