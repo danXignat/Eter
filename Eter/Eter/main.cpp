@@ -24,5 +24,10 @@ int main() {
 	board.appendMove(
 		{ 14, 9 }, std::make_unique<base::CombatCard>(base::CombatCardType::ETER)
 	);
+
+	board.appendMove(
+		{ 18, 9 }, std::make_unique<base::CombatCard>(base::CombatCardType::ETER)
+	);
 	board.renderBoard();
+
 }

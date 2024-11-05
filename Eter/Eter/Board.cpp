@@ -27,21 +27,16 @@ namespace utils {
 namespace base {
 	//----------------------------Constructors--------------------------------
 
-	Board::Board() {
-
-	}
-
 	Board::Board(uint16_t size) :
 		m_size{ size },
-		m_col_min{ SHRT_MAX }, m_col_max{ SHRT_MIN },
-		m_row_min{ SHRT_MAX }, m_row_max{ SHRT_MIN } {
+		m_bounding_rect{ size } {
 
 	}
 
 	//----------------------------Public-Methods--------------------------------
 
 	void Board::appendMove(Coord coord, CardPtr&& card_ptr) {
-		_updateBoardBoundry(coord);
+		m_bounding_rect.add(coord);
 
 		m_combat_cards[coord].push_back(std::move(card_ptr));
 
@@ -56,16 +51,17 @@ namespace base {
 		for (const auto& pair : m_available_spaces) {
 			utils::printAtCoordinate(pair.first, pair.second, "*");
 		}
+
+		for (int i = 0; i < m_bounding_rect.corner2.second - m_bounding_rect.corner1.second + 1; i++) {
+			for (int j = 0; j < m_bounding_rect.corner2.first - m_bounding_rect.corner1.first + 1; j += 2)
+				std::cout << "*";
+			std::cout << std::endl;
+		}
+		std::cin.get();
 	}
 
 	//----------------------------Private-Methods--------------------------------
 
-	void Board::_updateBoardBoundry(Coord coord) {
-		m_row_min = std::min(int(m_row_min), int(coord.first));
-		m_row_max = std::max(int(m_row_max), int(coord.first));
-		m_col_min = std::min(int(m_col_min), int(coord.second));
-		m_col_max = std::max(int(m_col_max), int(coord.second));
-	}
 
 	void Board::_updateAvailableSpaces(Coord coord) {
 		std::array<Coord, 8> offsets = { {
@@ -82,20 +78,54 @@ namespace base {
 				m_available_spaces.emplace(new_point);
 			}
 		}
-
-		if (m_row_max - m_row_min) {
-
-		}
-		if (m_col_max - m_col_min) {
-
-		}
 	}
 
-	//--------------------------------Functor-------------------------------------
+	//--------------------------------Inner-Classes-------------------------------------
 
 	size_t Board::CoordFunctor::operator()(const Coord& coord) const {
 		std::hash<uint16_t> hasher;
 
 		return hasher(coord.first) ^ hasher(coord.second << 1);
+	}
+
+	Board::BoundingRect::BoundingRect(uint16_t size) :
+		size{ size },
+		corner1{ 10, 8 }, corner2{ 10, 8 },
+		fixed_width{ false }, fixed_height{ false } {
+
+	}
+
+	void Board::BoundingRect::add(Coord coord) {
+		if (!fixed_width) {
+			corner1.first = std::min(corner1.first, coord.first);
+			corner2.first = std::max(corner2.first, coord.first);
+		}
+		
+		if (!fixed_height) {
+			corner1.second = std::min(corner1.second, coord.second);
+			corner2.second = std::max(corner2.second, coord.second);
+		}
+
+		/*std::cout << corner1.first << " " << corner1.second << std::endl;
+		std::cout << corner2.first << " " << corner2.second << std::endl << std::endl;*/
+
+		fixed_width = ( (corner2.first - corner1.first) /2 + 1 == size) ? true : false;
+		fixed_height = (corner2.second - corner1.second + 1 == size) ? true : false;
+	}
+
+	void Board::BoundingRect::remove(Coord coord) {
+
+	}
+
+	bool Board::BoundingRect::withinWidth(Coord coord) const {
+		return corner1.first <= coord.first && coord.first <= corner2.first;
+	}
+
+	bool Board::BoundingRect::withinHeight(Coord coord) const {
+		return corner1.second <= coord.second && coord.second <= corner2.second;
+	}
+
+	bool Board::BoundingRect::within(Coord coord) const {
+		return withinHeight(coord) && withinWidth(coord);
 	}
 }
