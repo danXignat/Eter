@@ -142,9 +142,12 @@
     <ClCompile Include="MageCard.cpp" />
     <ClCompile Include="MageCard.cppm" />
     <ClCompile Include="MageCardType.cppm" />
+    <ClCompile Include="MageCardTypeAbility.cppm" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Player.cppm" />
+    <ClCompile Include="PowerCard.cpp" />
+    <ClCompile Include="PowerCard.cppm" />
     <ClCompile Include="TrainingMode.cpp" />
     <ClCompile Include="TrainingMode.cppm" />
     <ClCompile Include="utils.cppm" />

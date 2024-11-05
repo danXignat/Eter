@@ -1,4 +1,4 @@
-export module base.MageCardType;
+export module MageCardType;
 
 import <unordered_map>;
 import <string>;

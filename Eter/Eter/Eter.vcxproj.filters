@@ -72,8 +72,14 @@
     <ClCompile Include="Board.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Inventory.cppm">
-      <Filter>Modules</Filter>
+    <ClCompile Include="PowerCard.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PowerCard.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MageCardTypeAbility.cppm">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
