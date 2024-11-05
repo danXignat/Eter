@@ -1,6 +1,6 @@
 export module Player;
-import base.CombatCard;
-import base.CombatCardType;
+import CombatCard;
+import CombatCardType;
 
 import<string>;
 import <string_view>;

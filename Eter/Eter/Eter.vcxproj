@@ -129,6 +129,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Board.cpp" />
+    <ClCompile Include="Board.cppm" />
     <ClCompile Include="CombatCard.cpp" />
     <ClCompile Include="CombatCard.cppm" />
     <ClCompile Include="CombatCardType.cppm" />
@@ -142,10 +144,15 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Player.cppm" />
+    <ClCompile Include="TrainingMode.cpp" />
     <ClCompile Include="TrainingMode.cppm" />
+    <ClCompile Include="utils.cppm" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="log.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="View.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
