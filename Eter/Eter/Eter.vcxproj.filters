@@ -16,13 +16,22 @@
     <Filter Include="Modules">
       <UniqueIdentifier>{c3c610e1-ba25-4b71-a2c2-43fabd60910c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Game">
+      <UniqueIdentifier>{7d71d409-4702-402e-9294-d2f786656be8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Card">
+      <UniqueIdentifier>{43abc9c8-8703-4528-b875-31c7e9554221}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Board">
+      <UniqueIdentifier>{faee7d0a-a619-45b8-9aa6-3690aae0b794}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Player">
+      <UniqueIdentifier>{7e272ece-d44a-4ea8-beab-55f1565cce60}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Game.cppm">
-      <Filter>Modules</Filter>
     </ClCompile>
     <ClCompile Include="Game.cpp">
       <Filter>Source Files</Filter>
@@ -39,32 +48,11 @@
     <ClCompile Include="Player.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CombatCard.cppm">
-      <Filter>Modules</Filter>
-    </ClCompile>
-    <ClCompile Include="CombatCardType.cppm">
-      <Filter>Modules</Filter>
-    </ClCompile>
-    <ClCompile Include="Player.cppm">
-      <Filter>Modules</Filter>
-    </ClCompile>
-    <ClCompile Include="MageCardType.cppm">
-      <Filter>Modules</Filter>
-    </ClCompile>
-    <ClCompile Include="MageCard.cppm">
-      <Filter>Modules</Filter>
-    </ClCompile>
     <ClCompile Include="MageCard.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="TrainingMode.cppm">
-      <Filter>Modules</Filter>
-    </ClCompile>
     <ClCompile Include="TrainingMode.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Board.cppm">
-      <Filter>Modules</Filter>
     </ClCompile>
     <ClCompile Include="utils.cppm">
       <Filter>Modules</Filter>
@@ -72,14 +60,29 @@
     <ClCompile Include="Board.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="PowerCard.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="Game.cppm">
+      <Filter>Game</Filter>
     </ClCompile>
-    <ClCompile Include="PowerCard.cppm">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="MageCard.cppm">
+      <Filter>Card</Filter>
     </ClCompile>
-    <ClCompile Include="MageCardTypeAbility.cppm">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="MageCardType.cppm">
+      <Filter>Card</Filter>
+    </ClCompile>
+    <ClCompile Include="Player.cppm">
+      <Filter>Player</Filter>
+    </ClCompile>
+    <ClCompile Include="CombatCardType.cppm">
+      <Filter>Card</Filter>
+    </ClCompile>
+    <ClCompile Include="CombatCard.cppm">
+      <Filter>Card</Filter>
+    </ClCompile>
+    <ClCompile Include="TrainingMode.cppm">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="Board.cppm">
+      <Filter>Board</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

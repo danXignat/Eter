@@ -2,6 +2,7 @@ import <iostream>;
 import <string>;
 import <unordered_map>;
 import <memory>;
+import <unordered_set>;
 
 import utils;
 
@@ -12,22 +13,42 @@ import CombatCard;
 import CombatCardType;
 
 int main() {
-	//system("start powershell -Command \"Get-Content -Path 'log.txt' -Wait\"");
+	system("start powershell -Command \"Get-Content -Path 'log.txt' -Wait\"");
 	base::Board board(3);
 
-	board.appendMove(
-		{10, 8}, std::make_unique<base::CombatCard>(base::CombatCardType::ETER)
-	);
-	board.appendMove(
-		{ 12, 9 }, std::make_unique<base::CombatCard>(base::CombatCardType::ONE)
-	);
-	board.appendMove(
-		{ 14, 9 }, std::make_unique<base::CombatCard>(base::CombatCardType::ETER)
-	);
 
-	board.appendMove(
-		{ 18, 9 }, std::make_unique<base::CombatCard>(base::CombatCardType::ETER)
-	);
-	board.renderBoard();
+	while (true) {
+		system("cls");
 
+		board.renderBoard();
+
+		int x, y;
+		char ch;
+		base::CombatCardType type;
+		std::cin >> x >> y >> ch;
+
+		switch (ch)
+		{
+			using enum base::CombatCardType;
+		case '1':
+			type = ONE;
+			break;
+		case '2':
+			type = TWO;
+			break;
+		case '3':
+			type = THREE;
+			break;
+		case 'E':
+			type = ETER;
+			break;
+		default:
+			break;
+		}
+
+		board.appendMove(
+			{ x, y }, std::make_unique<base::CombatCard>(type)
+		);
+
+	}
 }

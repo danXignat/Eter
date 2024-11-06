@@ -36,9 +36,6 @@ namespace base {
 		case THREE:
 			out << "3";
 			break;
-		case FOUR:
-			out << "4";
-			break;
 		default:
 			break;
 		}

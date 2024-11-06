@@ -10,17 +10,18 @@ import <unordered_set>;
 #include <array>
 #include <limits.h>
 
+import Logger;
 import CombatCard;
 
 namespace utils {
 	void printAtCoordinate(uint16_t x, uint16_t y, std::string_view content) {
 		std::cout << "\033[" << y << ";" << x << "H" << content;
-		std::cout << "\033[" << 20 << ";" << 0 << "H";
+		std::cout << "\033[" << 10 << ";" << 0 << "H" << std::flush;
 	}
 
 	void printAtCoordinate(uint16_t x, uint16_t y, const base::CombatCard& card) {
-		std::cout << "\033[" << y << ";" << x << "H" << card << "\033[K";
-		std::cout << "\033[" << 20 << ";" << 0 << "H";
+		std::cout << "\033[" << y << ";" << x << "H" << card;
+		std::cout << "\033[" << 10 << ";" << 0 << "H" << std::flush;
 	}
 }
 
@@ -29,39 +30,54 @@ namespace base {
 
 	Board::Board(uint16_t size) :
 		m_size{ size },
-		m_bounding_rect{ size } {
+		m_bounding_rect{ size },
+		m_available_spaces{ Coord{10, 5} } {
 
 	}
 
 	//----------------------------Public-Methods--------------------------------
 
 	void Board::appendMove(Coord coord, CardPtr&& card_ptr) {
-		m_bounding_rect.add(coord);
+		bool valid_card = (m_combat_cards[coord].empty()) ? true :
+			static_cast<uint8_t>(card_ptr->getType()) < static_cast<uint8_t>(m_combat_cards[coord].back()->getType());
 
-		m_combat_cards[coord].push_back(std::move(card_ptr));
+		if (_isValidPos(coord) && valid_card) {
+			m_bounding_rect.add(coord);
 
-		_updateAvailableSpaces(coord);
+			m_combat_cards[coord].push_back(std::move(card_ptr));
+
+			_updateAvailableSpaces(coord);
+		}
+		else {
+			using namespace logger;
+
+			Logger::log(Level::WARNING, "position not valid");
+		}
 	}
 
 	void Board::renderBoard() const {
+		using namespace logger;
+
 		for (const auto& pair : m_combat_cards) {
 			utils::printAtCoordinate(pair.first.first, pair.first.second, *pair.second.back());
+			Logger::log(Level::INFO, "card({}, {})", pair.first.first, pair.first.second);
 		}
 
 		for (const auto& pair : m_available_spaces) {
 			utils::printAtCoordinate(pair.first, pair.second, "*");
 		}
 
-		for (int i = 0; i < m_bounding_rect.corner2.second - m_bounding_rect.corner1.second + 1; i++) {
+		/*for (int i = 0; i < m_bounding_rect.corner2.second - m_bounding_rect.corner1.second + 1; i++) {
 			for (int j = 0; j < m_bounding_rect.corner2.first - m_bounding_rect.corner1.first + 1; j += 2)
 				std::cout << "*";
 			std::cout << std::endl;
-		}
-		std::cin.get();
+		}*/
 	}
 
 	//----------------------------Private-Methods--------------------------------
-
+	bool Board::_isValidPos(Coord coord) const {
+		return m_available_spaces.contains(coord);
+	}
 
 	void Board::_updateAvailableSpaces(Coord coord) {
 		std::array<Coord, 8> offsets = { {
@@ -78,6 +94,18 @@ namespace base {
 				m_available_spaces.emplace(new_point);
 			}
 		}
+
+		if (m_bounding_rect.fixed_width) {
+			std::erase_if(m_available_spaces, [&](Coord coord) { 
+				return !m_bounding_rect.withinWidth(coord); 
+			});
+		}
+
+		if (m_bounding_rect.fixed_height) {
+			std::erase_if(m_available_spaces, [&](Coord coord) {
+				return !m_bounding_rect.withinHeight(coord);
+			});
+		}
 	}
 
 	//--------------------------------Inner-Classes-------------------------------------
@@ -90,7 +118,7 @@ namespace base {
 
 	Board::BoundingRect::BoundingRect(uint16_t size) :
 		size{ size },
-		corner1{ 10, 8 }, corner2{ 10, 8 },
+		corner1{ 10, 5 }, corner2{ 10, 5 },
 		fixed_width{ false }, fixed_height{ false } {
 
 	}

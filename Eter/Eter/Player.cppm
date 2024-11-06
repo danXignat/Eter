@@ -3,7 +3,7 @@ import CombatCard;
 import CombatCardType;
 
 import<string>;
-import <string_view>;
+import<string_view>;
 import<set>;
 
 namespace player {
@@ -12,7 +12,7 @@ namespace player {
 		Player() = default;
 		~Player();
 		std::string_view getName() const;
-		const std::multiset<base::CombatCard>& getCards()const;
+		const std::multiset<base::CombatCard>& getCards() const;
 
 		void addCard(const base::CombatCard& card);
 		//void printCard() const;

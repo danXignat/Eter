@@ -22,6 +22,7 @@ namespace base {
 
 	private:
 		void _updateAvailableSpaces(Coord);
+		bool _isValidPos(Coord) const;
 	
 	private:
 		struct CoordFunctor {
