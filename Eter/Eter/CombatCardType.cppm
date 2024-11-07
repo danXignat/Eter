@@ -7,6 +7,7 @@ namespace base {
 		ONE = 1,
 		TWO = 2,
 		THREE = 3,
-		ETER = 4
+		FOUR = 4,
+		ETER = 5
 	};
 }

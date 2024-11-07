@@ -1,6 +1,8 @@
 export module TrainingMode;
 import <string>;
 import <set>;
+import <unordered_map>;
+
 import Board;
 import Player;
 import CombatCard;
@@ -13,11 +15,13 @@ export namespace modes {
 		void switchPlayer();
 	
 	private:
+		bool _boardIsSet();
 		bool _notWon(bool);
 	private:
 		struct WinManager {
 			WinManager();
-
+			std::unordered_map<uint16_t, uint16_t> rows, cols;
+			bool won(uint16_t, uint16_t);
 		};
 
 	private:
