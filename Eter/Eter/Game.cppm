@@ -2,7 +2,6 @@ export module Game;
 
 import <iostream>;
 import <memory>;
-
 namespace game {
 	export class Game {
 	public:
