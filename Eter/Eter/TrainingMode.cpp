@@ -93,7 +93,7 @@ namespace modes {
 		return 0;
 	}
 	bool TrainingMode::_boardIsSet() {
-		bool meow;
+		bool meow = true;
 
 		return meow;
 	}

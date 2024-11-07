@@ -134,6 +134,9 @@
     <ClCompile Include="CombatCard.cpp" />
     <ClCompile Include="CombatCard.cppm" />
     <ClCompile Include="CombatCardType.cppm" />
+    <ClCompile Include="ElementalPowerCard.cpp" />
+    <ClCompile Include="ElementalPowerCard.cppm" />
+    <ClCompile Include="ElementalPowerCardType.cppm" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Game.cppm" />
     <ClCompile Include="Logger.cpp" />
@@ -141,6 +144,7 @@
     <ClCompile Include="MageCard.cpp" />
     <ClCompile Include="MageCard.cppm" />
     <ClCompile Include="MageCardType.cppm" />
+    <ClCompile Include="MageCardTypeAbility.cppm" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Player.cppm" />

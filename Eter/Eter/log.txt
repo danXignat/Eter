@@ -1,6 +1,0 @@
-[INFO] card(10, 5)
-[INFO] card(10, 5)
-[INFO] card(12, 5)
-[INFO] card(10, 5)
-[INFO] card(12, 5)
-[INFO] card(8, 5)

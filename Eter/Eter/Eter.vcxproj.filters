@@ -48,9 +48,6 @@
     <ClCompile Include="Player.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MageCard.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="TrainingMode.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -83,6 +80,21 @@
     </ClCompile>
     <ClCompile Include="Board.cppm">
       <Filter>Board</Filter>
+    </ClCompile>
+    <ClCompile Include="ElementalPowerCardType.cppm">
+      <Filter>Card</Filter>
+    </ClCompile>
+    <ClCompile Include="ElementalPowerCard.cpp">
+      <Filter>Card</Filter>
+    </ClCompile>
+    <ClCompile Include="ElementalPowerCard.cppm">
+      <Filter>Card</Filter>
+    </ClCompile>
+    <ClCompile Include="MageCardTypeAbility.cppm">
+      <Filter>Card</Filter>
+    </ClCompile>
+    <ClCompile Include="MageCard.cpp">
+      <Filter>Card</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
