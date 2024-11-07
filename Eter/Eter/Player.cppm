@@ -14,6 +14,7 @@ namespace player {
 		std::string_view getName() const;
 		const std::multiset<base::CombatCard>& getCards() const;
 
+		void setName(std::string_view);
 		void addCard(const base::CombatCard& card);
 		//void printCard() const;
 		bool hasCard() const;

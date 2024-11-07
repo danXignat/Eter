@@ -11,7 +11,9 @@ namespace player {
 	std::string_view Player::getName() const {
 		return m_name;
 	}
-
+	void Player::setName(std::string_view name) {
+		m_name = name;
+	}
 	const std::multiset<base::CombatCard>& Player::getCards()const {
 		return m_cards;
 	}
