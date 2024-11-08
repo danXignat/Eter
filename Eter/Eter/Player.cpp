@@ -1,76 +1,83 @@
 module Player;
 
+import <iostream>;
+import <string>;
+import <string_view>;
+import <unordered_map>;
+import <memory>;
+
 import CombatCard; 
 import CombatCardType;
+import GameModeTypes;
 
-import <iostream>;
+namespace base {
 
-namespace player {
+    //--------------------------------------Constructors Destructor----------------------------------
 
-    Player::Player(std::string_view name, GameMode mode)
-        : m_name{ name } {
-        _initializeCards(mode);
+    Player::Player(std::string_view name, GameModeTypes mode) :
+        m_name{ name } {
+
+        this->_initializeCards(mode);
+     }
+
+    Player::~Player() {
+    
+    }
+    
+    //-------------------------------------------Initialisation------------------------------------
+
+    void Player::_addCard(CombatCardType type, uint16_t count = 1) {
+        for (uint16_t i = 0; i < count; i++) {
+            m_cards.emplace(type, std::make_unique<base::CombatCard>(type));
+        }
+    }
+    
+
+    void Player::_initializeCards(GameModeTypes mode) {
+        using enum CombatCardType;
+
+        this->_addCard(ONE, 2);
+        this->_addCard(TWO, 2);
+        this->_addCard(THREE, 2);
+        this->_addCard(FOUR);
+        
+
+        if (mode != GameModeTypes::Training) {
+            this->_addCard(TWO);
+            this->_addCard(THREE);
+            this->_addCard(ETER);
+        }
     }
 
-    Player::~Player() {}
+    //---------------------------------------Setters Getters---------------------------------------
 
-    std::string_view Player::getName() const {
+    std::string Player::getName() const {
         return m_name;
     }
 
-    std::unordered_multimap<base::CombatCardType, Player::CardPtr> Player::getCard() const {
-        return m_cards;
+    void Player::setName(std::string_view name) {
+        m_name = name;
     }
 
-    void Player::addCard(std::unique_ptr<base::CombatCard> card) {
-        base::CombatCardType type = card->getType();
-        m_cards.emplace(type, std::move(card));
-    }
-
-    bool Player::hasCard() const {
+    bool Player::hasCards() const {
         return !m_cards.empty();
     }
 
-    std::unique_ptr<base::CombatCard> Player::eraseCard(base::CombatCardType type) {
+    std::optional<CardPtr> Player::getCard(CombatCardType type) { // getting card ptr or nothing if there is no card
         auto it = m_cards.find(type);
-        if (it != m_cards.end()) {
-            std::unique_ptr<base::CombatCard> removedCard = std::move(it->second);
-            m_cards.erase(it);
-            return removedCard;
-        }
-        return nullptr;
-    }
-
-    void Player::_initializeCards(GameMode mode) {
-        if (mode == GameMode::TrainingMode) {
-            addCard(std::make_unique<base::CombatCard>(base::CombatCardType::ONE));
-            addCard(std::make_unique<base::CombatCard>(base::CombatCardType::ONE));
-            addCard(std::make_unique<base::CombatCard>(base::CombatCardType::TWO));
-            addCard(std::make_unique<base::CombatCard>(base::CombatCardType::TWO));
-            addCard(std::make_unique<base::CombatCard>(base::CombatCardType::THREE));
-            addCard(std::make_unique<base::CombatCard>(base::CombatCardType::THREE));
-            addCard(std::make_unique<base::CombatCard>(base::CombatCardType::FOUR));
-        }
-        else if (mode == GameMode::MageDuel) {
-            _initializeCards(GameMode::TrainingMode);
-            addCard(std::make_unique<base::CombatCard>(base::CombatCardType::TWO));
-            addCard(std::make_unique<base::CombatCard>(base::CombatCardType::THREE));
-            addCard(std::make_unique<base::CombatCard>(base::CombatCardType::ETER));
-        }
-    }
-
-    void Player::showCards() const {
-        if (m_cards.empty()) {
-            std::cout << m_name << " has no cards in inventory.\n";
-            return;
+        
+        if (it == m_cards.end()) {
+            return std::nullopt;
         }
 
-        std::cout << "Cards inventory for " << m_name << ":\n";
-        for (const auto& [type, cardPtr] : m_cards) {
-            if (cardPtr) {
-                std::cout << *cardPtr << " ";
-            }
-        }
-        std::cout << std::endl;
+        CardPtr card_ptr = std::move(it->second);
+        m_cards.erase(it);
+
+        return card_ptr;
     }
+
+    void Player::addCard(std::unique_ptr<CombatCard>&& card) {
+        m_cards.emplace(card->getType(), std::move(card));
+    }
+
 }

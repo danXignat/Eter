@@ -19,6 +19,8 @@ namespace base {
 
 		void appendMove(Coord, CardPtr&&);
 		void renderBoard() const;
+		uint16_t getSize() const;
+		bool isFixed() const;
 
 	private:
 		void _updateAvailableSpaces(Coord);
@@ -40,6 +42,7 @@ namespace base {
 			bool withinWidth(Coord) const;
 			bool withinHeight(Coord) const;
 			bool within(Coord) const;
+			bool isFixed() const;
 		};
 
 	private:

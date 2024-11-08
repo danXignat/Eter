@@ -12,18 +12,7 @@ import <unordered_set>;
 
 import Logger;
 import CombatCard;
-
-namespace utils {
-	void printAtCoordinate(uint16_t x, uint16_t y, std::string_view content) {
-		std::cout << "\033[" << y << ";" << x << "H" << content;
-		std::cout << "\033[" << 10 << ";" << 0 << "H" << std::flush;
-	}
-
-	void printAtCoordinate(uint16_t x, uint16_t y, const base::CombatCard& card) {
-		std::cout << "\033[" << y << ";" << x << "H" << card;
-		std::cout << "\033[" << 10 << ";" << 0 << "H" << std::flush;
-	}
-}
+import utils;
 
 namespace base {
 	//----------------------------Constructors--------------------------------
@@ -59,12 +48,12 @@ namespace base {
 		using namespace logger;
 
 		for (const auto& pair : m_combat_cards) {
-			utils::printAtCoordinate(pair.first.first, pair.first.second, *pair.second.back());
+			utils::printAtCoordinate(*pair.second.back(), pair.first.first, pair.first.second);
 			Logger::log(Level::INFO, "card({}, {})", pair.first.first, pair.first.second);
 		}
 
 		for (const auto& pair : m_available_spaces) {
-			utils::printAtCoordinate(pair.first, pair.second, "*");
+			utils::printAtCoordinate("*", pair.first, pair.second);
 		}
 
 		/*for (int i = 0; i < m_bounding_rect.corner2.second - m_bounding_rect.corner1.second + 1; i++) {
@@ -73,6 +62,17 @@ namespace base {
 			std::cout << std::endl;
 		}*/
 	}
+
+	bool Board::isFixed() const {
+		return m_bounding_rect.isFixed();
+	}
+
+	//-------------------------------------------Setter Getter------------------------------------
+
+	uint16_t Board::getSize() const {
+		return m_size;
+	}
+
 
 	//----------------------------Private-Methods--------------------------------
 	bool Board::_isValidPos(Coord coord) const {
@@ -155,5 +155,9 @@ namespace base {
 
 	bool Board::BoundingRect::within(Coord coord) const {
 		return withinHeight(coord) && withinWidth(coord);
+	}
+
+	bool Board::BoundingRect::isFixed() const {
+		return fixed_width && fixed_height;
 	}
 }

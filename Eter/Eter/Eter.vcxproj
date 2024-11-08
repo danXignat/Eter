@@ -139,6 +139,7 @@
     <ClCompile Include="ElementalPowerCardType.cppm" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Game.cppm" />
+    <ClCompile Include="GameModeTypes.cppm" />
     <ClCompile Include="Logger.cpp" />
     <ClCompile Include="Logger.cppm" />
     <ClCompile Include="MageCard.cpp" />

@@ -7,94 +7,99 @@ import <unordered_map>;
 import CombatCard;
 import CombatCardType;
 import Board;
+import GameModeTypes;
+import utils;
 
-namespace modes {
+namespace base {
+	//---------------------------------------------------------------Constructor-------------------------------------
 
-
-	TrainingMode::TrainingMode(std::string player1_name, std::string player2_name) {
-
-		m_player1.setName(player1_name);
-		m_player2.setName(player2_name);
-
+	TrainingMode::TrainingMode(std::string player1_name, std::string player2_name) :
+		m_player1{ player1_name, GameModeTypes::Training },
+		m_player2{ player2_name, GameModeTypes::Training },
+		m_board{ 3 } {
 	}
+
+	//---------------------------------------------------------------Events----------------------------------------------
+
 	void TrainingMode::gameLoop(bool win) {
-		base::Board board(3);
-		WinManager m_winManager;
-		base::CombatCardType type;
-		std::pair<uint16_t, uint16_t>up, down;
-		up.first = down.first = 10;
-		up.second = down.second = 5;
+		using enum CombatCardType;
+
 		while (!win) {
+			system("cls");
+			m_board.renderBoard();
 			
 			uint16_t posX, posY;
 			char card_type;
-			std::cout << m_player1.getName();
 			std::cin >> posX >> posY >> card_type;
-			if (posX > down.first) {
-				down.first = posX;
+			
+			std::unordered_map<char, base::CombatCardType> switch_map{
+				{'1', ONE},
+				{'2', TWO},
+				{'3', THREE},
+				{'4', FOUR},
+				{'E', ETER}
+			};
+
+			CombatCardType move_card_type = switch_map[card_type];
+
+			auto card = m_player1.getCard(move_card_type); //optional cu cartea se extrage cartea din invetaru playerului
+
+			if (card) {
+				m_board.appendMove(
+					{ posX, posY }, std::move(*card)
+				);
 			}
-			if (posX < up.first) {
-				up.first = posX;
-			}
-			if (posY > down.second) {
-				down.second = posY;
-			}
-			if (posY < up.second) {
-				up.second = posY;
-			}
-			switch (card_type)
-			{
-				using enum base::CombatCardType;
-			case '1':
-				type = ONE;
-				break;
-			case '2':
-				type = TWO;
-				break;
-			case '3':
-				type = THREE;
-				break;
-			case '4':
-				type = FOUR;
-				break;
-			case 'E':
-				type = ETER;
-				break;
-			default:
-				break;
+			else {
+
 			}
 
-			board.appendMove(
-				{ posX, posY }, std::make_unique<base::CombatCard>(type)
-			);
-			board.renderBoard();
-			win = m_winManager.won(posX, posY);
-			if (win == 1)
-				std::cout << "AM CASTIGAT";
+
+			//win = m_winManager.won(posX, posY);
 		}
 		
 	}
 
-	TrainingMode::WinManager::WinManager() {
-
-
-	}
-	bool TrainingMode::WinManager::won(uint16_t row, uint16_t col) {
-		rows[row]++;
-		std::cout << rows[row] << std::endl;
-		if (rows[row] == 3) {
-			return 1;
-		}
-		cols[col]++;
-		std::cout << cols[col] << std::endl;
-		if (cols[col] == 3) {
-			return 1;
-		}
-		return 0;
-	}
 	bool TrainingMode::_boardIsSet() {
 		bool meow = true;
 
 		return meow;
 	}
+
+	void TrainingMode::switchPlayer() {
+
+	}
+
+	bool TrainingMode::_Won(bool won) {
+		return true;
+	}
+
+	//--------------------------------------------------Win Manager--------------------------------------------------------
+
+	TrainingMode::WinManager::WinManager(uint16_t size) : 
+		size{size},
+		diag1{ 0 },
+		diag2{ 0 } {
+
+	}
+
+	bool TrainingMode::WinManager::won(uint16_t row, uint16_t col, const Board& board) {
+		rows[row]++;
+	
+		if (rows[row] == size) {
+			return true;
+		}
+
+		cols[col]++;
+		
+		if (cols[col] == size) {
+			return true;
+		}
+
+		if (board.isFixed()) {
+			//board.diagsCount() -> pair <nr elemente diag1, nr element diag2>
+		}
+
+		return false;
+	}
 }
+

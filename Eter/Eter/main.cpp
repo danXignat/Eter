@@ -1,8 +1,10 @@
-﻿import <iostream>;
+﻿#include <optional>
+import <iostream>;
 import <string>;
 import <unordered_map>;
-import <memory>;
 import <unordered_set>;
+import <memory>;
+import <format>;
 
 import utils;
 
@@ -12,16 +14,31 @@ import Board;
 import CombatCard;
 import CombatCardType;
 import TrainingMode;
+import Player;
+import GameModeTypes;
+
+using namespace base;
 
 int main() {
 	//system("start powershell -Command \"Get-Content -Path 'log.txt' -Wait\"");
 
-	modes::TrainingMode trainingInstance("Player1", "Player2");
+	/*base::Board board(3);
 
-	bool win = false;
-	trainingInstance.gameLoop(win);
+	while (true) {
+		system("cls");
 
+		board.renderBoard();
 
+		int16_t x, y;
+		std::cin >> x >> y;
 
+		board.appendMove(
+			{ x, y }, std::make_unique<base::CombatCard>(base::CombatCardType::ETER)
+		);
+	}*/
+	std::unordered_map < std::string, int > map;
 
+	map["miau"]++;
+
+	std::cout << map["miau"];
 }

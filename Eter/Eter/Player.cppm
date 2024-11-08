@@ -1,39 +1,39 @@
 export module Player;
 
-import CombatCard;
-import CombatCardType;
-
+import <optional>;
+import <iostream>;
 import <string>;
 import <string_view>;
 import <unordered_map>;
 import <memory>;
-import <iostream>;
+import <array>;
+import <vector>;
 
-export enum class GameMode {
-    TrainingMode,
-    MageDuel
-};
+import CombatCard;
+import CombatCardType;
+import GameModeTypes;
 
-namespace player {
+namespace base {
+    using CardPtr = std::unique_ptr<CombatCard>;
+
     export class Player {
     public:
-        using CardPtr = std::unique_ptr<base::CombatCard>;
 
-        Player(std::string_view name, GameMode mode);
+        Player(std::string_view, GameModeTypes);
         ~Player();
 
-        std::string_view getName() const;
-         std::unordered_multimap<base::CombatCardType, CardPtr> getCard() const;
-        void addCard(std::unique_ptr<base::CombatCard> card);
-        void showCards() const;
-        bool hasCard() const;
-        std::unique_ptr<base::CombatCard> eraseCard(base::CombatCardType type);
+        std::string getName() const;
+        void setName(std::string_view name);
+        bool hasCards() const;
+        std::optional<CardPtr> getCard(CombatCardType);
+        void addCard(std::unique_ptr<CombatCard>&&);
 
     private:
-        void _initializeCards(GameMode mode);
+        void _initializeCards(GameModeTypes);
+        void _addCard(CombatCardType, uint16_t);
 
     private:
         std::string m_name;
-        std::unordered_multimap<base::CombatCardType, CardPtr> m_cards;
+        std::unordered_multimap<CombatCardType, CardPtr> m_cards;
     };
 }
