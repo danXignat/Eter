@@ -20,25 +20,10 @@ import GameModeTypes;
 using namespace base;
 
 int main() {
-	//system("start powershell -Command \"Get-Content -Path 'log.txt' -Wait\"");
 
-	/*base::Board board(3);
 
-	while (true) {
-		system("cls");
+	TrainingMode trainingInstance("player1", "player2");
+	trainingInstance.gameLoop(true);
 
-		board.renderBoard();
-
-		int16_t x, y;
-		std::cin >> x >> y;
-
-		board.appendMove(
-			{ x, y }, std::make_unique<base::CombatCard>(base::CombatCardType::ETER)
-		);
-	}*/
-	std::unordered_map < std::string, int > map;
-
-	map["miau"]++;
-
-	std::cout << map["miau"];
+	return 0;
 }
