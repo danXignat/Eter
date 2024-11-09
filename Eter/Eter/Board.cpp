@@ -56,25 +56,34 @@ namespace base {
 			utils::printAtCoordinate("*", pair.first, pair.second);
 		}
 
-		/*for (int i = 0; i < m_bounding_rect.corner2.second - m_bounding_rect.corner1.second + 1; i++) {
-			for (int j = 0; j < m_bounding_rect.corner2.first - m_bounding_rect.corner1.first + 1; j += 2)
-				std::cout << "*";
-			std::cout << std::endl;
-		}*/
 	}
+
+	Coord Board::getCountDiag() {
+		auto [x, y] = m_bounding_rect.corner1;
+
+		Coord diags_count{0, 0};
+
+		for (uint16_t i = 0; i < m_size; i++) {
+			Coord coord{ x + i, y + i };
+			if (m_combat_cards.contains(coord)) {
+				teams::Team team = m_combat_cards[coord].back()->getTeam();
+
+				diags_count.first += (team == teams::Team::BLUE) ? 1 : -1;
+			}
+		}
+	}
+
+	//------------------------------Setter Getter------------------------------------
 
 	bool Board::isFixed() const {
 		return m_bounding_rect.isFixed();
 	}
 
-	//-------------------------------------------Setter Getter------------------------------------
-
 	uint16_t Board::getSize() const {
 		return m_size;
 	}
 
-
-	//----------------------------Private-Methods--------------------------------
+	//----------------------------Private Methods--------------------------------
 	bool Board::_isValidPos(Coord coord) const {
 		return m_available_spaces.contains(coord);
 	}
@@ -108,7 +117,7 @@ namespace base {
 		}
 	}
 
-	//--------------------------------Inner-Classes-------------------------------------
+	//--------------------------------Inner Classes-------------------------------------
 
 	size_t Board::CoordFunctor::operator()(const Coord& coord) const {
 		std::hash<uint16_t> hasher;

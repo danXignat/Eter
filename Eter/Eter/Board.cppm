@@ -10,8 +10,8 @@ import <vector>;
 import CombatCard;
 
 namespace base {
-	using Coord = std::pair<int16_t, int16_t>;
-	using CardPtr = std::unique_ptr<CombatCard>;
+	export using Coord = std::pair<int16_t, int16_t>;
+	export using CardPtr = std::unique_ptr<CombatCard>;
 
 	export class Board {
 	public:
@@ -19,6 +19,7 @@ namespace base {
 
 		void appendMove(Coord, CardPtr&&);
 		void renderBoard() const;
+		std::pair<int16_t, int16_t> getCountDiag();
 		uint16_t getSize() const;
 		bool isFixed() const;
 

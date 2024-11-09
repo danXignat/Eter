@@ -149,6 +149,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Player.cppm" />
+    <ClCompile Include="Teams.cppm" />
     <ClCompile Include="TrainingMode.cpp" />
     <ClCompile Include="TrainingMode.cppm" />
     <ClCompile Include="utils.cppm" />

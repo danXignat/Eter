@@ -13,17 +13,14 @@ import Logger;
 import Board;
 import CombatCard;
 import CombatCardType;
-import TrainingMode;
 import Player;
 import GameModeTypes;
-
-using namespace base;
+import TrainingMode;
 
 int main() {
-
-
-	TrainingMode trainingInstance("player1", "player2");
-	trainingInstance.gameLoop(true);
+	base::TrainingMode mode("gigi", "titi");
+	mode.gameLoop();
+	
 
 	return 0;
 }

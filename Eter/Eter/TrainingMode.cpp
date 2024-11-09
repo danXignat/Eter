@@ -3,101 +3,111 @@ module TrainingMode;
 import <iostream>;
 import <memory>;
 import <unordered_map>;
+import <format>;
 
 import CombatCard;
 import CombatCardType;
 import Board;
 import GameModeTypes;
 import utils;
+import Teams;
+import Logger;
+import Player;
 
 namespace base {
-	//---------------------------------------------------------------Constructor-------------------------------------
+	//---------------------------------------Constructor-------------------------------------
 
 	TrainingMode::TrainingMode(std::string player1_name, std::string player2_name) :
-		m_player1{ player1_name, GameModeTypes::Training },
-		m_player2{ player2_name, GameModeTypes::Training },
-		m_board{ 3 } {
+		m_player1{ player1_name, GameModeTypes::Training, teams::Team::RED },
+		m_player2{ player2_name, GameModeTypes::Training, teams::Team::BLUE },
+		m_board{ 3 },
+		m_win_manager{ 3 } {
+
 	}
 
-	//---------------------------------------------------------------Events----------------------------------------------
+	//---------------------------------------Events----------------------------------------------
 
+	void TrainingMode::gameLoop() {
 
-
-	void TrainingMode::gameLoop(bool win) {
-		using enum CombatCardType;
+		m_board.renderBoard();
+		bool win = false;
 
 		while (!win) {
+			uint16_t x, y;
+			char card_type;
+			std::cin >> x >> y >> card_type;
+
+			CombatCardType type = this->_fromCharToType(card_type);
+			Player& current_player = this->_curentPlayer();
+
+			auto card = current_player.getCard(type); //optional cu cartea se extrage cartea din invetaru playerului
+
+			if (card) {
+				m_board.appendMove(
+					{ x, y }, std::move(*card)
+				);
+
+				win = m_win_manager.won(
+					{ x, y }, current_player, m_board
+				);
+
+				this->_switchPlayer();
+			}
+			else {
+				using namespace logger;
+
+				Logger::log(Level::WARNING, "no cards left of type '{}'", card_type);
+			}
+
 			system("cls");
 			m_board.renderBoard();
+		}
 
-			uint16_t posX, posY;
-			char card_type;
-			std::cin >> posX >> posY >> card_type;
+		std::cout << std::format("Player {}",
+			(this->_curentPlayer().getTeam() == teams::Team::BLUE) ? "BLUE" : "RED"
+		);
+		std::cin.get();
+	}
 
-			std::unordered_map<char, base::CombatCardType> switch_map{
+	//------------------------------------------------Methods-------------------------------------------------
+
+	CombatCardType TrainingMode::_fromCharToType(char ch) {
+		using enum CombatCardType;
+
+		std::unordered_map<char, CombatCardType> switch_map{
 				{'1', ONE},
 				{'2', TWO},
 				{'3', THREE},
 				{'4', FOUR},
 				{'E', ETER}
-			};
+		};
 
-			CombatCardType move_card_type = switch_map[card_type];
-
-			auto& currentPlayerRef = currentPlayer ? m_player1 : m_player2;
-			auto card = currentPlayerRef.getCard(move_card_type); //optional cu cartea se extrage cartea din invetaru playerului
-
-			if (card) {
-				m_board.appendMove(
-					{ posX, posY }, std::move(*card)
-				);
-				win = (currentPlayer ? m_win_p1 : m_win_p2).won(currentPlayer, posX, posY, m_board);
-				if (!win) {
-					switchPlayer();
-				}
-			}
-			else {
-
-			}
-
-
-		}
-
+		return switch_map[ch];
 	}
 
-	bool TrainingMode::_boardIsSet() {
-		bool meow = true;
-
-		return meow;
+	void TrainingMode::_switchPlayer() {
+		m_current_player = !m_current_player;
 	}
 
-	void TrainingMode::switchPlayer() {
-		currentPlayer = !currentPlayer;
+	Player& TrainingMode::_curentPlayer() {
+		return (m_current_player) ? m_player1 : m_player2;
 	}
 
-	bool TrainingMode::_Won(bool won) {
-		return true;
+	//------------------------------------------------Win Manager-----------------------------------------------
+
+	TrainingMode::WinManager::WinManager(uint16_t size) : size{ size } {
+		
 	}
 
-	//--------------------------------------------------Win Manager--------------------------------------------------------
+	bool TrainingMode::WinManager::won(const Coord& coord, const Player& player, const Board& board) {
+		const auto& [x, y] = coord;
 
-	TrainingMode::WinManager::WinManager(uint16_t size) :
-		size{ size },
-		diag1{ 0 },
-		diag2{ 0 } {
+		int16_t incrementor = (player.getTeam() == teams::Team::BLUE) ? 1 : -1;
 
-	}
+		rows[y] += incrementor;
+		cols[x] += incrementor;
 
-	bool TrainingMode::WinManager::won(uint16_t player, uint16_t row, uint16_t col, const Board& board) {
-		rows[{player, row}]++;
-
-		if (rows[{player, row}] == size) {
-			return true;
-		}
-
-		cols[{player, col}]++;
-
-		if (cols[{player, col}] == size) {
+		if (abs(rows[y]) == size || abs(cols[x]) == size) {
 			return true;
 		}
 

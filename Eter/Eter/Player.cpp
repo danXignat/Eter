@@ -9,14 +9,15 @@ import <memory>;
 import CombatCard; 
 import CombatCardType;
 import GameModeTypes;
+import Teams;
 
 namespace base {
 
     //--------------------------------------Constructors Destructor----------------------------------
 
-    Player::Player(std::string_view name, GameModeTypes mode) :
-        m_name{ name } {
-
+    Player::Player(std::string_view name, GameModeTypes mode, teams::Team team) :
+        m_name{ name },
+        m_team{ team } {
         this->_initializeCards(mode);
      }
 
@@ -28,7 +29,7 @@ namespace base {
 
     void Player::_addCard(CombatCardType type, uint16_t count = 1) {
         for (uint16_t i = 0; i < count; i++) {
-            m_cards.emplace(type, std::make_unique<base::CombatCard>(type));
+            m_cards.emplace(type, std::make_unique<base::CombatCard>(type, m_team));
         }
     }
     
@@ -53,6 +54,10 @@ namespace base {
 
     std::string Player::getName() const {
         return m_name;
+    }
+
+    teams::Team Player::getTeam() const {
+        return m_team;
     }
 
     void Player::setName(std::string_view name) {

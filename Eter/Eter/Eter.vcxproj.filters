@@ -57,9 +57,6 @@
     <ClCompile Include="CombatCard.cppm">
       <Filter>Card</Filter>
     </ClCompile>
-    <ClCompile Include="TrainingMode.cppm">
-      <Filter>Game</Filter>
-    </ClCompile>
     <ClCompile Include="Board.cppm">
       <Filter>Board</Filter>
     </ClCompile>
@@ -97,6 +94,12 @@
       <Filter>Utils</Filter>
     </ClCompile>
     <ClCompile Include="GameModeTypes.cppm">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="Teams.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TrainingMode.cppm">
       <Filter>Game</Filter>
     </ClCompile>
   </ItemGroup>
