@@ -17,7 +17,8 @@ namespace base {
 
     Player::Player(std::string_view name, GameModeTypes mode, teams::Team team) :
         m_name{ name },
-        m_team{ team } {
+        m_team{ team },
+        m_illusion_used{false} {
         this->_initializeCards(mode);
      }
 
@@ -58,7 +59,7 @@ namespace base {
 
     teams::Team Player::getTeam() const {
         return m_team;
-    }
+    }   
 
     void Player::setName(std::string_view name) {
         m_name = name;
@@ -68,7 +69,14 @@ namespace base {
         return !m_cards.empty();
     }
 
-    std::optional<CardPtr> Player::getCard(CombatCardType type) { // getting card ptr or nothing if there is no card
+    std::optional<CardPtr> Player::getCard(CombatCardType type, bool illusion) { // getting card ptr or nothing if there is no card
+        if (illusion) {
+            if (m_illusion_used) {
+                std::cout << "You can't use more illusions in this match!\n";
+                return std::nullopt;
+            }
+            m_illusion_used = true; 
+        }
         auto it = m_cards.find(type);
         
         if (it == m_cards.end()) {
@@ -77,6 +85,8 @@ namespace base {
 
         CardPtr card_ptr = std::move(it->second);
         m_cards.erase(it);
+
+        card_ptr->setIllusionCard(illusion);
 
         return card_ptr;
     }

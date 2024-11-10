@@ -34,13 +34,14 @@ namespace base {
 
 		while (!win) {
 			uint16_t x, y;
-			char card_type;
-			std::cin >> x >> y >> card_type;
+			char card_type, is_illusion;
+			std::cin >> x >> y >> card_type>>is_illusion;
 
 			CombatCardType type = this->_fromCharToType(card_type);
+			bool illusion = (is_illusion == 'Y' || is_illusion == 'y');
 			Player& current_player = this->_curentPlayer();
 
-			auto card = current_player.getCard(type); //optional cu cartea se extrage cartea din invetaru playerului
+			auto card = current_player.getCard(type,illusion); //optional cu cartea se extrage cartea din invetaru playerului
 
 			if (card) {
 				m_board.appendMove(

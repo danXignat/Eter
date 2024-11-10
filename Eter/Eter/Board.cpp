@@ -71,6 +71,7 @@ namespace base {
 				diags_count.first += (team == teams::Team::BLUE) ? 1 : -1;
 			}
 		}
+		return diags_count;
 	}
 
 	//------------------------------Setter Getter------------------------------------

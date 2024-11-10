@@ -31,7 +31,7 @@ namespace base {
         void setName(std::string_view name);
         bool hasCards() const;
         teams::Team getTeam() const;
-        std::optional<CardPtr> getCard(CombatCardType);
+        std::optional<CardPtr> getCard(CombatCardType, bool);
         void addCard(std::unique_ptr<CombatCard>&&);
 
     private:
@@ -42,5 +42,6 @@ namespace base {
         teams::Team m_team;
         std::string m_name;
         std::unordered_multimap<CombatCardType, CardPtr> m_cards;
+        bool m_illusion_used;
     };
 }
