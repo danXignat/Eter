@@ -9,7 +9,7 @@ namespace base {
 	export class CombatCard {
 
 	public:
-		CombatCard(CombatCardType type, bool illusion, teams::Team team);
+		CombatCard(CombatCardType type, teams::Team team);
 		CombatCardType getType() const;
 
 		teams::Team getTeam() const;

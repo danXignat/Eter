@@ -6,12 +6,16 @@ import CombatCardType;
 import Teams;
 
 namespace base {
-	CombatCard::CombatCard(CombatCardType type, bool illusion, teams::Team team)
+	//----------------------------------------Constructor-----------------------------
+	CombatCard::CombatCard(CombatCardType type, teams::Team team)
 		: m_type{ type },
-		m_illusion{ illusion },
-		m_team{ team } {
+		m_team{ team },
+		m_illusion{ false } {
 
 	}
+
+	//-------------------------------------------Getters Setters---------------------------------------
+
 	CombatCardType CombatCard::getType()const {
 		return m_type;
 	}
@@ -19,6 +23,8 @@ namespace base {
 	teams::Team CombatCard::getTeam() const {
 		return m_team;
 	}
+
+	//-----------------------------------------Illusion-------------------------------------------
 
 	void CombatCard::reveal() {
 		m_illusion = false;
@@ -30,6 +36,7 @@ namespace base {
 	void CombatCard::setIllusionCard(bool illusion) {
 		m_illusion = illusion;
 	}
+
 
 	bool CombatCard::attemptCover(const CombatCard& opponentCard) const {
 		if (m_illusion)
@@ -44,6 +51,8 @@ namespace base {
 		return opponentCard.getType() < m_type;
 	}
 
+	//--------------------------------Overloads--------------------------------
+
 	bool CombatCard:: operator<(const CombatCard& other) const {
 		return m_type < other.m_type;
 	}
@@ -53,6 +62,8 @@ namespace base {
 	}
 
 	std::ostream& operator<<(std::ostream& out, const CombatCard& other) {
+		out << teams::to_string(other.getTeam());
+
 		if (other.m_illusion) {
 			out << "X";
 		}
@@ -79,6 +90,9 @@ namespace base {
 				break;
 			}
 		}
+
+		out << teams::to_string(teams::Team::DEFAULT);
+
 		return out;
 	}
 }

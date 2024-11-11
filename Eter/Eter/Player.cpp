@@ -10,6 +10,7 @@ import CombatCard;
 import CombatCardType;
 import GameModeTypes;
 import Teams;
+import Logger;
 
 namespace base {
 
@@ -72,11 +73,12 @@ namespace base {
     std::optional<CardPtr> Player::getCard(CombatCardType type, bool illusion) { // getting card ptr or nothing if there is no card
         if (illusion) {
             if (m_illusion_used) {
-                std::cout << "You can't use more illusions in this match!\n";
+                logger::Logger::log(logger::Level::WARNING, "no more illusion");
                 return std::nullopt;
             }
             m_illusion_used = true; 
         }
+
         auto it = m_cards.find(type);
         
         if (it == m_cards.end()) {

@@ -1,6 +1,5 @@
 [INFO] card(10, 5)
-[INFO] card(12, 6)
 [INFO] card(10, 5)
-[INFO] card(12, 6)
+[WARNING] position not valid
 [INFO] card(10, 5)
-[INFO] card(10, 6)
+[INFO] card(10, 5)

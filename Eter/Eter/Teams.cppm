@@ -5,7 +5,8 @@ import <iostream>;
 namespace teams {
 	export enum class Team : uint8_t {
 		RED,
-		BLUE
+		BLUE,
+		DEFAULT
 	};
 
 	export std::string to_string(Team team) {
@@ -18,6 +19,7 @@ namespace teams {
 			return "\033[34m";
 			break;
 		default:
+			return "\033[0m";
 			break;
 		}
 	}

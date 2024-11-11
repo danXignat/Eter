@@ -26,6 +26,7 @@ namespace base {
 	private:
 		void _updateAvailableSpaces(Coord);
 		bool _isValidPos(Coord) const;
+		bool _isValidMove(Coord, const CombatCard&);
 	
 	private:
 		struct CoordFunctor {

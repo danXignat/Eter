@@ -31,7 +31,7 @@ namespace base {
         void setName(std::string_view name);
         bool hasCards() const;
         teams::Team getTeam() const;
-        std::optional<CardPtr> getCard(CombatCardType, bool);
+        std::optional<CardPtr> getCard(CombatCardType, bool = false);
         void addCard(std::unique_ptr<CombatCard>&&);
 
     private:

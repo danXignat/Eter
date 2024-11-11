@@ -27,15 +27,15 @@ namespace base {
 	//----------------------------Public-Methods--------------------------------
 
 	void Board::appendMove(Coord coord, CardPtr&& card_ptr) {
-		bool valid_card = (m_combat_cards[coord].empty()) ? true :
-			static_cast<uint8_t>(card_ptr->getType()) < static_cast<uint8_t>(m_combat_cards[coord].back()->getType());
-
-		if (_isValidPos(coord) && valid_card) {
+		if (_isValidPos(coord)) {
 			m_bounding_rect.add(coord);
 
-			m_combat_cards[coord].push_back(std::move(card_ptr));
+			m_combat_cards[coord].emplace_back(std::move(card_ptr));
 
 			_updateAvailableSpaces(coord);
+		}
+		else if (_isValidMove(coord, *card_ptr)) {
+			m_combat_cards[coord].emplace_back(std::move(card_ptr));
 		}
 		else {
 			using namespace logger;
@@ -87,6 +87,13 @@ namespace base {
 	//----------------------------Private Methods--------------------------------
 	bool Board::_isValidPos(Coord coord) const {
 		return m_available_spaces.contains(coord);
+	}
+
+	bool Board::_isValidMove(Coord coord, const CombatCard& card) {
+		bool is_bottom_card = m_combat_cards.contains(coord);
+		bool is_bigger = (*m_combat_cards[coord].back() < card);
+
+		return is_bottom_card && is_bigger;
 	}
 
 	void Board::_updateAvailableSpaces(Coord coord) {
