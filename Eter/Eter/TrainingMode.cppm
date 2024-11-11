@@ -1,4 +1,5 @@
 export module TrainingMode;
+import <sstream>;
 import <optional>;
 import <string>;
 import <unordered_map>;
@@ -11,7 +12,6 @@ import CombatCardType;
 namespace base {
 	export class TrainingMode {
 	public:
-		TrainingMode() = default;
 		TrainingMode(std::string, std::string);
 
 		void gameLoop();
@@ -29,6 +29,14 @@ namespace base {
 
 			WinManager(uint16_t);
 			bool won(const Coord&, const Player&, const Board&);
+		};
+
+		struct Input {
+			uint16_t x, y;
+			char card_type;
+			bool illusion;
+
+			Input();
 		};
 
 	private:

@@ -14,6 +14,8 @@ import Logger;
 import CombatCard;
 import utils;
 
+using namespace logger;
+
 namespace base {
 	//----------------------------Constructors--------------------------------
 
@@ -31,25 +33,32 @@ namespace base {
 			m_bounding_rect.add(coord);
 
 			m_combat_cards[coord].emplace_back(std::move(card_ptr));
+			Logger::log(Level::INFO, "card({}, {})", coord.first, coord.second);
 
 			_updateAvailableSpaces(coord);
+		}
+		else if (m_combat_cards[coord].back()->isIllusion()) {
+			bool win = *m_combat_cards[coord].back() < *card_ptr;
+			m_combat_cards[coord].back()->revealIllusion();
+
+			if (win) {
+				m_combat_cards[coord].emplace_back(std::move(card_ptr));
+			}
+			else {
+				card_ptr.reset();
+			}
 		}
 		else if (_isValidMove(coord, *card_ptr)) {
 			m_combat_cards[coord].emplace_back(std::move(card_ptr));
 		}
 		else {
-			using namespace logger;
-
 			Logger::log(Level::WARNING, "position not valid");
 		}
 	}
 
 	void Board::renderBoard() const {
-		using namespace logger;
-
 		for (const auto& pair : m_combat_cards) {
 			utils::printAtCoordinate(*pair.second.back(), pair.first.first, pair.first.second);
-			Logger::log(Level::INFO, "card({}, {})", pair.first.first, pair.first.second);
 		}
 
 		for (const auto& pair : m_available_spaces) {

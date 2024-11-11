@@ -4,6 +4,7 @@ import <iostream>;
 import <memory>;
 import <unordered_map>;
 import <format>;
+import <string>;
 
 import CombatCard;
 import CombatCardType;
@@ -13,6 +14,8 @@ import utils;
 import Teams;
 import Logger;
 import Player;
+
+using namespace logger;
 
 namespace base {
 	//---------------------------------------Constructor-------------------------------------
@@ -28,37 +31,30 @@ namespace base {
 	//---------------------------------------Events----------------------------------------------
 
 	void TrainingMode::gameLoop() {
-
 		bool win = false;
 		m_board.renderBoard();
 
-		while (!win) {
-			uint16_t x, y;
-			char card_type, is_illusion;
-			std::cin >> x >> y >> card_type>>is_illusion;
+		while (win == false) {
+			Input input; //asta da handle la inputu de la tastatura
 
-			CombatCardType type = this->_fromCharToType(card_type);
-			Player& current_player = this->_curentPlayer();
+			CombatCardType type = _fromCharToType(input.card_type);
+			Player& current_player = _curentPlayer();
 
-			bool illusion = (is_illusion == 'Y' || is_illusion == 'y');
-
-			auto card = current_player.getCard(type); //optional cu cartea se extrage cartea din invetaru playerului
+			auto card = current_player.getCard(type, input.illusion); //optional cu cartea se extrage cartea din invetaru playerului
 
 			if (card) {
 				m_board.appendMove(
-					{ x, y }, std::move(*card)
+					{ input.x, input.y }, std::move(*card)
 				);
 
 				win = m_win_manager.won(
-					{ x, y }, current_player, m_board
+					{ input.x, input.y }, current_player, m_board
 				);
 
-				this->_switchPlayer();
+				_switchPlayer();
 			}
 			else {
-				using namespace logger;
-
-				Logger::log(Level::WARNING, "no cards left of type '{}'", card_type);
+				Logger::log(Level::WARNING, "no cards left of type '{}'", input.card_type);
 			}
 
 			system("cls");
@@ -66,7 +62,7 @@ namespace base {
 		}
 
 		std::cout << std::format("Player {}",
-			(this->_curentPlayer().getTeam() == teams::Team::BLUE) ? "BLUE" : "RED"
+			(_curentPlayer().getTeam() == teams::Team::BLUE) ? "BLUE" : "RED"
 		);
 		std::cin.get();
 	}
@@ -80,8 +76,7 @@ namespace base {
 				{'1', ONE},
 				{'2', TWO},
 				{'3', THREE},
-				{'4', FOUR},
-				{'E', ETER}
+				{'4', FOUR}
 		};
 
 		return switch_map[ch];
@@ -118,6 +113,53 @@ namespace base {
 		}
 
 		return false;
+	}
+
+	//-------------------------------------------Inner Classes---------------------------------------------
+
+	TrainingMode::Input::Input() {
+		std::unordered_set<char> available_moves{ '1', '2', '3', '4' };
+
+		std::string input;
+		std::getline(std::cin, input);
+
+		std::istringstream stream{ input };
+		std::string token;
+		char del{ ' ' };
+
+		std::getline(stream, token, del);
+
+		std::cout << token;
+		if (utils::isNumber(token)) {
+			x = std::stoi(token);
+		}
+		else {
+			throw std::invalid_argument("number is needed");
+		}
+
+		std::getline(stream, token, del);
+		if (utils::isNumber(token)) {
+			y = std::stoi(token);
+		}
+		else {
+			throw std::invalid_argument("number is needed");
+		}
+
+		std::getline(stream, token, del);
+		if (token.size() == 1 && available_moves.contains(token[0])) {
+			card_type = token[0];
+		}
+		else {
+			throw std::invalid_argument("not valid choice");
+		}
+
+		std::getline(stream, token, del);
+		if (!token.empty() && token.size() == 1 && token[0] == 'i') {
+			illusion = true;
+		}
+		else {
+			illusion = false;
+		}
 	}
 }
 

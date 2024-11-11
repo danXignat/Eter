@@ -6,6 +6,7 @@ import <stack>;
 import <unordered_map>;
 import <unordered_set>;
 import <vector>;
+import <string>;
 
 import CombatCard;
 

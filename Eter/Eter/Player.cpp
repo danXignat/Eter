@@ -12,6 +12,8 @@ import GameModeTypes;
 import Teams;
 import Logger;
 
+using namespace logger;
+
 namespace base {
 
     //--------------------------------------Constructors Destructor----------------------------------
@@ -73,10 +75,12 @@ namespace base {
     std::optional<CardPtr> Player::getCard(CombatCardType type, bool illusion) { // getting card ptr or nothing if there is no card
         if (illusion) {
             if (m_illusion_used) {
-                logger::Logger::log(logger::Level::WARNING, "no more illusion");
+                Logger::log(Level::WARNING, "no more illusion");
                 return std::nullopt;
             }
-            m_illusion_used = true; 
+            else {
+                m_illusion_used = true;
+            }
         }
 
         auto it = m_cards.find(type);
@@ -88,7 +92,9 @@ namespace base {
         CardPtr card_ptr = std::move(it->second);
         m_cards.erase(it);
 
-        card_ptr->setIllusionCard(illusion);
+        if (m_illusion_used) {
+            card_ptr->setIllusion();
+        }
 
         return card_ptr;
     }

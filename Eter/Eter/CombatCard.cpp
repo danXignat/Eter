@@ -26,17 +26,17 @@ namespace base {
 
 	//-----------------------------------------Illusion-------------------------------------------
 
-	void CombatCard::reveal() {
+	void CombatCard::revealIllusion() {
 		m_illusion = false;
 	}
-	bool CombatCard::getIllusionCard() const {
+
+	void CombatCard::setIllusion() {
+		m_illusion = true;
+	}
+
+	bool CombatCard::isIllusion() const {
 		return m_illusion; 
 	}
-
-	void CombatCard::setIllusionCard(bool illusion) {
-		m_illusion = illusion;
-	}
-
 
 	bool CombatCard::attemptCover(const CombatCard& opponentCard) const {
 		if (m_illusion)

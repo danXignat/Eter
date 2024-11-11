@@ -13,9 +13,9 @@ namespace base {
 		CombatCardType getType() const;
 
 		teams::Team getTeam() const;
-		void reveal();
-		bool getIllusionCard() const;
-		void setIllusionCard(bool illusion);
+		void revealIllusion();
+		void setIllusion();
+		bool isIllusion() const;
 
 		bool attemptCover(const CombatCard& opponentCard) const;
 
