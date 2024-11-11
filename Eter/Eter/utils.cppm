@@ -2,6 +2,7 @@ export module utils;
 
 import <iostream>;
 import <string>;
+import <unordered_map>;
 
 import CombatCard;
 

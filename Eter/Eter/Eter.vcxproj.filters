@@ -102,6 +102,18 @@
     <ClCompile Include="TrainingMode.cppm">
       <Filter>Game</Filter>
     </ClCompile>
+    <ClCompile Include="Inventory.cppm">
+      <Filter>Board</Filter>
+    </ClCompile>
+    <ClCompile Include="Inventory.cpp">
+      <Filter>Board</Filter>
+    </ClCompile>
+    <ClCompile Include="ExplosionCard.ixx">
+      <Filter>Card</Filter>
+    </ClCompile>
+    <ClCompile Include="ExplosionCard.cpp">
+      <Filter>Card</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="log.txt">

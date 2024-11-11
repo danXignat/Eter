@@ -137,9 +137,13 @@
     <ClCompile Include="ElementalPowerCard.cpp" />
     <ClCompile Include="ElementalPowerCard.cppm" />
     <ClCompile Include="ElementalPowerCardType.cppm" />
+    <ClCompile Include="ExplosionCard.cpp" />
+    <ClCompile Include="ExplosionCard.ixx" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Game.cppm" />
     <ClCompile Include="GameModeTypes.cppm" />
+    <ClCompile Include="Inventory.cpp" />
+    <ClCompile Include="Inventory.cppm" />
     <ClCompile Include="Logger.cpp" />
     <ClCompile Include="Logger.cppm" />
     <ClCompile Include="MageCard.cpp" />

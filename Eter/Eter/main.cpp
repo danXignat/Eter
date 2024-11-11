@@ -18,8 +18,10 @@ import GameModeTypes;
 import TrainingMode;
 
 int main() {
+	/*system("start powershell -Command \"Get-Content -Path 'log.txt' -Wait\"");
+
 	base::TrainingMode mode("gigi", "titi");
-	mode.gameLoop();
+	mode.gameLoop();*/
 	
 
 	return 0;
