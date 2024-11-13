@@ -108,7 +108,7 @@
     <ClCompile Include="Inventory.cpp">
       <Filter>Board</Filter>
     </ClCompile>
-    <ClCompile Include="ExplosionCard.ixx">
+    <ClCompile Include="ExplosionCard.cppm">
       <Filter>Card</Filter>
     </ClCompile>
     <ClCompile Include="ExplosionCard.cpp">
