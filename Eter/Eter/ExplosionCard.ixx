@@ -26,7 +26,7 @@ namespace base {
 
 	private:
 		struct CoordFunctor {
-			size_t operator()(const Coord& coord) {
+			size_t operator()(const Coord& coord)const {
 				std::hash<uint16_t> hasher;
 
 				return hasher(coord.first) ^ hasher(coord.second << 1);

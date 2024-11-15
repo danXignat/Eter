@@ -54,6 +54,10 @@ namespace base {
         }
     }
 
+    void Player::addMageCard(std::unique_ptr<MageCard>&& mageCard) {
+        m_mageCards.emplace_back(std::move(mageCard));
+    }
+
     //---------------------------------------Setters Getters---------------------------------------
 
     std::string Player::getName() const {

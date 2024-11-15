@@ -114,6 +114,12 @@
     <ClCompile Include="ExplosionCard.cpp">
       <Filter>Card</Filter>
     </ClCompile>
+    <ClCompile Include="MageDuelMode.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="MageDuelMode.cppm">
+      <Filter>Game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="log.txt">

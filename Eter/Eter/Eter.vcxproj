@@ -150,6 +150,8 @@
     <ClCompile Include="MageCard.cppm" />
     <ClCompile Include="MageCardType.cppm" />
     <ClCompile Include="MageCardTypeAbility.cppm" />
+    <ClCompile Include="MageDuelMode.cpp" />
+    <ClCompile Include="MageDuelMode.cppm" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Player.cppm" />

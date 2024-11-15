@@ -37,7 +37,7 @@ namespace base {
 		while (win == false) {
 			Input input; //asta da handle la inputu de la tastatura
 
-			CombatCardType type = _fromCharToType(input.card_type);
+			CombatCardType type = _fromCharToType(input.card_type); 
 			Player& current_player = _curentPlayer();
 
 			auto card = current_player.getCard(type, input.illusion); //optional cu cartea se extrage cartea din invetaru playerului

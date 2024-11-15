@@ -14,21 +14,21 @@ namespace base {
 	public:
 		TrainingMode(std::string, std::string);
 
-		void gameLoop();
+	    void gameLoop();
 
-	private:
+	protected:
 		void _switchPlayer();
 		Player& _curentPlayer();
 		CombatCardType _fromCharToType(char);
 
-	private:
-		struct WinManager {
+	protected:
+		 struct WinManager {
 			uint16_t size;
 			std::optional<int16_t> diag1, diag2;
 			std::unordered_map<uint16_t, int16_t> rows, cols;
 
 			WinManager(uint16_t);
-			bool won(const Coord&, const Player&, const Board&);
+			 bool won(const Coord&, const Player&, const Board&);
 		};
 
 		struct Input {
@@ -39,7 +39,7 @@ namespace base {
 			Input();
 		};
 
-	private:
+	protected:
 		WinManager m_win_manager;
 		Player m_player1, m_player2;
 		Board m_board;

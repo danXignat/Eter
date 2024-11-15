@@ -13,6 +13,9 @@ import CombatCard;
 import CombatCardType;
 import GameModeTypes;
 import Teams;
+import MageCard;
+import MageCardType;
+import MageCardTypeAbility;
 
 namespace base {
     export enum class PlayerType {
@@ -33,15 +36,17 @@ namespace base {
         teams::Team getTeam() const;
         std::optional<CardPtr> getCard(CombatCardType, bool = false);
         void addCard(std::unique_ptr<CombatCard>&&);
+        void addMageCard(std::unique_ptr<MageCard>&& mageCard);
 
     private:
         void _initializeCards(GameModeTypes);
         void _addCard(CombatCardType, uint16_t);
-
+       
     private:
         teams::Team m_team;
         std::string m_name;
         std::unordered_multimap<CombatCardType, CardPtr> m_cards;
         bool m_illusion_used;
+        std::vector < std::unique_ptr<MageCard>> m_mageCards;
     };
 }

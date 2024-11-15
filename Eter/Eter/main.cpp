@@ -18,11 +18,21 @@ import GameModeTypes;
 import TrainingMode;
 
 int main() {
-	/*system("start powershell -Command \"Get-Content -Path 'log.txt' -Wait\"");
+	system("start powershell -Command \"Get-Content -Path 'log.txt' -Wait\"");
 
-	base::TrainingMode mode("gigi", "titi");
-	mode.gameLoop();*/
-	
+	/*base::TrainingMode mode("gigi", "titi");
+	mode.gameLoop();
+	*/
+    try {
+    
+        base::TrainingMode trainingMode("Player1", "Player2");
+        trainingMode.gameLoop();
 
+    }
+    catch (const std::exception& e) {
+        std::cerr << "An error occurred: " << e.what() << std::endl;
+        return 1;
+    }
 	return 0;
 }
+
