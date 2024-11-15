@@ -138,7 +138,7 @@
     <ClCompile Include="ElementalPowerCard.cppm" />
     <ClCompile Include="ElementalPowerCardType.cppm" />
     <ClCompile Include="ExplosionCard.cpp" />
-    <ClCompile Include="ExplosionCard.ixx" />
+    <ClCompile Include="ExplosionCard.cppm" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Game.cppm" />
     <ClCompile Include="GameModeTypes.cppm" />
