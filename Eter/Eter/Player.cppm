@@ -27,7 +27,10 @@ namespace base {
 
     export class Player {
     public:
-        Player(std::string_view, GameModeTypes, teams::Team);
+        Player() {
+
+        }
+       /* Player(std::string_view, GameModeTypes, teams::Team);
         ~Player();
 
         std::string getName() const;
@@ -53,6 +56,6 @@ namespace base {
         bool m_illusion_used;
 
         std::unique_ptr<MageCard> m_mage_card;
-        bool m_mage_card_used;
+        bool m_mage_card_used;*/
     };
 }

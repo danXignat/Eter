@@ -28,6 +28,27 @@
     <Filter Include="Utils">
       <UniqueIdentifier>{c3c610e1-ba25-4b71-a2c2-43fabd60910c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="GameModes">
+      <UniqueIdentifier>{a6ab05d3-8e54-4a89-9b74-fa90fe1a5c09}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GameModes\TrainingMode">
+      <UniqueIdentifier>{b52d0c6b-cbf5-417c-8887-112d525f9d4e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GameModes\MageMode">
+      <UniqueIdentifier>{8b883cd4-00c9-4a2e-ba13-30f33b5ede65}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GameModes\ElementalMode">
+      <UniqueIdentifier>{600cf054-4ee5-42ce-903b-8b1fcc7852fb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GameModes\TournamentMode">
+      <UniqueIdentifier>{efe32417-4bab-4203-a2a9-4cdc06e2266c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GameModes\TimedMode">
+      <UniqueIdentifier>{fc6df1e7-d089-4b7f-9143-a295fa611266}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GameModes\Services">
+      <UniqueIdentifier>{80c6965a-f5d9-4691-8093-f978439ee0ce}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -84,23 +105,14 @@
     <ClCompile Include="Game.cpp">
       <Filter>Game</Filter>
     </ClCompile>
-    <ClCompile Include="TrainingMode.cpp">
-      <Filter>Game</Filter>
-    </ClCompile>
     <ClCompile Include="Player.cpp">
       <Filter>Player</Filter>
     </ClCompile>
     <ClCompile Include="Logger.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
-    <ClCompile Include="GameModeTypes.cppm">
-      <Filter>Game</Filter>
-    </ClCompile>
     <ClCompile Include="Teams.cppm">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="TrainingMode.cppm">
-      <Filter>Game</Filter>
     </ClCompile>
     <ClCompile Include="Inventory.cppm">
       <Filter>Board</Filter>
@@ -114,11 +126,50 @@
     <ClCompile Include="ExplosionCard.cpp">
       <Filter>Card</Filter>
     </ClCompile>
-    <ClCompile Include="MageDuelMode.cpp">
-      <Filter>Game</Filter>
+    <ClCompile Include="IGameMode.cppm">
+      <Filter>GameModes</Filter>
+    </ClCompile>
+    <ClCompile Include="TrainingMode.cppm">
+      <Filter>GameModes\TrainingMode</Filter>
+    </ClCompile>
+    <ClCompile Include="TrainingMode.cpp">
+      <Filter>GameModes\TrainingMode</Filter>
     </ClCompile>
     <ClCompile Include="MageDuelMode.cppm">
-      <Filter>Game</Filter>
+      <Filter>GameModes\MageMode</Filter>
+    </ClCompile>
+    <ClCompile Include="MageDuelMode.cpp">
+      <Filter>GameModes\MageMode</Filter>
+    </ClCompile>
+    <ClCompile Include="GameModeTypes.cppm">
+      <Filter>GameModes</Filter>
+    </ClCompile>
+    <ClCompile Include="GameModeFactory.cppm">
+      <Filter>GameModes</Filter>
+    </ClCompile>
+    <ClCompile Include="TournamentMode.cppm">
+      <Filter>GameModes\TournamentMode</Filter>
+    </ClCompile>
+    <ClCompile Include="TimedMode.cppm">
+      <Filter>GameModes\TimedMode</Filter>
+    </ClCompile>
+    <ClCompile Include="ElementalMode.cppm">
+      <Filter>GameModes\ElementalMode</Filter>
+    </ClCompile>
+    <ClCompile Include="TournamentMode.cpp">
+      <Filter>GameModes\TournamentMode</Filter>
+    </ClCompile>
+    <ClCompile Include="TimedMode.cpp">
+      <Filter>GameModes\TimedMode</Filter>
+    </ClCompile>
+    <ClCompile Include="ElementalMode.cpp">
+      <Filter>GameModes\ElementalMode</Filter>
+    </ClCompile>
+    <ClCompile Include="IllusionService.cppm">
+      <Filter>GameModes\Services</Filter>
+    </ClCompile>
+    <ClCompile Include="MageService.cppm">
+      <Filter>GameModes\Services</Filter>
     </ClCompile>
     <ClCompile Include="ElementalBattleMode.cpp">
       <Filter>Game</Filter>
@@ -136,5 +187,10 @@
     <ClInclude Include="View.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ExplosionService.cppm">
+      <Filter>GameModes\Services</Filter>
+    </None>
   </ItemGroup>
 </Project>
