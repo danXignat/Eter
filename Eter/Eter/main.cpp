@@ -58,5 +58,5 @@ int main() {
 //
 //	return 0;
 
-	base::GameModePtr ptr = base::GameModeFactory::get("3003121");
+	base::GameModePtr ptr = base::GameModeFactory::get("1003121", "gigi", "titi");
 }

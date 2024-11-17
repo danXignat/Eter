@@ -141,8 +141,10 @@
     <ClCompile Include="ElementalPowerCardType.cppm" />
     <ClCompile Include="ExplosionCard.cpp" />
     <ClCompile Include="ExplosionCard.cppm" />
+    <ClCompile Include="ExplosionService.cppm" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Game.cppm" />
+    <ClCompile Include="GameMode.cppm" />
     <ClCompile Include="GameModeFactory.cppm" />
     <ClCompile Include="GameModeTypes.cppm" />
     <ClCompile Include="IGameMode.cppm" />
@@ -175,9 +177,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="View.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="ExplosionService.cppm" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

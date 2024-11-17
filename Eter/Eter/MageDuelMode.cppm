@@ -2,9 +2,11 @@ export module MageDuelMode;
 import TrainingMode;
 import MageCard;
 
+import GameMode;
+
 namespace base {
 
-	export class MageDuelMode : public TrainingMode {
+	export class MageDuelMode : public GameMode {
 	public:
 		void run() override {
 

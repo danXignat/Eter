@@ -10,12 +10,15 @@ import CombatCard;
 import CombatCardType;
 import Inventory;
 
-import IGameMode;
+import GameMode;
+
+import IllusionService;
+import ExplosionService;
 
 namespace base {
-	export class TrainingMode : public IGameMode {
+	export class TrainingMode : public GameMode {
 	public:
-		TrainingMode(std::string, std::string);
+		TrainingMode(bool, bool, const std::string&, const std::string&);
 		void run() {
 
 		}
@@ -47,6 +50,9 @@ namespace base {
 	protected:
 		Board m_board;
 		Player m_player1, m_player2;
+
+		std::optional<IllusionService> m_illusion_service;
+		std::optional<ExplosionService> m_explosion_service;
 
 		WinManager m_win_manager;
 		bool m_current_player;

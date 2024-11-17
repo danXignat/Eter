@@ -1,9 +1,9 @@
 export module ElementalMode;
 
-import IGameMode;
+import GameMode;
 
 namespace base {
-	export class ElementalMode : public IGameMode {
+	export class ElementalMode : public GameMode {
 	public:
 		void run() override {
 

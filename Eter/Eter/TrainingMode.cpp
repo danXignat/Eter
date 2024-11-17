@@ -21,9 +21,16 @@ using namespace logger;
 namespace base {
 	//---------------------------------------Constructor-------------------------------------
 
-	TrainingMode::TrainingMode(std::string player1_name, std::string player2_name) :
+	TrainingMode::TrainingMode(bool illusion, bool explosion, const std::string& player1_name, const std::string& player2_name) :
 		m_board{ 3 } {
 
+		if (illusion) {
+			m_illusion_service = IllusionService();
+		}
+
+		if (explosion) {
+			m_explosion_service = ExplosionService();
+		}
 	}
 	//	m_player1{ player1_name, GameModeTypes::Training, teams::Team::RED },
 	//	m_player2{ player2_name, GameModeTypes::Training, teams::Team::BLUE },

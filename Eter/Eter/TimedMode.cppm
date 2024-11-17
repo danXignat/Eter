@@ -1,9 +1,9 @@
 export module TimedMode;
 
-import IGameMode;
+import GameMode;
 
 namespace base {
-	export class TimedMode : public IGameMode {
+	export class TimedMode : public GameMode {
 	public:
 		void run() override {
 
