@@ -9,6 +9,7 @@ import <vector>;
 import <string>;
 
 import CombatCard;
+import Player;
 
 namespace base {
 	export using Coord = std::pair<int16_t, int16_t>;
@@ -23,6 +24,7 @@ namespace base {
 		std::pair<int16_t, int16_t> getCountDiag();
 		uint16_t getSize() const;
 		bool isFixed() const;
+		void squallCard(Player& currentPlayer);
 
 	private:
 		void _updateAvailableSpaces(Coord);
