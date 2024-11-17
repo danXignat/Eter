@@ -16,6 +16,8 @@ namespace base {
 		void removeOpponentCard(const Coord& coord, Player& player);
 		void removeRow(const Coord& startCoord, Player& player);
 		void removeColumn(const Coord& start_coord, Player& player);
+		void moveOpponentsStack(const Coord& fromCoord, const Coord& toCoord, Player& player);
+		void moveOwnStack(const Coord& fromCoor, const Coord& toCoord, Player& player);
 
 	private:
 

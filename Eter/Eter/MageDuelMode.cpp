@@ -73,7 +73,7 @@ namespace base {
 	}
 
 
-	void MageDuelMode::removeRow(const Coord& start_coord, Player& player){
+	void MageDuelMode::removeRow(const Coord& start_coord, Player& player) {
 		int row_count = 0;
 		bool own_card_found = false;
 
@@ -100,7 +100,7 @@ namespace base {
 		}
 		else {
 			Logger::log(Level::WARNING, "Cannot remove row, conditions not met at ({}, {})", start_coord.first, start_coord.second);
-		
+
 		}
 	}
 
@@ -116,7 +116,7 @@ namespace base {
 			auto& card_stack = combat_cards[current_coord];
 			if (!card_stack.empty()) {
 				if (card_stack.back()->getTeam() == player.getTeam()) {
-					own_card_found = true; 
+					own_card_found = true;
 				}
 				column_count++;
 			}
@@ -127,7 +127,7 @@ namespace base {
 			current_coord = start_coord;
 			for (int i = 0; i < column_count; i++) {
 				combat_cards.erase(current_coord);
-				current_coord.second++; 
+				current_coord.second++;
 			}
 			Logger::log(Level::INFO, "Removed entire column starting from ({}, {})", start_coord.first, start_coord.second);
 		}
@@ -135,5 +135,58 @@ namespace base {
 			Logger::log(Level::WARNING, "Cannot remove column, conditions not met at ({}, {})", start_coord.first, start_coord.second);
 		}
 	}
+
+	void MageDuelMode::moveOpponentsStack(const Coord& fromCoord, const Coord& toCoord, Player& player) {
+		auto& combat_cards = m_board.getCombatCards();
+
+		auto fromIt = combat_cards.find(fromCoord);
+
+		if (fromIt != combat_cards.end() && !fromIt->second.empty()) {
+			if (fromIt->second.back()->getTeam() != player.getTeam()) {
+				if (combat_cards.find(toCoord) == combat_cards.end()) {
+					combat_cards[toCoord] = std::move(fromIt->second);
+					combat_cards.erase(fromIt);
+					Logger::log(Level::INFO, "Moved stack from ({}, {}) to ({}, {})", fromCoord.first, fromCoord.second, toCoord.first, toCoord.second);
+				}
+				else {
+					Logger::log(Level::WARNING, "Destination position ({}, {}) is not empty", toCoord.first, toCoord.second);
+				}
+			}
+			else {
+				Logger::log(Level::WARNING, "Top card at original position ({}, {}) is not an opponent's card", fromCoord.first, fromCoord.second);
+			}
+		}
+
+		else {
+			Logger::log(Level::WARNING, "No stack found at the original position ({}, {})", fromCoord.first, fromCoord.second);
+		}
+	}
+
+	void MageDuelMode::moveOwnStack(const Coord& fromCoord, const Coord& toCoord, Player& player) {
+		auto& combat_cards = m_board.getCombatCards();
+
+		auto fromIt = combat_cards.find(fromCoord);
+
+		if (fromIt != combat_cards.end() && !fromIt->second.empty()) {
+			if (fromIt->second.back()->getTeam() == player.getTeam()) {
+				if (combat_cards.find(toCoord) == combat_cards.end()) {
+					combat_cards[toCoord] = std::move(fromIt->second);
+					combat_cards.erase(fromIt);
+					Logger::log(Level::INFO, "Moved stack from ({}, {}) to ({}, {})", fromCoord.first, fromCoord.second, toCoord.first, toCoord.second);
+				}
+				else {
+					Logger::log(Level::WARNING, "Destination position ({}, {}) is not empty", toCoord.first, toCoord.second);
+				}
+			}
+			else {
+				Logger::log(Level::WARNING, "Top card at original position ({}, {}) is not an opponent's card", fromCoord.first, fromCoord.second);
+			}
+		}
+
+		else {
+			Logger::log(Level::WARNING, "No stack found at the original position ({}, {})", fromCoord.first, fromCoord.second);
+		}
+	}
+
 
 }
