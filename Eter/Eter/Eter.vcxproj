@@ -134,6 +134,8 @@
     <ClCompile Include="CombatCard.cpp" />
     <ClCompile Include="CombatCard.cppm" />
     <ClCompile Include="CombatCardType.cppm" />
+    <ClCompile Include="ElementalBattleMode.cpp" />
+    <ClCompile Include="ElementalBattleMode.cppm" />
     <ClCompile Include="ElementalPowerCard.cpp" />
     <ClCompile Include="ElementalPowerCard.cppm" />
     <ClCompile Include="ElementalPowerCardType.cppm" />

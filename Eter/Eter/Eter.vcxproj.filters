@@ -120,6 +120,12 @@
     <ClCompile Include="MageDuelMode.cppm">
       <Filter>Game</Filter>
     </ClCompile>
+    <ClCompile Include="ElementalBattleMode.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="ElementalBattleMode.cppm">
+      <Filter>Game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="log.txt">
