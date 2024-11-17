@@ -21,7 +21,8 @@ namespace base {
     Player::Player(std::string_view name, GameModeTypes mode, teams::Team team) :
         m_name{ name },
         m_team{ team },
-        m_illusion_used{false} {
+        m_illusion_used{false},
+        m_mage_card_used{false} {
         this->_initializeCards(mode);
      }
 
@@ -45,7 +46,7 @@ namespace base {
         this->_addCard(TWO, 2);
         this->_addCard(THREE, 2);
         this->_addCard(FOUR);
-        
+
 
         if (mode != GameModeTypes::Training) {
             this->_addCard(TWO);
@@ -54,9 +55,6 @@ namespace base {
         }
     }
 
-    void Player::addMageCard(std::unique_ptr<MageCard>&& mageCard) {
-        m_mageCards.emplace_back(std::move(mageCard));
-    }
 
     //---------------------------------------Setters Getters---------------------------------------
 
@@ -105,6 +103,27 @@ namespace base {
 
     void Player::addCard(std::unique_ptr<CombatCard>&& card) {
         m_cards.emplace(card->getType(), std::move(card));
+    }
+
+    void Player::setMageCard(std::unique_ptr<MageCard>&& mageCard) {
+        m_mage_card = std::move(mageCard);
+    }
+
+    MageCard* Player:: getMageCard() {
+        return m_mage_card.get();
+    }
+
+    bool Player::useMageCard() {
+        if (!m_mage_card_used && m_mage_card) {
+            m_mage_card_used = true;
+            return true;
+        }
+        return false;
+    }
+
+    bool Player::hasUnusedMageCard() const
+    {
+        return m_mage_card && !m_mage_card_used;
     }
 
 }

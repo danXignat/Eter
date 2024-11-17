@@ -48,6 +48,10 @@ namespace base {
 			bool isFixed() const;
 		};
 
+	public:
+		const std::unordered_map<Coord, std::vector<std::unique_ptr<CombatCard>>, CoordFunctor>& getCombatCards() const;
+		std::unordered_map<Coord, std::vector<std::unique_ptr<CombatCard>>, CoordFunctor>& getCombatCards();
+
 	private:
 		uint16_t m_size;
 		BoundingRect m_bounding_rect;

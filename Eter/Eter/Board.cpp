@@ -89,6 +89,7 @@ namespace base {
 		return m_bounding_rect.isFixed();
 	}
 
+
 	uint16_t Board::getSize() const {
 		return m_size;
 	}
@@ -103,6 +104,14 @@ namespace base {
 		bool is_bigger = (*m_combat_cards[coord].back() < card);
 
 		return is_bottom_card && is_bigger;
+	}
+
+	const std::unordered_map<Coord, std::vector<std::unique_ptr<CombatCard>>, Board::CoordFunctor>& Board::getCombatCards()const {
+		return m_combat_cards;
+	}
+
+	std::unordered_map<Coord, std::vector<std::unique_ptr<CombatCard>>, Board::CoordFunctor>& Board::getCombatCards(){
+		return m_combat_cards;
 	}
 
 	void Board::_updateAvailableSpaces(Coord coord) {

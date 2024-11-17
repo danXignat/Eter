@@ -36,7 +36,11 @@ namespace base {
         teams::Team getTeam() const;
         std::optional<CardPtr> getCard(CombatCardType, bool = false);
         void addCard(std::unique_ptr<CombatCard>&&);
-        void addMageCard(std::unique_ptr<MageCard>&& mageCard);
+
+        void setMageCard(std::unique_ptr<MageCard>&& mageCard);
+        MageCard* getMageCard();
+        bool useMageCard();
+        bool hasUnusedMageCard() const;
 
     private:
         void _initializeCards(GameModeTypes);
@@ -47,6 +51,8 @@ namespace base {
         std::string m_name;
         std::unordered_multimap<CombatCardType, CardPtr> m_cards;
         bool m_illusion_used;
-        std::vector < std::unique_ptr<MageCard>> m_mageCards;
+
+        std::unique_ptr<MageCard> m_mage_card;
+        bool m_mage_card_used;
     };
 }
