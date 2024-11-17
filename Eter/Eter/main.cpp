@@ -18,10 +18,10 @@ import Player;
 import GameModeTypes;
 import TrainingMode;
 import ExplosionCard;
-
 import MageDuelMode;
+import GameModeFactory;
 
-//int main() {
+int main() {
 //	//system("start powershell -Command \"Get-Content -Path 'log.txt' -Wait\"");
 //
 //	/*base::TrainingMode mode("gigi", "titi");
@@ -57,4 +57,6 @@ import MageDuelMode;
 //	}
 //
 //	return 0;
-//}
+
+	base::GameModePtr ptr = base::GameModeFactory::get("3003121");
+}

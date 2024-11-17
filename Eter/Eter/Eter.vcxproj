@@ -134,6 +134,8 @@
     <ClCompile Include="CombatCard.cpp" />
     <ClCompile Include="CombatCard.cppm" />
     <ClCompile Include="CombatCardType.cppm" />
+    <ClCompile Include="ElementalMode.cpp" />
+    <ClCompile Include="ElementalMode.cppm" />
     <ClCompile Include="ElementalPowerCard.cpp" />
     <ClCompile Include="ElementalPowerCard.cppm" />
     <ClCompile Include="ElementalPowerCardType.cppm" />
@@ -141,7 +143,10 @@
     <ClCompile Include="ExplosionCard.cppm" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Game.cppm" />
+    <ClCompile Include="GameModeFactory.cppm" />
     <ClCompile Include="GameModeTypes.cppm" />
+    <ClCompile Include="IGameMode.cppm" />
+    <ClCompile Include="IllusionService.cppm" />
     <ClCompile Include="Inventory.cpp" />
     <ClCompile Include="Inventory.cppm" />
     <ClCompile Include="Logger.cpp" />
@@ -152,10 +157,15 @@
     <ClCompile Include="MageCardTypeAbility.cppm" />
     <ClCompile Include="MageDuelMode.cpp" />
     <ClCompile Include="MageDuelMode.cppm" />
+    <ClCompile Include="MageService.cppm" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Player.cppm" />
     <ClCompile Include="Teams.cppm" />
+    <ClCompile Include="TimedMode.cpp" />
+    <ClCompile Include="TimedMode.cppm" />
+    <ClCompile Include="TournamentMode.cpp" />
+    <ClCompile Include="TournamentMode.cppm" />
     <ClCompile Include="TrainingMode.cpp" />
     <ClCompile Include="TrainingMode.cppm" />
     <ClCompile Include="utils.cppm" />
@@ -165,6 +175,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="View.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ExplosionService.cppm" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

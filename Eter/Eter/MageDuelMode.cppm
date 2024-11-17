@@ -5,8 +5,11 @@ import MageCard;
 namespace base {
 
 	export class MageDuelMode : public TrainingMode {
-
 	public:
+		void run() override {
+
+		}
+	/*public:
 
 		MageDuelMode(std::string Player1, std::string Player2);
 
@@ -21,6 +24,6 @@ namespace base {
 
 	private:
 
-		std::vector<std::unique_ptr<MageCard>>m_mageCardsPool;
+		std::vector<std::unique_ptr<MageCard>>m_mageCardsPool;*/
 	};
 }

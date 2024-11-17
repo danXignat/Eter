@@ -17,7 +17,6 @@ namespace base {
 	export class Board {
 	public:
 		Board(uint16_t);
-
 		void appendMove(Coord, CardPtr&&);
 		void renderBoard() const;
 		std::pair<int16_t, int16_t> getCountDiag();
