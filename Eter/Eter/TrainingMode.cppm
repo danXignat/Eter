@@ -8,6 +8,7 @@ import Board;
 import Player;
 import CombatCard;
 import CombatCardType;
+import Inventory;
 
 import IGameMode;
 
