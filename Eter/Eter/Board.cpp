@@ -11,6 +11,7 @@ import <unordered_set>;
 #include <limits.h>
 
 import Logger;
+import Player;
 import CombatCard;
 import utils;
 
@@ -195,4 +196,30 @@ namespace base {
 	bool Board::BoundingRect::isFixed() const {
 		return fixed_width && fixed_height;
 	}
-}
+
+	void Board::squallCard(Player& currentPlayer) {
+		Player& opponent = (m_player1.getTeam() == currentPlayer.getTeam()) ? m_player2 : m_player1;
+
+		for (auto& pair : m_combat_cards) {
+			const auto& coord = pair.first;
+			auto& cards = pair.second;
+
+			if (cards.empty()) {
+				continue;
+			}
+			for (auto& card : cards) {
+
+				if (card->getTeam() != currentPlayer.getTeam()) { 
+
+					opponent.addCard(std::move(card));
+					cards.erase(std::remove(cards.begin(), cards.end(), card), cards.end());
+
+					return; 
+				}
+			}
+		}
+
+		Logger::log(Level::WARNING, "No visible card to return.");
+	}
+
+	}
