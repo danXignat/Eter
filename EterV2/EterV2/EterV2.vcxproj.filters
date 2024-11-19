@@ -1,0 +1,115 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="GameMode.cpp">
+      <Filter>GameMode</Filter>
+    </ClCompile>
+    <ClCompile Include="Player.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Board.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="CombatCard.cpp">
+      <Filter>Cards</Filter>
+    </ClCompile>
+    <ClCompile Include="TrainingMode.cpp">
+      <Filter>GameMode\GameModes</Filter>
+    </ClCompile>
+    <ClCompile Include="MageMode.cpp">
+      <Filter>GameMode\GameModes</Filter>
+    </ClCompile>
+    <ClCompile Include="ElementalMode.cpp">
+      <Filter>GameMode\GameModes</Filter>
+    </ClCompile>
+    <ClCompile Include="IllusionService.cpp">
+      <Filter>GameMode\Services</Filter>
+    </ClCompile>
+    <ClCompile Include="ExplosionService.cpp">
+      <Filter>GameMode\Services</Filter>
+    </ClCompile>
+    <ClCompile Include="MageService.cpp">
+      <Filter>GameMode\Services</Filter>
+    </ClCompile>
+    <ClCompile Include="GameModeFactory.cpp">
+      <Filter>GameMode</Filter>
+    </ClCompile>
+    <ClCompile Include="logger.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="GameMode">
+      <UniqueIdentifier>{5b411e3d-005d-4ebb-b47a-1a659c9dc756}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utils">
+      <UniqueIdentifier>{d790a02f-36dc-4193-8286-26b202c1553b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Cards">
+      <UniqueIdentifier>{cc01e163-7aa3-4952-a2c3-2f7082144005}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GameMode\GameModes">
+      <UniqueIdentifier>{3195d8e2-f669-41f8-aa9f-d7b7acd3960e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GameMode\Services">
+      <UniqueIdentifier>{667d5372-d782-4602-a415-2b74719e9716}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core">
+      <UniqueIdentifier>{0fac7413-1e45-4ad7-a80e-6455d898959f}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="IGameMode.h">
+      <Filter>GameMode</Filter>
+    </ClInclude>
+    <ClInclude Include="GameMode.h">
+      <Filter>GameMode</Filter>
+    </ClInclude>
+    <ClInclude Include="Board.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Player.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="utils.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="CombatCard.h">
+      <Filter>Cards</Filter>
+    </ClInclude>
+    <ClInclude Include="colors.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="typedefs.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="TrainingMode.h">
+      <Filter>GameMode\GameModes</Filter>
+    </ClInclude>
+    <ClInclude Include="MageMode.h">
+      <Filter>GameMode\GameModes</Filter>
+    </ClInclude>
+    <ClInclude Include="ElementalMode.h">
+      <Filter>GameMode\GameModes</Filter>
+    </ClInclude>
+    <ClInclude Include="IllusionService.h">
+      <Filter>GameMode\Services</Filter>
+    </ClInclude>
+    <ClInclude Include="ExplosionService.h">
+      <Filter>GameMode\Services</Filter>
+    </ClInclude>
+    <ClInclude Include="MageService.h">
+      <Filter>GameMode\Services</Filter>
+    </ClInclude>
+    <ClInclude Include="GameModeFactory.h">
+      <Filter>GameMode</Filter>
+    </ClInclude>
+    <ClInclude Include="logger.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="ServiceType.h">
+      <Filter>GameMode\Services</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
