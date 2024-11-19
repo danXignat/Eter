@@ -45,7 +45,6 @@ namespace base {
 			void removeCard(const Coord&);
 
 			void _setDiags();
-			bool _areInitDiags() const;
 			int16_t _getIncrement(const Coord&);
 		};
 
