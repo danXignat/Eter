@@ -20,6 +20,7 @@ namespace base {
 		void renderBoard() const;
 		uint16_t getSize() const;
 		bool isFixed() const;
+		uint16_t size() const;
 		std::optional<std::reference_wrapper<CombatCard>> getTopCard(Coord pos);
 		Coord getLeftCorner() const;
 	private:

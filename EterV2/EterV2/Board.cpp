@@ -47,6 +47,9 @@ namespace base {
 	}
 
 	//------------------------------Setter Getter------------------------------------
+	uint16_t Board::size() const {
+		return m_size;
+	}
 
 	bool Board::isFixed() const {
 		return m_bounding_rect.isFixed();

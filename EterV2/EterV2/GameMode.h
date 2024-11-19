@@ -6,6 +6,7 @@
 #include <sstream>
 #include <optional>
 
+
 #include "IGameMode.h"
 
 #include "Board.h"
@@ -32,11 +33,20 @@ namespace base {
 	protected:
 		struct WinManager {
 			Board& board;
-			uint16_t size;
-			std::optional<int16_t> diag1, diag2;
+			uint16_t board_size;
+
 			std::unordered_map<uint16_t, int16_t> rows, cols;
-			WinManager(uint16_t, Board&);
-			bool won(const Coord&, const Player&);
+			int16_t diag1, diag2;
+			bool are_diags_init;
+
+			WinManager(Board&);
+			bool won(const Coord&);
+			bool addCardAndCheck(const Coord&);
+			void removeCard(const Coord&);
+
+			void _setDiags();
+			bool _areInitDiags() const;
+			int16_t _getIncrement(const Coord&);
 		};
 
 		struct Input {

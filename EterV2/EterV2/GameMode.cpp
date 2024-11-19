@@ -34,59 +34,78 @@ namespace base {
 
 	////----------------------------------------------Win Manager-----------------------------------------------
 
-	GameMode::WinManager::WinManager(uint16_t size, Board& board) 
-		: size{ size },
-		board{ board } {
+	GameMode::WinManager::WinManager(Board& board) 
+		:	board{ board },
+			board_size{ board.size() },
+			diag1{ 0 },
+			diag2{ 0 },
+			are_diags_init{ false }
+	{}
 
-	}
-
-	bool GameMode::WinManager::won(const Coord& coord, const Player& player) {
+	bool GameMode::WinManager::addCardAndCheck(const Coord& coord) {
 		const auto& [x, y] = coord;
-
-		int16_t increment = (player.getColor() == color::ColorType::BLUE) ? 1 : -1;
+		int16_t increment = _getIncrement(coord);
 
 		rows[y] += increment;
 		cols[x] += increment;
 
-		bool init_diags = (diag1 && diag2);
-		if (board.isFixed() && init_diags == false) {
-			diag1.emplace(0);
-			diag2.emplace(0);
+		if (board.isFixed() && are_diags_init == false) {
+			_setDiags();
+		}
+		else if (are_diags_init == true) {
+			const auto& [corner_x, corner_y] = board.getLeftCorner();
 
-			for (uint16_t i = 0; i < size; i++) {
-				Coord corner = board.getLeftCorner();
+			uint16_t local_x = (x - corner_x) / 2;
+			uint16_t local_y = y - corner_y;
 
-				Coord pos1{ corner.first + 2 * i, corner.second + i };
-				auto card = board.getTopCard(pos1);
-				if (card != std::nullopt) {
-					increment = (card->get().getColor() == color::ColorType::BLUE) ? 1 : -1;
-
-					diag1.value() += increment;
-				}
-
-				Coord pos2{ corner.first + 2 * (size - 1 - i), corner.second + i};
-				card = board.getTopCard(pos2);
-				if (card != std::nullopt) {
-					increment = (card->get().getColor() == color::ColorType::BLUE) ? 1 : -1;
-
-					diag2.value() += increment;
-				}
+			if (local_x == local_y) {
+				diag1 += increment;
 			}
 
-			init_diags = true;
-		}
-
-		if (init_diags) {
-			if (abs(diag1.value()) == size || abs(diag2.value()) == size) {
-				return true;
+			if (local_x + local_y == board_size - 1) {
+				diag2 += increment;
 			}
 		}
 
-		if (abs(rows[y]) == size || abs(cols[x]) == size) {
+		return won(coord);
+	}
+
+	bool GameMode::WinManager::won(const Coord& coord) {
+		const auto& [x, y] = coord;
+
+		if (abs(rows[y]) == board_size || abs(cols[x]) == board_size) {
+			return true;
+		}
+
+		if (abs(diag1) == board_size || abs(diag2) == board_size) {
 			return true;
 		}
 
 		return false;
+	}
+
+	int16_t GameMode::WinManager::_getIncrement(const Coord& coord) {
+		int16_t increment = 0;
+
+		if (auto card = board.getTopCard(coord)) {
+			increment = (card->get().getColor() == color::ColorType::BLUE) ? 1 : -1;
+		}
+
+		return increment;
+	}
+
+	void GameMode::WinManager::_setDiags() {
+		for (uint16_t i = 0; i < board_size; i++) {
+			const auto& [x, y] = board.getLeftCorner();
+
+			Coord pos1{ x + 2 * i, y + i };
+			Coord pos2{ x + 2 * (board_size - 1 - i), y + i };
+
+			diag1 += _getIncrement(pos1);
+			diag2 += _getIncrement(pos2);
+		}
+
+		are_diags_init = true;
 	}
 
 	//-------------------------------------------Input Manager---------------------------------------------
