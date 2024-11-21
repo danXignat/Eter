@@ -38,6 +38,9 @@
     <ClCompile Include="logger.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
+    <ClCompile Include="WinManager.cpp">
+      <Filter>GameMode\Managers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="GameMode">
@@ -57,6 +60,15 @@
     </Filter>
     <Filter Include="Core">
       <UniqueIdentifier>{0fac7413-1e45-4ad7-a80e-6455d898959f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GameMode\Managers">
+      <UniqueIdentifier>{0c39b4d0-4c04-48a9-9e62-50205884f96c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Enums">
+      <UniqueIdentifier>{09422589-6c44-4b56-a2a5-7efdbfc0ad29}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resources">
+      <UniqueIdentifier>{f8596b21-c55c-4a3f-91f1-6346f25b3f5b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -108,8 +120,22 @@
     <ClInclude Include="logger.h">
       <Filter>Utils</Filter>
     </ClInclude>
-    <ClInclude Include="ServiceType.h">
-      <Filter>GameMode\Services</Filter>
+    <ClInclude Include="WinManager.h">
+      <Filter>GameMode\Managers</Filter>
     </ClInclude>
+    <ClInclude Include="CombatCardType.h">
+      <Filter>Enums</Filter>
+    </ClInclude>
+    <ClInclude Include="ServiceType.h">
+      <Filter>Enums</Filter>
+    </ClInclude>
+    <ClInclude Include="Signal.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="log.txt">
+      <Filter>Resources</Filter>
+    </Text>
   </ItemGroup>
 </Project>

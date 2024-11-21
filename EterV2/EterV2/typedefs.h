@@ -1,10 +1,11 @@
 #pragma once
 
 #include <tuple>
-#include <memory>
+#include <functional>
 
 #include "CombatCard.h"
 namespace base {
 	using Coord = std::pair<int16_t, int16_t>;
-	using CardPtr = std::unique_ptr<base::CombatCard>;
+	using CombatCardPtr = std::unique_ptr<CombatCard>;
+	using CombatCardRef = std::reference_wrapper<CombatCard>;
 }

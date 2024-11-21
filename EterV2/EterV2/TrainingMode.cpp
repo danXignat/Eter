@@ -2,6 +2,10 @@
 
 #include <format>
 
+#include "logger.h"
+
+using namespace logger;
+
 namespace base {
 	//---------------------------------------Constructor-------------------------------------
 	TrainingMode::TrainingMode(bool illusion, bool explosion, const std::string& player1_name, const std::string& player2_name)
@@ -12,7 +16,7 @@ namespace base {
 		m_player2.emplace(player2_name, color::ColorType::BLUE );
 
 		if (illusion) {
-			//m_illusion_service.emplace();
+			m_illusion_service.emplace(m_board);
 		}
 
 		if (explosion) {
@@ -23,36 +27,43 @@ namespace base {
 	//---------------------------------------Events----------------------------------------------
 
 	void TrainingMode::run() {
-		bool win = false;
 		m_board.renderBoard();
 
-		while (win == false) {
-			Input input; //asta da handle la inputu de la tastatura
-			input.read();
+		while (m_win_manager.won() == false) {
+			InputHandler input;
+			try {
+				input.read();								//asta da handle la inputu de la tastatura
+			}
+			catch (const std::runtime_error& err) {
+				Logger::log(Level::ERROR, err.what());
+				continue;
+			}
 			
-			CombatCardType type = _fromCharToType(input.card_type);
-			Player& current_player = _curentPlayer();
+			auto card = _currPlayer().getCard(input.card_type.value());
+			Coord coord { input.x.value(), input.y.value()};
 
-			std::optional<CombatCard> card = current_player.getCard(type, input.illusion); //optional cu cartea se extrage cartea din invetaru playerului
+			if (card.has_value()) {
+				m_board.appendMove(coord, std::move(*card));
 
-			if (card) {
-				m_board.appendMove({ input.x, input.y }, std::move(*card));
-
-				win = m_win_manager.addCardAndCheck({ input.x, input.y });
+				m_win_manager.addCard(coord);
 
 				_switchPlayer();
 			}
 			else {
-				
+				Logger::log(Level::WARNING, "No more cards of this type");
 			}
 
 			system("cls");
 			m_board.renderBoard();
 		}
 
-		std::cout << std::format("Player {}",
-			(_curentPlayer().getColor() == color::ColorType::BLUE) ? "BLUE" : "RED"
-		);
+		if (_currPlayer().getColor() == color::ColorType::BLUE) {
+			std::cout << "Player RED has won";
+		}
+		else {
+			std::cout << "Player RED has won";
+		}
+
 		std::cin.get();
 	}
 

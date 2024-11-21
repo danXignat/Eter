@@ -32,11 +32,13 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="TrainingMode.cpp" />
+    <ClCompile Include="WinManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Board.h" />
     <ClInclude Include="colors.h" />
     <ClInclude Include="CombatCard.h" />
+    <ClInclude Include="CombatCardType.h" />
     <ClInclude Include="ElementalMode.h" />
     <ClInclude Include="ExplosionService.h" />
     <ClInclude Include="GameMode.h" />
@@ -48,9 +50,14 @@
     <ClInclude Include="MageService.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="ServiceType.h" />
+    <ClInclude Include="Signal.h" />
     <ClInclude Include="TrainingMode.h" />
     <ClInclude Include="typedefs.h" />
     <ClInclude Include="utils.h" />
+    <ClInclude Include="WinManager.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="log.txt" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

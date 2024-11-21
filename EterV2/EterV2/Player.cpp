@@ -27,12 +27,13 @@ namespace base {
         this->_addCard(THREE, 2);
         this->_addCard(FOUR);
 
-
-        /*if (mode != GameModeTypes::Training) {
+        /*
+        if (mode != GameModeTypes::Training) {
             this->_addCard(TWO);
             this->_addCard(THREE);
             this->_addCard(ETER);
-        }*/
+        }
+        */
     }
 
 
@@ -74,7 +75,7 @@ namespace base {
         m_cards.erase(it);
 
         if (m_illusion_used) {
-            card.setIllusion();
+            //card.setIllusion();
         }
 
         return card;

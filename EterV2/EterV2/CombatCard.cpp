@@ -44,29 +44,12 @@ namespace base {
 
 	//-----------------------------------------Illusion-------------------------------------------
 
-	void CombatCard::revealIllusion() {
-		m_illusion = false;
+	void CombatCard::flip() {
+		m_illusion != m_illusion;
 	}
-
-	void CombatCard::setIllusion() {
-		m_illusion = true;
-	}
-
+	
 	bool CombatCard::isIllusion() const {
 		return m_illusion;
-	}
-
-	bool CombatCard::attemptCover(const CombatCard& opponentCard) const {
-		if (m_illusion)
-		{
-			if (opponentCard.getType() >= m_type) {
-				return false;
-			}
-			else {
-				return true;
-			}
-		}
-		return opponentCard.getType() < m_type;
 	}
 
 	//--------------------------------Overloads--------------------------------

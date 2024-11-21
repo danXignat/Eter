@@ -3,18 +3,10 @@
 #include <iostream>
 #include <cstdint>
 
+#include "CombatCardType.h"
 #include "colors.h"
 
 namespace base {
-	enum class CombatCardType : uint16_t {
-		NONE =0,
-		ONE = 1,
-		TWO = 2,
-		THREE = 3,
-		FOUR = 4,
-		ETER = 5
-	};
-
 	class CombatCard {
 	public:
 		CombatCard();
@@ -27,10 +19,8 @@ namespace base {
 		CombatCardType getType() const;
 		color::ColorType getColor() const;
 
-		void revealIllusion();
-		void setIllusion();
+		void flip();
 		bool isIllusion() const;
-		bool attemptCover(const CombatCard& opponentCard) const;
 
 		bool operator<(const CombatCard& other) const;
 		bool operator==(const CombatCard& other) const;

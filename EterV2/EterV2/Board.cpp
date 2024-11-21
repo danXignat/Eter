@@ -2,6 +2,10 @@
 
 #include <array>
 
+#include "logger.h"
+
+using namespace logger;
+
 namespace base {
 	//----------------------------Constructors--------------------------------
 
@@ -14,13 +18,19 @@ namespace base {
 
 	//----------------------------Public-Methods--------------------------------
 
-	void Board::appendMove(Coord coord, CombatCard&& card) {
-		if (_isValidPos(coord)) {
+	void Board::appendMove(const Coord& coord, CombatCard&& card) {
+		if (isValidMove(coord, card)) {
 			m_bounding_rect.add(coord);
 
 			m_combat_cards[coord].emplace_back(std::move(card));
 
 			_updateAvailableSpaces(coord);
+
+			Logger::log(
+				Level::INFO,
+				"card({}) appended at ({}, {})",
+				combatCardToChar(m_combat_cards[coord].back().getType()), coord.first, coord.second
+			);
 		}
 	}
 
@@ -35,7 +45,7 @@ namespace base {
 
 	}
 
-	std::optional<std::reference_wrapper<CombatCard>> Board::getTopCard(Coord pos) {
+	std::optional<CombatCardRef> Board::getTopCard(Coord pos) {
 		if (m_combat_cards.contains(pos)) {
 			return std::ref(m_combat_cards[pos].back());
 		}
@@ -61,16 +71,22 @@ namespace base {
 	}
 
 	//----------------------------Private Methods--------------------------------
-	bool Board::_isValidPos(Coord coord) const {
-		return m_available_spaces.contains(coord);
+	bool Board::isValidMove(const Coord& coord, const CombatCard& card) {
+		if (m_combat_cards.contains(coord)) {
+			bool bigger = card.getType() > m_combat_cards[coord].back().getType();
+			
+			if (!bigger) {
+				Logger::log(Level::WARNING, "card too small");
+				return false;
+			}
+		}
+		else if (!m_available_spaces.contains(coord)) {
+			Logger::log(Level::WARNING, "not available place");
+			return false;
+		}
+
+		return true;
 	}
-
-	/*bool Board::_isValidMove(Coord coord, const CombatCard& card) {
-		bool is_bottom_card = m_combat_cards.contains(coord);
-		bool is_bigger = (*m_combat_cards[coord].back() < card);
-
-		return is_bottom_card && is_bigger;
-	}*/
 
 	void Board::_updateAvailableSpaces(Coord coord) {
 		std::array<Coord, 8> offsets = { {

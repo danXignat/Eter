@@ -5,9 +5,11 @@
 #include <functional>
 
 #include "CombatCard.h"
+#include "CombatCardType.h"
 
 #include "utils.h"
 #include "colors.h"
+#include "typedefs.h"
 using namespace utils;
 
 namespace base {
@@ -16,17 +18,17 @@ namespace base {
 	public:
 		Board(uint16_t);
 
-		void appendMove(Coord, CombatCard&&);
+		void appendMove(const Coord&, CombatCard&&);
 		void renderBoard() const;
 		uint16_t getSize() const;
 		bool isFixed() const;
+		bool isValidMove(const Coord&, const CombatCard&);
 		uint16_t size() const;
 		std::optional<std::reference_wrapper<CombatCard>> getTopCard(Coord pos);
 		Coord getLeftCorner() const;
+
 	private:
 		void _updateAvailableSpaces(Coord);
-		bool _isValidPos(Coord) const;
-		bool _isValidMove(Coord, const CombatCard&);
 
 	private:
 		struct CoordFunctor {

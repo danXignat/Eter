@@ -1,3 +1,4 @@
+#pragma once
 #include <cstdint>
 
 namespace base {
@@ -11,7 +12,7 @@ namespace base {
 		TIMED
 	};
 
-	inline ServiceType fromCharToService(char ch) {
+	inline ServiceType charToService(char ch) {
 		switch (ch)
 		{
 			using enum ServiceType;
