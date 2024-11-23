@@ -16,11 +16,11 @@ namespace base {
 		IllusionService(Board&);
 
 		void add(CombatCard& card);
-		void eventSlot(CombatCard& illusion, CombatCard& other);
+		static void event(CombatCard& illusion, CombatCard& other);
 
 	private:
-		bool m_player1_illusion;
-		bool m_player2_illusion;
+		bool m_p1_has_illusion;
+		bool m_p2_has_illusion;
 
 		Board& board;
 	};

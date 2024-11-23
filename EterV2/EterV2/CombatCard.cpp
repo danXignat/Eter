@@ -45,7 +45,7 @@ namespace base {
 	//-----------------------------------------Illusion-------------------------------------------
 
 	void CombatCard::flip() {
-		m_illusion != m_illusion;
+		m_illusion = !m_illusion;
 	}
 	
 	bool CombatCard::isIllusion() const {

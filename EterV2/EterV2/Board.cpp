@@ -2,6 +2,7 @@
 
 #include <array>
 
+#include "IllusionService.h"
 #include "logger.h"
 
 using namespace logger;
@@ -19,7 +20,10 @@ namespace base {
 	//----------------------------Public-Methods--------------------------------
 
 	void Board::appendMove(const Coord& coord, CombatCard&& card) {
-		if (isValidMove(coord, card)) {
+		if (auto illusion = this->getTopCard(coord); illusion.has_value()) {
+			IllusionService::event(illusion->get(), card);
+		}
+		else  if (isValidMove(coord, card)) {
 			m_bounding_rect.add(coord);
 
 			m_combat_cards[coord].emplace_back(std::move(card));

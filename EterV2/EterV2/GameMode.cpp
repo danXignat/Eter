@@ -25,32 +25,58 @@ namespace base {
 		std::getline(std::cin, input);
 
 		std::istringstream stream{ input };
+		std::vector<std::string> tokens;
 		std::string token;
-		char del{ ' ' };
 
-		std::regex coord_pattern{ R"(^\d{0,2}\n?$)" };
-		std::regex card_pattern{ R"(^1|2|3|4|E\n?$)" };
-		std::regex service_pattern{ R"(^i|e|m|p\n?$)" };
-
-		if (!std::getline(stream, token, del) || !std::regex_match(token, coord_pattern)) {
-			std::cout << std::regex_match(token, coord_pattern) << " " << std::stoi(token);
-			throw std::runtime_error("Invalid x-coordinate");
+		while (stream >> token) {
+			tokens.push_back(token);
 		}
-		x = std::stoi(token);
 
-		if (!std::getline(stream, token, del) || !std::regex_match(token, coord_pattern)) {
-			throw std::runtime_error("Invalid y-coordinate");
+		if (tokens.size() < 1) {
+			throw std::runtime_error("No arguments");
 		}
-		y = std::stoi(token);
+		else if (tokens.size() == 1) {
+			std::string special_card{ tokens.front() };
+			std::regex pattern{ R"(^[emp]$)" };
 
-		if (!std::getline(stream, token, del) || !std::regex_match(token, card_pattern)) {
-			throw std::runtime_error("Invalid card choice");
+			if (special_card.size() == 1 && std::regex_match(special_card, pattern)) {
+				service_type = charToService(special_card.front());
+			}
+			else {
+				throw std::runtime_error("Invalid special card");
+			}
 		}
-		card_type = charToCombatCard(token.front());
+		else if (tokens.size() > 1 && tokens.size() <= 4) {
+			std::regex coord_pattern{ R"(^\d{0,2}$)" };
+			std::regex card_pattern{ R"(^[1234E]$)" };
 
-		if (std::getline(stream, token, del) && !std::regex_match(token, service_pattern)) {
-			throw std::runtime_error("Invalid service choice");
+			std::string pos1{ tokens[0] }, pos2{ tokens[1] };
+			std::string card_type_str{ tokens[2] };
+
+			if (!std::regex_match(pos1, coord_pattern)) {
+				throw std::runtime_error("Invalid x-coordinate");
+			}
+			x = std::stoi(pos1);
+
+			if (!std::regex_match(pos2, coord_pattern)) {
+				throw std::runtime_error("Invalid y-coordinate");
+			}
+			y = std::stoi(pos2);
+
+			if (!std::regex_match(card_type_str, card_pattern)) {
+				throw std::runtime_error("Invalid card choice");
+			}
+			card_type = charToCombatCard(card_type_str.front());
+
+			if (tokens.size() == 4) {
+				if (tokens[3].front() != 'i') {
+					throw std::runtime_error("Invalid service choice");
+				}
+				service_type = charToService(tokens[3].front());
+			}
 		}
-		service_type = charToService(token.front());
+		else {
+			throw std::runtime_error("Invalid argument number");
+		}
 	}
 }

@@ -41,6 +41,9 @@
     <ClCompile Include="WinManager.cpp">
       <Filter>GameMode\Managers</Filter>
     </ClCompile>
+    <ClCompile Include="ExplosionCard.cpp">
+      <Filter>Cards</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="GameMode">
@@ -131,6 +134,9 @@
     </ClInclude>
     <ClInclude Include="Signal.h">
       <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="ExplosionCard.h">
+      <Filter>Cards</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -20,14 +20,14 @@ namespace base {
 		}
 
 		if (explosion) {
-			//m_explosion_service.emplace();
+			m_explosion_service.emplace(m_board, m_player1.value(), m_player2.value());
 		}
 	}
 
 	//---------------------------------------Events----------------------------------------------
 
 	void TrainingMode::run() {
-		m_board.renderBoard();
+		this->render();
 
 		while (m_win_manager.won() == false) {
 			InputHandler input;
@@ -36,13 +36,29 @@ namespace base {
 			}
 			catch (const std::runtime_error& err) {
 				Logger::log(Level::ERROR, err.what());
+				system("cls");
+				this->render();
 				continue;
 			}
-			
-			auto card = _currPlayer().getCard(input.card_type.value());
-			Coord coord { input.x.value(), input.y.value()};
 
-			if (card.has_value()) {
+			if (m_explosion_service) {
+				bool is_explosion = input.service_type && input.service_type == ServiceType::EXPLOSION;
+				if (is_explosion) {
+					m_explosion_service->setting();
+					continue;
+				}
+			}
+
+			if (auto card = _currPlayer().getCard(input.card_type.value())) {
+				Coord coord { input.x.value(), input.y.value()};
+
+				if (m_illusion_service) {
+					bool is_illusion = input.service_type && input.service_type == ServiceType::ILLUSION;
+					if (is_illusion) {
+						m_illusion_service->add(card.value());
+					}
+				}
+
 				m_board.appendMove(coord, std::move(*card));
 
 				m_win_manager.addCard(coord);
@@ -54,7 +70,7 @@ namespace base {
 			}
 
 			system("cls");
-			m_board.renderBoard();
+			this->render();
 		}
 
 		if (_currPlayer().getColor() == color::ColorType::BLUE) {
@@ -69,5 +85,12 @@ namespace base {
 
 	////------------------------------------------------Methods-------------------------------------------------
 
+	void TrainingMode::render() {
+		m_board.renderBoard();
+
+		if (m_explosion_service) {
+			m_explosion_service->render_explosion();
+		}
+	}
 	
 }

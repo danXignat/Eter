@@ -22,6 +22,7 @@
     <ClCompile Include="Board.cpp" />
     <ClCompile Include="CombatCard.cpp" />
     <ClCompile Include="ElementalMode.cpp" />
+    <ClCompile Include="ExplosionCard.cpp" />
     <ClCompile Include="ExplosionService.cpp" />
     <ClCompile Include="GameMode.cpp" />
     <ClCompile Include="GameModeFactory.cpp" />
@@ -40,6 +41,7 @@
     <ClInclude Include="CombatCard.h" />
     <ClInclude Include="CombatCardType.h" />
     <ClInclude Include="ElementalMode.h" />
+    <ClInclude Include="ExplosionCard.h" />
     <ClInclude Include="ExplosionService.h" />
     <ClInclude Include="GameMode.h" />
     <ClInclude Include="GameModeFactory.h" />

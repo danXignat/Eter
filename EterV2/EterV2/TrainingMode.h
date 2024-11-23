@@ -14,6 +14,9 @@ namespace base {
 		TrainingMode(bool, bool, const std::string&, const std::string&);
 		void run();
 
+	protected:
+		void render();
+
 	private:
 		Board m_board;
 		WinManager m_win_manager;
