@@ -44,6 +44,24 @@
     <ClCompile Include="ExplosionCard.cpp">
       <Filter>Cards</Filter>
     </ClCompile>
+    <ClCompile Include="MasterOfFire.cpp">
+      <Filter>Cards\Mage</Filter>
+    </ClCompile>
+    <ClCompile Include="MageTypeAbility.h">
+      <Filter>Cards\Mage</Filter>
+    </ClCompile>
+    <ClCompile Include="MageCard.cpp">
+      <Filter>Cards\Mage</Filter>
+    </ClCompile>
+    <ClCompile Include="MasterOfEarth.cpp">
+      <Filter>Cards\Mage</Filter>
+    </ClCompile>
+    <ClCompile Include="MasterOfAir.cpp">
+      <Filter>Cards\Mage</Filter>
+    </ClCompile>
+    <ClCompile Include="MasterOfWater.cpp">
+      <Filter>Cards\Mage</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="GameMode">
@@ -72,6 +90,9 @@
     </Filter>
     <Filter Include="Resources">
       <UniqueIdentifier>{f8596b21-c55c-4a3f-91f1-6346f25b3f5b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Cards\Mage">
+      <UniqueIdentifier>{957a2051-8db9-4503-a2a2-c6358a590160}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -137,6 +158,21 @@
     </ClInclude>
     <ClInclude Include="ExplosionCard.h">
       <Filter>Cards</Filter>
+    </ClInclude>
+    <ClInclude Include="MageCard.h">
+      <Filter>Cards\Mage</Filter>
+    </ClInclude>
+    <ClInclude Include="MasterOfFire.h">
+      <Filter>Cards\Mage</Filter>
+    </ClInclude>
+    <ClInclude Include="MasterOfEarth.h">
+      <Filter>Cards\Mage</Filter>
+    </ClInclude>
+    <ClInclude Include="MasterOfAir.h">
+      <Filter>Cards\Mage</Filter>
+    </ClInclude>
+    <ClInclude Include="MasterOfWater.h">
+      <Filter>Cards\Mage</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
