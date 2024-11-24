@@ -87,8 +87,8 @@ namespace base {
 
     /*void Player::setMageCard(std::unique_ptr<MageCard>&& mageCard) {
         m_mage_card = std::move(mageCard);
-    }
-
+    }*/
+   /*
     MageCard* Player::getMageCard() {
         return m_mage_card.get();
     }

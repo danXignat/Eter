@@ -1,4 +1,4 @@
-#include "Board.h"
+﻿#include "Board.h"
 
 #include <array>
 
@@ -59,6 +59,99 @@ namespace base {
 	Coord Board::getLeftCorner() const {
 		return m_bounding_rect.corner1;
 	}
+
+	//void Board::removeTopCardAt(const Coord& coord, const Player& player) {
+	//	auto it = m_combat_cards.find(coord);
+
+	//	if (it != m_combat_cards.end()) {
+	//		// Inițializare sigură a card_stack
+	//		auto& card_stack = it->second;
+
+	//		if (card_stack.size() > 1 && card_stack.back().getColor() != player.getColor()) {
+	//			auto& second_to_last_card = *(card_stack.rbegin() + 1);
+
+	//			if (second_to_last_card.getColor() == player.getColor()) {
+	//				card_stack.pop_back(); // Eliminăm cardul
+	//				Logger::log(Level::INFO, "Removed opponent's card covering your card at ({}, {})", coord.first, coord.second);
+
+	//				if (card_stack.empty()) {
+	//					m_combat_cards.erase(it);
+	//					Logger::log(Level::INFO, "Removed last card from the stack at ({}, {})", coord.first, coord.second);
+	//				}
+	//				return;
+	//			}
+	//		}
+	//		Logger::log(Level::WARNING, "Top card does not cover your card or is your card at ({}, {})", coord.first, coord.second);
+	//	}
+	//	else {
+	//		Logger::log(Level::WARNING, "No stack or only one card present at ({}, {})", coord.first, coord.second);
+	//	}
+	//}
+
+	//void Board::removeRow(const Coord& start_coord, const Player& player) {
+	//	int row_count = 0;
+	//	bool own_card_found = false;
+
+	//	Coord current_coord = start_coord;
+
+	//	while (m_combat_cards.find(current_coord) != m_combat_cards.end()) {
+	//		auto& card_stack = m_combat_cards[current_coord];
+	//		if (!card_stack.empty()) {
+	//			if (card_stack.back().getColor() == player.getColor()) {
+	//				own_card_found = true;
+	//			}
+	//			row_count++;
+	//		}
+	//		current_coord.first++; // Avansează pe linie
+	//	}
+
+	//	if (row_count >= 3 && own_card_found) {
+	//		current_coord = start_coord;
+	//		for (int i = 0; i < row_count; i++) {
+	//			m_combat_cards.erase(current_coord);
+	//			current_coord.first++;
+	//		}
+	//		Logger::log(Level::INFO, "Removed entire row starting from ({}, {})", start_coord.first, start_coord.second);
+	//	}
+	//	else {
+	//		Logger::log(Level::WARNING, "Cannot remove row, conditions not met at ({}, {})", start_coord.first, start_coord.second);
+	//	}
+	//}
+
+	//void Board::removeColumn(const Coord& start_coord, const Player& player) {
+	//	int column_count = 0;
+	//	bool own_card_found = false;
+
+	//	Coord current_coord = start_coord;
+
+	//	while (m_combat_cards.find(current_coord) != m_combat_cards.end()) {
+	//		auto& card_stack = m_combat_cards[current_coord];
+	//		if (!card_stack.empty()) {
+	//			if (card_stack.back().getColor() == player.getColor()) {
+	//				own_card_found = true;
+	//			}
+	//			column_count++;
+	//		}
+	//		current_coord.second++; // Avansează pe coloană
+	//	}
+
+	//	if (column_count >= 3 && own_card_found) {
+	//		current_coord = start_coord;
+	//		for (int i = 0; i < column_count; i++) {
+	//			m_combat_cards.erase(current_coord);
+	//			current_coord.second++;
+	//		}
+	//		Logger::log(Level::INFO, "Removed entire column starting from ({}, {})", start_coord.first, start_coord.second);
+	//	}
+	//	else {
+	//		Logger::log(Level::WARNING, "Cannot remove column, conditions not met at ({}, {})", start_coord.first, start_coord.second);
+	//	}
+	//}
+
+
+
+	
+	
 
 	//------------------------------Setter Getter------------------------------------
 	uint16_t Board::size() const {

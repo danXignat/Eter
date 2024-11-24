@@ -6,10 +6,11 @@
 
 #include "CombatCard.h"
 #include "CombatCardType.h"
-
+#include"Player.h"
 #include "utils.h"
 #include "colors.h"
 #include "typedefs.h"
+#include<memory>
 using namespace utils;
 
 namespace base {
@@ -26,6 +27,9 @@ namespace base {
 		uint16_t size() const;
 		std::optional<std::reference_wrapper<CombatCard>> getTopCard(Coord pos);
 		Coord getLeftCorner() const;
+	/*	void removeTopCardAt(const Coord& coords,const Player&player);
+		void removeRow(const Coord& start_coord, const Player& player);
+		void removeColumn(const Coord& start_coord, const Player& player);*/
 
 	private:
 		void _updateAvailableSpaces(Coord);
@@ -47,6 +51,7 @@ namespace base {
 			bool withinHeight(Coord) const;
 			bool within(Coord) const;
 			bool isFixed() const;
+
 		};
 
 	private:

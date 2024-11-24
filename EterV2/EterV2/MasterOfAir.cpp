@@ -1,15 +1,14 @@
-#include"MasterOfEarth.h"
-#include "MasterOfAir.h"
-
-namespace base {
-
-	MasterOfAir::MasterOfAir(MageType type, MageTypeAbility front_ability, MageType back_ability) :
-		MageCard(MageType::Air, MageTypeAbility::BlowAway, MageTypeAbility::BlowEter) {
-	}
-
-	void MasterOfAir::applyAbility(){
-
-	}
-
-	
-}
+//#include "MasterOfAir.h"
+//
+//namespace base {
+//
+//	MasterOfAir::MasterOfAir() :
+//		MageCard(MageType::Air, MageTypeAbility::BlowAway, MageTypeAbility::BlowEter) {
+//	}
+//
+//	void MasterOfAir::applyAbility(const Coord& coord, Board& board, const Player& player){
+//
+//	}
+//
+//	
+//}

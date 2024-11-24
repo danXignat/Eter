@@ -1,12 +1,12 @@
-#include"MasterOfEarth.h"
-
-namespace base {
-
-	MasterOfEarth::MasterOfEarth(MageType type, MageTypeAbility front_ability, MageType back_ability) :
-		MageCard(MageType::Earth, MageTypeAbility::Bury, MageTypeAbility::Hole) {
-	}
-
-	void MasterOfEarth::applyAbility(){
-	}
-
-}
+//#include"MasterOfEarth.h"
+//
+//namespace base {
+//
+//	MasterOfEarth::MasterOfEarth() :
+//		MageCard(MageType::Earth, MageTypeAbility::Bury, MageTypeAbility::Hole) {
+//	}
+//
+//	void MasterOfEarth::applyAbility(const Coord& coord, Board& board, const Player& player){
+//	}
+//
+//}

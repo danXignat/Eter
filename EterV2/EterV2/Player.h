@@ -6,7 +6,7 @@
 
 
 #include "CombatCard.h"
-
+#include"MageCard.h"
 #include "colors.h"
 #include "typedefs.h"
 
@@ -24,7 +24,8 @@ namespace base {
         void setName(std::string_view name);
         void addCard(CombatCard&&);
 
-        /*void setMageCard(std::unique_ptr<MageCard>&& mageCard);
+        //void setMageCard(std::unique_ptr<MageCard>&& mageCard);
+        /* 
         MageCard* getMageCard();
         bool useMageCard();
         bool hasUnusedMageCard() const;*/
@@ -39,7 +40,7 @@ namespace base {
         std::unordered_multimap<CombatCardType, CombatCard> m_cards;
         bool m_illusion_used;
 
-        /*std::unique_ptr<MageCard> m_mage_card;
-        bool m_mage_card_used;*/
+       // std::unique_ptr<MageCard> m_mage_card;
+        //bool m_mage_card_used;
     };
 }

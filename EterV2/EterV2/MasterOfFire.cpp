@@ -1,12 +1,18 @@
-#include"MasterOfFire.h"
-
-namespace base {
-	
-	MasterOfFire::MasterOfFire(MageType type, MageTypeAbility front_ability, MageType back_ability):
-		MageCard(MageType::Fire,MageTypeAbility::Burn,MageTypeAbility::BurnRowOrColumn){
-	}
-
-	void MasterOfFire::applyAbility() {
-	}
-	 
-}
+//#include"MasterOfFire.h"
+//#include<iostream>
+//namespace base {
+//	
+//	MasterOfFire::MasterOfFire():
+//		MageCard(MageType::Fire,MageTypeAbility::Burn,MageTypeAbility::BurnRowOrColumn){
+//	}
+//
+//	void MasterOfFire::applyAbility(const Coord& coord, Board& board, const Player& player) {
+//		if (m_face_up) {
+//			board.removeTopCardAt(coord, player);
+//		}
+//		else {
+//			board.removeColumn(coord, player);
+//		}
+//	}
+//	 
+//}
