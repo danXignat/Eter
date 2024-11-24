@@ -1,5 +1,5 @@
 //#include"MasterOfFire.h"
-//#include<iostream>
+//
 //namespace base {
 //	
 //	MasterOfFire::MasterOfFire():
@@ -13,6 +13,7 @@
 //		else {
 //			board.removeColumn(coord, player);
 //		}
+//		
 //	}
 //	 
 //}

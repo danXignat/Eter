@@ -1,11 +1,10 @@
 //#pragma once
-//#include<string>
 //#include"MageTypeAbility.h"
 //#include<iostream>
 //#include"Board.h"
 //#include"Player.h"
-//#include"utils.h"
-//#include<vector>
+//#include"typedefs.h"
+//class Player;
 //class Board;
 //namespace base {
 //	class MageCard {
@@ -17,7 +16,7 @@
 //		virtual std::string_view getTypeName() const;
 //		virtual  std::string_view getFrontAbilityName() const;
 //		virtual  std::string_view getBackAbilityName()const;
-//		virtual void applyAbility(const Coord& coord,Board& board, const Player& player) = 0;
+//		virtual void applyAbility(  const Coord& coord,Board& board, const Player& player) = 0;
 //		
 //		
 //	protected:

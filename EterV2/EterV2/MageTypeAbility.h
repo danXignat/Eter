@@ -27,9 +27,10 @@
 //		{MageType::Water, "Water"}
 //	};
 //
-//   inline std::string_view typeToStrings(MageType type) {
+//	inline std::string_view typeToStrings(MageType type) {
 //		return mapMageTypes.at(type);
 //	}
+//
 //	const std::unordered_map<MageTypeAbility, std::string_view>mapMageTypeAbilities = {
 //		{MageTypeAbility::Burn,"Remove from play an opponent's card that covers one of your cards"},
 //		{MageTypeAbility::BurnRowOrColumn,"Remove from play a row or a column of 3 or more cards"},

@@ -1,5 +1,11 @@
 //#pragma once
-//#include"MageCard.h"
+//#include "Board.h"
+//#include "Player.h"
+//#include"typedefs.h"
+//#include "MageCard.h"
+//
+//class Player;
+//class Board;
 //
 //namespace base {
 //	class MasterOfFire : public MageCard {

@@ -1,16 +1,15 @@
 #pragma once
-
+//#include"MageCard.h"
 #include <unordered_map>
 #include <unordered_set>
 #include <functional>
-
+#include<memory>
 #include "CombatCard.h"
 #include "CombatCardType.h"
 #include"Player.h"
 #include "utils.h"
 #include "colors.h"
 #include "typedefs.h"
-#include<memory>
 using namespace utils;
 
 namespace base {
@@ -27,9 +26,10 @@ namespace base {
 		uint16_t size() const;
 		std::optional<std::reference_wrapper<CombatCard>> getTopCard(Coord pos);
 		Coord getLeftCorner() const;
-	/*	void removeTopCardAt(const Coord& coords,const Player&player);
+		void removeTopCardAt(const Coord& coords,const Player&player);
 		void removeRow(const Coord& start_coord, const Player& player);
-		void removeColumn(const Coord& start_coord, const Player& player);*/
+		void removeColumn(const Coord& start_coord, const Player& player);
+		void moveStack(const Coord& fromCoord, const Coord& toCoord, Player& player, bool isOpponent);
 
 	private:
 		void _updateAvailableSpaces(Coord);
