@@ -62,6 +62,15 @@
     <ClCompile Include="MasterOfWater.cpp">
       <Filter>Cards\Mage</Filter>
     </ClCompile>
+    <ClCompile Include="ElementalService.cpp">
+      <Filter>GameMode\Services</Filter>
+    </ClCompile>
+    <ClCompile Include="PowerCard.cpp">
+      <Filter>Cards\Power</Filter>
+    </ClCompile>
+    <ClCompile Include="PowerCards.cpp">
+      <Filter>Cards\Power</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="GameMode">
@@ -93,6 +102,9 @@
     </Filter>
     <Filter Include="Cards\Mage">
       <UniqueIdentifier>{957a2051-8db9-4503-a2a2-c6358a590160}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Cards\Power">
+      <UniqueIdentifier>{09eb7f95-0ce9-4d2d-8f05-fa8e5b6e3f75}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -173,6 +185,18 @@
     </ClInclude>
     <ClInclude Include="MasterOfWater.h">
       <Filter>Cards\Mage</Filter>
+    </ClInclude>
+    <ClInclude Include="ElementalService.h">
+      <Filter>GameMode\Services</Filter>
+    </ClInclude>
+    <ClInclude Include="PowerCardType.h">
+      <Filter>Cards\Power</Filter>
+    </ClInclude>
+    <ClInclude Include="PowerCard.h">
+      <Filter>Cards\Power</Filter>
+    </ClInclude>
+    <ClInclude Include="PowerCards.h">
+      <Filter>Cards\Power</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

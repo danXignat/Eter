@@ -22,6 +22,7 @@
     <ClCompile Include="Board.cpp" />
     <ClCompile Include="CombatCard.cpp" />
     <ClCompile Include="ElementalMode.cpp" />
+    <ClCompile Include="ElementalService.cpp" />
     <ClCompile Include="ExplosionCard.cpp" />
     <ClCompile Include="ExplosionService.cpp" />
     <ClCompile Include="GameMode.cpp" />
@@ -38,6 +39,8 @@
     <ClCompile Include="MasterOfFire.cpp" />
     <ClCompile Include="MasterOfWater.cpp" />
     <ClCompile Include="Player.cpp" />
+    <ClCompile Include="PowerCard.cpp" />
+    <ClCompile Include="PowerCards.cpp" />
     <ClCompile Include="TrainingMode.cpp" />
     <ClCompile Include="WinManager.cpp" />
   </ItemGroup>
@@ -47,6 +50,7 @@
     <ClInclude Include="CombatCard.h" />
     <ClInclude Include="CombatCardType.h" />
     <ClInclude Include="ElementalMode.h" />
+    <ClInclude Include="ElementalService.h" />
     <ClInclude Include="ExplosionCard.h" />
     <ClInclude Include="ExplosionService.h" />
     <ClInclude Include="GameMode.h" />
@@ -62,6 +66,9 @@
     <ClInclude Include="MasterOfFire.h" />
     <ClInclude Include="MasterOfWater.h" />
     <ClInclude Include="Player.h" />
+    <ClInclude Include="PowerCard.h" />
+    <ClInclude Include="PowerCards.h" />
+    <ClInclude Include="PowerCardType.h" />
     <ClInclude Include="ServiceType.h" />
     <ClInclude Include="Signal.h" />
     <ClInclude Include="TrainingMode.h" />

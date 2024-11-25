@@ -5,6 +5,7 @@
 #include "GameModeFactory.h"
 #include "typedefs.h"
 #include "MageService.h"
+#include"ElementalService.h"
 #include "Board.h"
 
 int main() {
@@ -15,9 +16,9 @@ int main() {
 	game_mode->run();*/
 
 	
-	base::MageService service;
+	base::ElementalService service;
 
-	service.selectMages();
+	service.selectPowerCards();
 	
 
 	/*
