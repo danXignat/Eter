@@ -11,14 +11,12 @@
 namespace base {
 	class MageCard {
 	public:
-		MageCard() = default;
-
 		virtual ~MageCard() = default;
 
 		std::string_view getTypeName() const;
 		std::string_view getAbilityName() const;
 
-		virtual void apply(const Coord& coord, Board& board, const Player& player) = 0;
+		virtual void apply(Board& board, Player& player) = 0;
 		
 	protected:
 		MageType m_type;

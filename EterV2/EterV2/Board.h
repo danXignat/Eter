@@ -29,7 +29,7 @@ namespace base {
 		Coord getLeftCorner() const;
 
 
-		void removeTopCardAt(const Coord& coords,const Player&player);
+		void removeTopCardAt(const Coord& coord);
 		void removeRow(const Coord& start_coord, const Player& player);
 		void removeColumn(const Coord& start_coord, const Player& player);
 		void moveStack(const Coord& fromCoord, const Coord& toCoord, Player& player, bool isOpponent);

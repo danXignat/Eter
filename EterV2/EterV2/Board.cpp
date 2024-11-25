@@ -20,10 +20,11 @@ namespace base {
 	//----------------------------Public-Methods--------------------------------
 
 	void Board::appendMove(const Coord& coord, CombatCard&& card) {
-		if (auto illusion = this->getTopCard(coord); illusion.has_value()) {
-			IllusionService::event(illusion->get(), card);
+		auto top_card = this->getTopCard(coord);
+		if (top_card.has_value() && top_card->get().isIllusion()) {
+			IllusionService::event(top_card->get(), card);
 		}
-		else  if (isValidMove(coord, card)) {
+		else if (isValidMove(coord, card)) {
 			m_bounding_rect.add(coord);
 
 			m_combat_cards[coord].emplace_back(std::move(card));
@@ -60,28 +61,16 @@ namespace base {
 		return m_bounding_rect.corner1;
 	}
 
-	void Board::removeTopCardAt(const Coord& coord, const Player& player) {
+	void Board::removeTopCardAt(const Coord& coord) {
 		auto it = m_combat_cards.find(coord);
 
 		if (it != m_combat_cards.end()) {
 			// Inițializare sigură a card_stack
 			auto& card_stack = it->second;
 
-			if (card_stack.size() > 1 && card_stack.back().getColor() != player.getColor()) {
-				auto& second_to_last_card = *(card_stack.rbegin() + 1);
+			card_stack.pop_back();
 
-				if (second_to_last_card.getColor() == player.getColor()) {
-					card_stack.pop_back(); // Eliminăm cardul
-					Logger::log(Level::INFO, "Removed opponent's card covering your card at ({}, {})", coord.first, coord.second);
-
-					if (card_stack.empty()) {
-						m_combat_cards.erase(it);
-						Logger::log(Level::INFO, "Removed last card from the stack at ({}, {})", coord.first, coord.second);
-					}
-					return;
-				}
-			}
-			Logger::log(Level::WARNING, "Top card does not cover your card or is your card at ({}, {})", coord.first, coord.second);
+			Logger::log(Level::INFO, "Removed last card from the stack at ({}, {})", coord.first, coord.second);
 		}
 		else {
 			Logger::log(Level::WARNING, "No stack or only one card present at ({}, {})", coord.first, coord.second);

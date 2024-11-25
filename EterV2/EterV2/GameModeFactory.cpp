@@ -1,5 +1,7 @@
 #include "GameModeFactory.h"
 
+#include "MageMode.h"
+
 namespace base {
 	GameModePtr GameModeFactory::get(const std::string& id, const std::string& name1, const std::string& name2) {
 		switch (id.front()) {
@@ -8,7 +10,7 @@ namespace base {
 		}
 		case '2': {
 			//return std::unique_ptr<MageDuelMode>();
-			return nullptr;
+			return std::make_unique<MageMode>(id[1] - 48, id[2] - 48, name1, name2);
 		}
 		case '3': {
 			//return std::unique_ptr<ElementalMode>();
