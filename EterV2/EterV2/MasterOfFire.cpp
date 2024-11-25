@@ -49,7 +49,7 @@ namespace base {
         return choices;
     }
 
-    ///-----------------------------------Burn Row adn Col--------------------------------
+    ///-----------------------------------Burn Row and Col--------------------------------
 
 
 	MasterOfFireBack::MasterOfFireBack() {
@@ -59,8 +59,8 @@ namespace base {
 
     void MasterOfFireBack::apply(Board& board, Player& player) {
         auto choices = getChoices(board, player);
-
         std::cout << "Available choices:\n";
+
         std::cout << "Available rows: ";
         for (uint16_t row : choices.first) {
             std::cout << row << " ";
@@ -80,9 +80,13 @@ namespace base {
         if (line_or_col == 'l') {
             board.removeRow(choice);
         }
-        else {
-            //board.removeColumn();
+        else if (line_or_col == 'c') {
+            board.removeColumn(choice);
         }
+        else {
+            Logger::log(Level::INFO, "invalid input");
+        }
+
         Logger::log(Level::INFO, "Mage fire ability remove top card used");
     }
 
@@ -90,28 +94,38 @@ namespace base {
         std::vector<uint16_t> line_choices;
         std::vector<uint16_t> column_choices;
 
-        std::unordered_map<uint16_t, uint16_t> rows;
-        std::unordered_map<uint16_t, uint16_t> cols;
+        std::unordered_map<uint16_t, std::pair<uint16_t, bool>> rows;
+        std::unordered_map<uint16_t, std::pair<uint16_t, bool>> cols;
 
         for (const auto& [coord, stack] : board) {
             auto [x, y] = coord;
 
-            rows[y] += stack.size();
-            cols[x] += stack.size();
+            rows[y].first += uint16_t(stack.size());
+            cols[x].first += uint16_t(stack.size());
+
+            if (board.isCardOfColorAt(player.getColor(), coord)) {
+                rows[y].second = true;
+                cols[x].second = true;
+            }
         }
 
         for (const auto& [pos, val] : rows) {
-            line_choices.push_back(pos);
+            if (val.first && val.second >= 3) {
+                line_choices.push_back(pos);
+            }
         }
         for (const auto& [pos, val] : cols) {
-            column_choices.push_back(pos);
+            if (val.first && val.second >= 3) {
+                column_choices.push_back(pos);
+            }
         }
 
         return {line_choices, column_choices};
     }
 
 
-    ///------------------------------------------ MasterOfEarthFront
+    ///------------------------------------------ MasterOfEarthFront-------------------------------------------
+
     MasterOfEarthFront::MasterOfEarthFront() {
         m_type = MageType::Earth;
         m_ability = MageTypeAbility::Bury;

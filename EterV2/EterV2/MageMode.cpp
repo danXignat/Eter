@@ -83,7 +83,7 @@ namespace base {
 	////------------------------------------------------Methods-------------------------------------------------
 
 	void MageMode::render() {
-		m_board.renderBoard();
+		m_board.render();
 
 		if (m_explosion_service) {
 			m_explosion_service->render_explosion();

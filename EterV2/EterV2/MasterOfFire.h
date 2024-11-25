@@ -22,6 +22,9 @@ namespace base {
 		MasterOfFireBack();
 
 		void apply(Board& board, Player& player) override;
+
+		std::pair<std::vector<uint16_t>, std::vector<uint16_t>> getChoices(const Board& board, const Player& player);
+		
 	};
 
 	class MasterOfEarthFront : public MageCard {

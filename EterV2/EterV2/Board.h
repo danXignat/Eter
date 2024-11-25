@@ -3,6 +3,7 @@
 #include <unordered_set>
 #include <functional>
 #include <memory>
+#include <algorithm>
 
 #include "CombatCard.h"
 #include "CombatCardType.h"
@@ -18,24 +19,27 @@ namespace base {
 	class Board {
 	public:
 		Board(uint16_t);
-
-		void appendMove(const Coord&, CombatCard&&);
-		void renderBoard() const;
-		uint16_t getSize() const;
-		bool isFixed() const;
-		bool isValidMove(const Coord&, const CombatCard&);
 		uint16_t size() const;
+
+		void render() const;
+		bool isFixed() const;
+		bool isCardOfColorAt(color::ColorType, const Coord&) const;
+		uint16_t getSize() const;
 		std::optional<std::reference_wrapper<CombatCard>> getTopCard(Coord pos);
 		Coord getLeftCorner() const;
 
-
+		void appendMove(const Coord&, CombatCard&&);
 		void removeTopCardAt(const Coord& coord);
-		void removeRow(const Coord& start_coord, const Player& player);
-		void removeColumn(const Coord& start_coord, const Player& player);
-		void moveStack(const Coord& fromCoord, const Coord& toCoord, Player& player, bool isOpponent);
+		void removeStack(const Coord& coord);
+		void removeRow(uint16_t x);
+		void removeColumn(uint16_t y);
+		void moveStack(const Coord& from_coord, const Coord& to_coord);
+		void swapStacks(const Coord& from_coord, const Coord& to_coord);
 
 	private:
+		bool _isValidMove(const Coord&, const CombatCard&);
 		void _updateAvailableSpaces(Coord);
+		void _reinitialise();
 
 	private:
 		struct BoundingRect {
@@ -44,11 +48,13 @@ namespace base {
 			bool fixed_width, fixed_height;
 
 			BoundingRect(uint16_t);
-			void add(Coord);
-			void remove(Coord);
-			bool withinWidth(Coord) const;
-			bool withinHeight(Coord) const;
-			bool within(Coord) const;
+			BoundingRect(uint16_t size, const Coord& coord);
+
+			void add(const Coord&);
+			void remove(const Coord&);
+			bool withinWidth(const Coord&) const;
+			bool withinHeight(const Coord&) const;
+			bool within(const Coord&) const;
 			bool isFixed() const;
 		};
 

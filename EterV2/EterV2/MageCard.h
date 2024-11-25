@@ -11,6 +11,7 @@
 namespace base {
 	class MageCard {
 	public:
+		MageCard();
 		virtual ~MageCard() = default;
 
 		std::string_view getTypeName() const;
