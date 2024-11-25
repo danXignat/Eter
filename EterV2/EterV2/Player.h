@@ -4,9 +4,7 @@
 #include <string_view>
 #include <optional>
 
-
 #include "CombatCard.h"
-#include"MageCard.h"
 #include "colors.h"
 #include "typedefs.h"
 
@@ -40,7 +38,7 @@ namespace base {
         std::unordered_multimap<CombatCardType, CombatCard> m_cards;
         bool m_illusion_used;
 
-       // std::unique_ptr<MageCard> m_mage_card;
+        // std::unique_ptr<MageCard> m_mage_card;
         //bool m_mage_card_used;
     };
 }

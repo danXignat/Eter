@@ -15,7 +15,8 @@ namespace base {
 	}
 
 	void ExplosionService::setting() {
-		while (true) {
+		bool is_setting = true;
+		while (is_setting) {
 			if (_kbhit()) {
 				char ch = _getch();
 
@@ -23,13 +24,13 @@ namespace base {
 					ch = _getch();
 
 					switch (ch) {
-					case 77:
+					case 77:							//right arrow
 						m_card.rotateRight();
 						m_card.render();
 						break;
 
-					case 75:
-						m_card.rotateLeft();
+					case 75:							//left arrow
+						m_card.rotateLeft();	
 						m_card.render();
 						break;
 
@@ -37,10 +38,9 @@ namespace base {
 						break;
 					}
 				}
-				else if (ch == 13) {
-					std::cout << "miau";
+				else if (ch == 13) {					//enter
+					is_setting = false;
 				}
-
 			}
 		}
 	}

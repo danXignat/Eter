@@ -1,15 +1,16 @@
 #pragma once
-//#include"MageCard.h"
 #include <unordered_map>
 #include <unordered_set>
 #include <functional>
-#include<memory>
+#include <memory>
+
 #include "CombatCard.h"
 #include "CombatCardType.h"
-#include"Player.h"
+#include "Player.h"
 #include "utils.h"
 #include "colors.h"
 #include "typedefs.h"
+
 using namespace utils;
 
 namespace base {
@@ -26,6 +27,8 @@ namespace base {
 		uint16_t size() const;
 		std::optional<std::reference_wrapper<CombatCard>> getTopCard(Coord pos);
 		Coord getLeftCorner() const;
+
+
 		void removeTopCardAt(const Coord& coords,const Player&player);
 		void removeRow(const Coord& start_coord, const Player& player);
 		void removeColumn(const Coord& start_coord, const Player& player);
@@ -35,10 +38,6 @@ namespace base {
 		void _updateAvailableSpaces(Coord);
 
 	private:
-		struct CoordFunctor {
-			size_t operator()(const Coord&) const;
-		};
-
 		struct BoundingRect {
 			uint16_t size;
 			Coord corner1, corner2;
@@ -51,7 +50,6 @@ namespace base {
 			bool withinHeight(Coord) const;
 			bool within(Coord) const;
 			bool isFixed() const;
-
 		};
 
 	private:
@@ -60,5 +58,21 @@ namespace base {
 
 		std::unordered_map<Coord, std::vector<CombatCard>, CoordFunctor> m_combat_cards;
 		std::unordered_set<Coord, CoordFunctor> m_available_spaces;
+
+	///------------------------------------------------Iterator---------------------------------------------
+
+	public:
+		using KeyType = Coord;
+		using ValueType = std::vector<CombatCard>;
+		using MapType = std::unordered_map<KeyType, ValueType>;
+
+		using iterator = MapType::iterator;
+		using const_iterator = MapType::const_iterator;
+
+		iterator begin();
+		iterator end();
+
+		const_iterator begin() const;
+		const_iterator end() const;
 	};	
 }

@@ -45,6 +45,9 @@ namespace base {
 				bool is_explosion = input.service_type && input.service_type == ServiceType::EXPLOSION;
 				if (is_explosion) {
 					m_explosion_service->setting();
+					m_explosion_service->apply();
+					system("cls");
+					this->render();
 					continue;
 				}
 			}

@@ -241,12 +241,6 @@ namespace base {
 
 	//--------------------------------Inner Classes-------------------------------------
 
-	size_t Board::CoordFunctor::operator()(const Coord& coord) const {
-		std::hash<uint16_t> hasher;
-
-		return hasher(coord.first) ^ hasher(coord.second << 1);
-	}
-
 	Board::BoundingRect::BoundingRect(uint16_t size) :
 		size{ size },
 		corner1{ 10, 5 }, corner2{ 10, 5 },
@@ -291,4 +285,24 @@ namespace base {
 	bool Board::BoundingRect::isFixed() const {
 		return fixed_width && fixed_height;
 	}
+
+
+	///-----------------------------------------Iterator-------------------------------
+
+	Board::iterator Board::begin() {
+		return m_combat_cards.begin();
+	}
+
+	Board::iterator Board::end() {
+		return m_combat_cards.end();
+	}
+
+	Board::const_iterator Board::begin() const {
+		return m_combat_cards.begin();
+	}
+
+	Board::const_iterator Board::end() const {
+		return m_combat_cards.end();
+	}
+
 }
