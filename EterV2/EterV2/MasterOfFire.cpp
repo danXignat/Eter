@@ -1,33 +1,123 @@
 #include"MasterOfFire.h"
 
+#include <format>
+
+using namespace logger;
+
 namespace base {
+
+	///------------------------------------------Burn-----------------------------------
 
 	MasterOfFireFront::MasterOfFireFront() {
 		m_type = MageType::Fire;
 		m_ability = MageTypeAbility::Burn;
 	}
 
-	void MasterOfFireFront::apply(const Coord& coord, Board& board, const Player& player) {
-		
+	void MasterOfFireFront::apply(Board& board, Player& player) {
+        auto choices = getChoices(board, player);
+
+        std::cout << "Available choices:\n";
+        for (auto [x, y] : choices) {
+            std::cout << std::format("({}, {})", x, y);
+        }
+        std::cout << '\n';
+
+        Coord choice;
+        std::cin >> choice.first >> choice.second;
+
+        board.removeTopCardAt(choice);
+        Logger::log(Level::INFO, "Mage fire ability remove top card used");
 	}
-	
+
+    std::vector<Coord> MasterOfFireFront::getChoices(const Board& board, const Player& player) {
+        std::vector<Coord> choices;
+
+        for (const auto& [coord, stack] : board) {
+            auto [x, y] = coord;
+
+            if (stack.size() < 2) {
+                continue;
+            }
+
+            bool is_player_card = stack[stack.size() - 2].getColor() == player.getColor();
+            bool is_covered = stack.back().getColor() != player.getColor();
+            if (is_player_card && is_covered) {
+                choices.emplace_back(x, y);
+            }
+        }
+
+        return choices;
+    }
+
+    ///-----------------------------------Burn Row adn Col--------------------------------
+
 
 	MasterOfFireBack::MasterOfFireBack() {
 		m_type = MageType::Fire;
 		m_ability = MageTypeAbility::BurnRowOrColumn;
 	}
 
-	void MasterOfFireBack::apply(const Coord& coord, Board& board, const Player& player) {
+    void MasterOfFireBack::apply(Board& board, Player& player) {
+        auto choices = getChoices(board, player);
 
-	}
+        std::cout << "Available choices:\n";
+        std::cout << "Available rows: ";
+        for (uint16_t row : choices.first) {
+            std::cout << row << " ";
+        }
+        std::cout << '\n';
 
-    // MasterOfEarthFront
+        std::cout << "Available cols: ";
+        for (uint16_t col : choices.second) {
+            std::cout << col << " ";
+        }
+        std::cout << '\n';
+
+        uint16_t choice;
+        char line_or_col;
+        std::cin >> choice >> line_or_col;
+
+        if (line_or_col == 'l') {
+            board.removeRow(choice);
+        }
+        else {
+            //board.removeColumn();
+        }
+        Logger::log(Level::INFO, "Mage fire ability remove top card used");
+    }
+
+    std::pair<std::vector<uint16_t>, std::vector<uint16_t>> MasterOfFireBack::getChoices(const Board& board, const Player& player) {
+        std::vector<uint16_t> line_choices;
+        std::vector<uint16_t> column_choices;
+
+        std::unordered_map<uint16_t, uint16_t> rows;
+        std::unordered_map<uint16_t, uint16_t> cols;
+
+        for (const auto& [coord, stack] : board) {
+            auto [x, y] = coord;
+
+            rows[y] += stack.size();
+            cols[x] += stack.size();
+        }
+
+        for (const auto& [pos, val] : rows) {
+            line_choices.push_back(pos);
+        }
+        for (const auto& [pos, val] : cols) {
+            column_choices.push_back(pos);
+        }
+
+        return {line_choices, column_choices};
+    }
+
+
+    ///------------------------------------------ MasterOfEarthFront
     MasterOfEarthFront::MasterOfEarthFront() {
         m_type = MageType::Earth;
         m_ability = MageTypeAbility::Bury;
     }
 
-    void MasterOfEarthFront::apply(const Coord& coord, Board& board, const Player& player) {
+    void MasterOfEarthFront::apply(Board& board, Player& player) {
         // TODO: Implement the ability logic for Bury
     }
 
@@ -37,7 +127,7 @@ namespace base {
         m_ability = MageTypeAbility::Hole;
     }
 
-    void MasterOfEarthBack::apply(const Coord& coord, Board& board, const Player& player) {
+    void MasterOfEarthBack::apply(Board& board, Player& player) {
         // TODO: Implement the ability logic for Hole
     }
 
@@ -47,7 +137,7 @@ namespace base {
         m_ability = MageTypeAbility::BlowAway;
     }
 
-    void MasterOfAirFront::apply(const Coord& coord, Board& board, const Player& player) {
+    void MasterOfAirFront::apply(Board& board, Player& player) {
         // TODO: Implement the ability logic for BlowAway
     }
 
@@ -57,7 +147,7 @@ namespace base {
         m_ability = MageTypeAbility::BlowEter;
     }
 
-    void MasterOfAirBack::apply(const Coord& coord, Board& board, const Player& player) {
+    void MasterOfAirBack::apply(Board& board, Player& player) {
         // TODO: Implement the ability logic for BlowEter
     }
 
@@ -67,7 +157,7 @@ namespace base {
         m_ability = MageTypeAbility::Boat;
     }
 
-    void MasterOfWaterFront::apply(const Coord& coord, Board& board, const Player& player) {
+    void MasterOfWaterFront::apply(Board& board, Player& player) {
         // TODO: Implement the ability logic for Boat
     }
 
@@ -77,7 +167,7 @@ namespace base {
         m_ability = MageTypeAbility::BoatRowOrColumn;
     }
 
-    void MasterOfWaterBack::apply(const Coord& coord, Board& board, const Player& player) {
+    void MasterOfWaterBack::apply(Board& board, Player& player) {
         // TODO: Implement the ability logic for BoatRowOrColumn
     }
 

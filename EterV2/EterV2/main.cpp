@@ -5,20 +5,19 @@
 #include "GameModeFactory.h"
 #include "typedefs.h"
 #include "MageService.h"
-#include"ElementalService.h"
 #include "Board.h"
 
 int main() {
-	/*system("start powershell -Command \"Get-Content -Path 'log.txt' -Wait\"");
+	/*system("start powershell -Command \"Get-Content -Path 'log.txt' -Wait\"");*/
 
-	base::GameModePtr game_mode = base::GameModeFactory::get("1110000", "titi", "gigi");
+	base::GameModePtr game_mode = base::GameModeFactory::get("2000000", "titi", "gigi");
 
-	game_mode->run();*/
+	game_mode->run();
 
 	
-	base::ElementalService service;
+	/*base::MageService service;
 
-	service.selectPowerCards();
+	service.selectMages();*/
 	
 
 	/*

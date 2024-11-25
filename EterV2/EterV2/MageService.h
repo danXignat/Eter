@@ -20,9 +20,10 @@ namespace base {
 
         MageService(Board& board);
         void selectMages();
-        MageType _getTypeChoice(uint16_t choice);
+        void apply(Player& player);
 
     private:
+        MageType _getTypeChoice(uint16_t choice);
         std::unique_ptr<MageCard> _factory(MageTypeAbility ability_type);
         std::pair<MageTypeAbility, MageTypeAbility> _getAbilityForType(MageType type);
         void _setPlayerMage(bool player);

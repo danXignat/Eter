@@ -15,13 +15,25 @@ namespace base {
 		uint16_t choice_p1 = choices[0];
 		uint16_t choice_p2 = choices[1];
 
-		type_p1 = _getTypeChoice(choice_p1);
-		type_p2 = _getTypeChoice(choice_p2);
+		/*type_p1 = _getTypeChoice(choice_p1);
+		type_p2 = _getTypeChoice(choice_p2);*/
+
+		type_p1 = MageType::Fire;
+		type_p2 = MageType::Fire;
 	}
 	
 	void MageService::selectMages() {
 		_setPlayerMage(0);
 		_setPlayerMage(1);
+	}
+
+	void MageService::apply(Player& player) {
+		if (player.getColor() == color::ColorType::RED) {
+			card_p1->apply(m_board, player);
+		}
+		else {
+			card_p2->apply(m_board, player);
+		}
 	}
 
 	void MageService::_setPlayerMage(bool player) {
