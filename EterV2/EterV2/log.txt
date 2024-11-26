@@ -1,7 +1,0 @@
-<<<<<<< Updated upstream
-=======
-[INFO] explosion effect [1, 2] -> 0
-[INFO] explosion effect [2, 2] -> 1
-[INFO] explosion effect [0, 0] -> 1
-[INFO] explosion effect [1, 0] -> 0
->>>>>>> Stashed changes
