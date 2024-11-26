@@ -6,7 +6,7 @@
 #include <algorithm>
 
 namespace base {
-	ElementalService::ElementalService() {
+	ElementalService::ElementalService(Board& board) :m_board{ board } {
 		std::random_device rd;
 		std::mt19937 gen(rd());
 
@@ -14,13 +14,24 @@ namespace base {
 		std::iota(choices.begin(), choices.end(), 0);
 		std::shuffle(choices.begin(), choices.end(), gen);
 
-		type_p1 = static_cast<PowerCardType>(choices[0]);
-		type_p2 = static_cast<PowerCardType>(choices[1]);
+		/*type_p1 = static_cast<PowerCardType>(choices[0]);
+		type_p2 = static_cast<PowerCardType>(choices[1]);*/
 
+		type_p1 = PowerCardType::Flame;
+		type_p2 = PowerCardType::Flame;
 	}
 	void ElementalService::selectPowerCards() {
 		_setPlayerPowerCard(0);
 			_setPlayerPowerCard(1);
+	}
+
+	void ElementalService::apply(Player& player) {
+		if (player.getColor() == color::ColorType::RED) {
+			card_p1->apply(m_board, player);
+		}
+		else {
+			card_p2->apply(m_board, player);
+		}
 	}
 
 		void ElementalService::_setPlayerPowerCard(bool player) {

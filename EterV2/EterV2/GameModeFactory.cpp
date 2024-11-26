@@ -1,6 +1,7 @@
 #include "GameModeFactory.h"
 
 #include "MageMode.h"
+#include"ElementalMode.h"
 
 namespace base {
 	GameModePtr GameModeFactory::get(const std::string& id, const std::string& name1, const std::string& name2) {
@@ -13,8 +14,7 @@ namespace base {
 			return std::make_unique<MageMode>(id[1] - 48, id[2] - 48, name1, name2);
 		}
 		case '3': {
-			//return std::unique_ptr<ElementalMode>();
-			return nullptr;
+			return std::make_unique<ElementalMode>(id[1] - 48, id[2] - 48, name1, name2);
 		}
 		case '4': {
 			//return std::unique_ptr<TournamentMode>();
