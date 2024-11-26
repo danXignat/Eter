@@ -1,2 +1,0 @@
-[ERROR] No arguments
-[ERROR] Invalid service choice
