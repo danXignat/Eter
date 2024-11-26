@@ -1,7 +1,6 @@
 #include <iostream>
 #include <conio.h>
 
-#include "GameMode.h"
 #include "GameModeFactory.h"
 #include "typedefs.h"
 #include "MageService.h"
@@ -11,7 +10,11 @@
 int main() {
 	system("start powershell -Command \"Get-Content -Path 'log.txt' -Wait\"");
 
+<<<<<<< Updated upstream
 	base::GameModePtr game_mode = base::GameModeFactory::get("3100000", "titi", "gigi");
+=======
+	base::GameModePtr game_mode = base::GameModeFactory::getGameMode("112", "titi", "gigi");
+>>>>>>> Stashed changes
 
 	game_mode->run();
 	

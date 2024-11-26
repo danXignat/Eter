@@ -25,7 +25,7 @@ namespace base {
 		bool isFixed() const;
 		bool isCardOfColorAt(color::ColorType, const Coord&) const;
 		uint16_t getSize() const;
-		std::optional<std::reference_wrapper<CombatCard>> getTopCard(Coord pos);
+		std::optional<CombatCardRef> getTopCard(Coord pos);
 		Coord getLeftCorner() const;
 
 		void appendMove(const Coord&, CombatCard&&,bool bury=false);

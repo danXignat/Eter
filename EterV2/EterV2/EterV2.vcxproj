@@ -25,9 +25,9 @@
     <ClCompile Include="ElementalService.cpp" />
     <ClCompile Include="ExplosionCard.cpp" />
     <ClCompile Include="ExplosionService.cpp" />
-    <ClCompile Include="GameMode.cpp" />
     <ClCompile Include="GameModeFactory.cpp" />
     <ClCompile Include="IllusionService.cpp" />
+    <ClCompile Include="InputHandler.cpp" />
     <ClCompile Include="logger.cpp" />
     <ClCompile Include="MageCard.cpp" />
     <ClCompile Include="MageMode.cpp" />
@@ -53,10 +53,11 @@
     <ClInclude Include="ElementalService.h" />
     <ClInclude Include="ExplosionCard.h" />
     <ClInclude Include="ExplosionService.h" />
-    <ClInclude Include="GameMode.h" />
     <ClInclude Include="GameModeFactory.h" />
+    <ClInclude Include="GameModeType.h" />
     <ClInclude Include="IGameMode.h" />
     <ClInclude Include="IllusionService.h" />
+    <ClInclude Include="InputHandler.h" />
     <ClInclude Include="logger.h" />
     <ClInclude Include="MageCard.h" />
     <ClInclude Include="MageMode.h" />
