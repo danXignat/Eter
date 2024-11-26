@@ -33,12 +33,8 @@
     <ClCompile Include="MageCard.cpp" />
     <ClCompile Include="MageMode.cpp" />
     <ClCompile Include="MageService.cpp" />
-    <ClCompile Include="MageTypeAbility.h" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="MasterOfAir.cpp" />
-    <ClCompile Include="MasterOfEarth.cpp" />
-    <ClCompile Include="MasterOfFire.cpp" />
-    <ClCompile Include="MasterOfWater.cpp" />
+    <ClCompile Include="Masters.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="PowerCard.cpp" />
     <ClCompile Include="PowerCards.cpp" />
@@ -62,10 +58,8 @@
     <ClInclude Include="MageCard.h" />
     <ClInclude Include="MageMode.h" />
     <ClInclude Include="MageService.h" />
-    <ClInclude Include="MasterOfAir.h" />
-    <ClInclude Include="MasterOfEarth.h" />
-    <ClInclude Include="MasterOfFire.h" />
-    <ClInclude Include="MasterOfWater.h" />
+    <ClInclude Include="MageTypeAbility.h" />
+    <ClInclude Include="Masters.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="PowerCard.h" />
     <ClInclude Include="PowerCards.h" />

@@ -2,11 +2,11 @@
 #include<iostream>
 
 
-#include"Board.h"
-#include"Player.h"
-#include"typedefs.h"
+#include "Board.h"
+#include "Player.h"
+#include "typedefs.h"
 
-#include"MageTypeAbility.h"
+#include "MageTypeAbility.h"
 
 namespace base {
 	class MageCard {

@@ -8,10 +8,7 @@
 #include "MageCard.h"
 #include "MageTypeAbility.h"
 
-#include "MasterOfFire.h"
-#include "MasterOfAir.h"
-#include "MasterOfWater.h"
-#include "MasterOfEarth.h"
+#include "Masters.h"
 
 namespace base {
     class MageService {

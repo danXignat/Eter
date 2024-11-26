@@ -8,20 +8,17 @@ using namespace logger;
 namespace base {
 	Explosion::Explosion(uint16_t size) :
 		m_board_size{ size },
-		m_generator{ m_random() } {
+		m_effects{ size, std::vector<std::optional<Effect>>(size) } {
 
-		m_effect_count = _generateEffectCount();
-		std::vector<Coord> positions{ _generateEffectPos() };
-		std::vector<Effect> effects{ _generateEffectType() };
+		std::random_device rd;
+		std::mt19937 gen(rd());
 
-		m_effects.resize(m_board_size);
-		for (auto& row : m_effects) {
-			row.resize(m_board_size);
-		}
+		m_effect_count = _generateEffectCount(gen);
+		std::vector<Coord> positions{ _generateEffectPos(gen) };
+		std::vector<Effect> effects{ _generateEffectType(gen) };
 
 		for (uint16_t i = 0; i < m_effect_count; ++i) {
 			auto [row, col] = positions[i];
-
 			m_effects[row][col] = effects[i];
 
 			Logger::log(
@@ -33,15 +30,15 @@ namespace base {
 
 	}
 
-	uint16_t Explosion::_generateEffectCount() {
-		uint16_t begin = (m_board_size == 3) ? 2 : 3;
-		uint16_t end = (m_board_size == 3) ? 4 : 6;
+	uint16_t Explosion::_generateEffectCount(std::mt19937& gen) {
+		uint16_t begin = (m_board_size == 3) ? MIN_EFFECTS_3x3 : MIN_EFFECTS_4x4;
+		uint16_t end = (m_board_size == 3) ? MAX_EFFECTS_3x3 : MAX_EFFECTS_4x4;
 
 		std::uniform_int_distribution<uint16_t> random{ begin, end };
-		return random(m_generator);
+		return random(gen);
 	}
 
-	std::vector<Coord> Explosion::_generateEffectPos() {
+	std::vector<Coord> Explosion::_generateEffectPos(std::mt19937& gen) {
 		std::vector<Coord> positions;
 		positions.reserve(m_board_size * m_board_size);
 
@@ -51,18 +48,18 @@ namespace base {
 			}
 		}
 
-		std::shuffle(positions.begin(), positions.end(), m_generator);
+		std::shuffle(positions.begin(), positions.end(), gen);
 
 		return { positions.begin(), positions.begin() + m_effect_count };
 	}
 
-	std::vector<Effect> Explosion::_generateEffectType() {
+	std::vector<Effect> Explosion::_generateEffectType(std::mt19937& gen) {
 		std::uniform_int_distribution<uint16_t> dist{ 0, 9 };
 		std::vector<Effect> effects;
 		effects.reserve(m_effect_count);
 
 		for (uint16_t i = 0; i < m_effect_count; i++) {
-			uint16_t random_num = dist(m_generator);
+			uint16_t random_num = dist(gen);
 
 			if (random_num == 0) {
 				effects.push_back(Effect::HOLE);

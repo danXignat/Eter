@@ -61,7 +61,9 @@ namespace base {
 				}
 			}
 			if (input.service_type.has_value() && input.service_type == ServiceType::ELEMENTAL) {
-				m_elemental_service.apply(curr_player.get());
+				char choice;
+				std::cin >> choice;
+				m_elemental_service.apply(choice, curr_player.get());
 				std::cin.get();
 			}
 			else if (auto card = curr_player.get().getCard(input.card_type.value())) {
@@ -111,6 +113,7 @@ namespace base {
 
 	void ElementalMode::render() {
 		m_board.render();
+		m_elemental_service.renderCards();
 
 		if (m_explosion_service) {
 			m_explosion_service->render_explosion();

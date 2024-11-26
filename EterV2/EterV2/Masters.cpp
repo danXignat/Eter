@@ -1,4 +1,4 @@
-#include"MasterOfFire.h"
+#include"Masters.h"
 
 #include <format>
 
@@ -110,12 +110,12 @@ namespace base {
         }
 
         for (const auto& [pos, val] : rows) {
-            if (val.first && val.second >= 3) {
+            if (val.first >= 3 && val.second) {
                 line_choices.push_back(pos);
             }
         }
         for (const auto& [pos, val] : cols) {
-            if (val.first && val.second >= 3) {
+            if (val.first >= 3 && val.second) {
                 column_choices.push_back(pos);
             }
         }
@@ -171,11 +171,11 @@ namespace base {
     }
 
     void MasterOfEarthBack::apply(Board& board, Player& player) {
-        
+
     }
 
-    // ---------------------------------------MasterOfAir----------------------------------------
-    // ---------BlowAway--------
+    /// ---------------------------------------MasterOfAir----------------------------------------
+    /// ---------BlowAway--------
     MasterOfAirFront::MasterOfAirFront() {
         m_type = MageType::Air;
         m_ability = MageTypeAbility::BlowAway;
@@ -234,7 +234,7 @@ namespace base {
     }
 
     void MasterOfAirBack::apply(Board& board, Player& player) {
-      
+
     }
 
     //----------------------------------------- MasterOfWater---------------------------------------
@@ -296,7 +296,7 @@ namespace base {
     }
 
     void MasterOfWaterBack::apply(Board& board, Player& player) {
-        
+
     }
 
 }

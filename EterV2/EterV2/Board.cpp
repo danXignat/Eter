@@ -250,7 +250,7 @@ namespace base {
 		}
 	}
 
-	//--------------------------------Inner Classes-------------------------------------
+	///--------------------------------Inner Classes-------------------------------------
 
 	Board::BoundingRect::BoundingRect(uint16_t size) :
 		size{ size },

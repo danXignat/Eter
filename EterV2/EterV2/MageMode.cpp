@@ -35,8 +35,11 @@ namespace base {
 	//---------------------------------------Events----------------------------------------------
 
 	void MageMode::run() {
-		this->render();
+		m_mage_service.selectMages();
+		system("cls");
 
+
+		this->render();
 		while (m_win_manager.won() == false) {
 			InputHandler input;
 			try {
@@ -63,7 +66,7 @@ namespace base {
 			if (input.service_type.has_value() && input.service_type == ServiceType::MAGE) {
 				m_mage_service.apply(curr_player.get());
 				std::cin.get();
-				_switchPlayer();
+				switchPlayer();
 			}
 			else if (auto card = curr_player.get().getCard(input.card_type.value())) {
 				Coord coord{ input.x.value(), input.y.value() };

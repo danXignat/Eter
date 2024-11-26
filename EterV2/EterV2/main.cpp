@@ -1,7 +1,7 @@
 #include <iostream>
 #include <conio.h>
 
-#include "GameMode.h"
+#include "IGameMode.h"
 #include "GameModeFactory.h"
 #include "typedefs.h"
 #include "MageService.h"
@@ -11,7 +11,7 @@
 int main() {
 	//system("start powershell -Command \"Get-Content -Path 'log.txt' -Wait\"");
 
-	base::GameModePtr game_mode = base::GameModeFactory::get("2000000", "titi", "gigi");
+	base::GameModePtr game_mode = base::GameModeFactory::get("312", "titi", "gigi");
 
 	game_mode->run();
 	

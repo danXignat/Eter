@@ -41,22 +41,7 @@
     <ClCompile Include="ExplosionCard.cpp">
       <Filter>Cards</Filter>
     </ClCompile>
-    <ClCompile Include="MasterOfFire.cpp">
-      <Filter>Cards\Mage</Filter>
-    </ClCompile>
-    <ClCompile Include="MageTypeAbility.h">
-      <Filter>Cards\Mage</Filter>
-    </ClCompile>
     <ClCompile Include="MageCard.cpp">
-      <Filter>Cards\Mage</Filter>
-    </ClCompile>
-    <ClCompile Include="MasterOfEarth.cpp">
-      <Filter>Cards\Mage</Filter>
-    </ClCompile>
-    <ClCompile Include="MasterOfAir.cpp">
-      <Filter>Cards\Mage</Filter>
-    </ClCompile>
-    <ClCompile Include="MasterOfWater.cpp">
       <Filter>Cards\Mage</Filter>
     </ClCompile>
     <ClCompile Include="ElementalService.cpp">
@@ -73,6 +58,9 @@
     </ClCompile>
     <ClCompile Include="InputHandler.cpp">
       <Filter>GameMode\Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="Masters.cpp">
+      <Filter>Cards\Mage</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -174,23 +162,8 @@
     <ClInclude Include="MageCard.h">
       <Filter>Cards\Mage</Filter>
     </ClInclude>
-    <ClInclude Include="MasterOfFire.h">
-      <Filter>Cards\Mage</Filter>
-    </ClInclude>
-    <ClInclude Include="MasterOfEarth.h">
-      <Filter>Cards\Mage</Filter>
-    </ClInclude>
-    <ClInclude Include="MasterOfAir.h">
-      <Filter>Cards\Mage</Filter>
-    </ClInclude>
-    <ClInclude Include="MasterOfWater.h">
-      <Filter>Cards\Mage</Filter>
-    </ClInclude>
     <ClInclude Include="ElementalService.h">
       <Filter>GameMode\Services</Filter>
-    </ClInclude>
-    <ClInclude Include="PowerCardType.h">
-      <Filter>Cards\Power</Filter>
     </ClInclude>
     <ClInclude Include="PowerCard.h">
       <Filter>Cards\Power</Filter>
@@ -200,6 +173,15 @@
     </ClInclude>
     <ClInclude Include="InputHandler.h">
       <Filter>GameMode\Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="MageTypeAbility.h">
+      <Filter>Enums</Filter>
+    </ClInclude>
+    <ClInclude Include="Masters.h">
+      <Filter>Cards\Mage</Filter>
+    </ClInclude>
+    <ClInclude Include="PowerCardType.h">
+      <Filter>Enums</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

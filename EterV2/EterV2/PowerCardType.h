@@ -58,10 +58,10 @@ namespace base {
  };
 
  const std::unordered_map<PowerCardType, std::string_view> mapPowerTypeAbilities = {
- {PowerCardType::ControllerExplosion,"Cause a Power Explosion."},
- {PowerCardType::Destruction, " Remove from play the last card played by the opponent."},
-	 {PowerCardType::Flame," Reveal an opponent�s Illusion and next place your card on any space on the playing field."},
-	 {PowerCardType::Fire,"Return to their owners� hands all visible cards of the same value (at least 2 of them) chosen by you - also yours! In case of stacks remove only the top card."},
+		{PowerCardType::ControllerExplosion,"Cause a Power Explosion."},
+		{PowerCardType::Destruction, " Remove from play the last card played by the opponent."},
+		{PowerCardType::Flame," Reveal an opponent�s Illusion and next place your card on any space on the playing field."},
+		{PowerCardType::Fire,"Return to their owners� hands all visible cards of the same value (at least 2 of them) chosen by you - also yours! In case of stacks remove only the top card."},
 		{PowerCardType::Ash," Rise like a Phoenix!  If one of your cards was removed from play, you can immediately play it again."},
 		{PowerCardType::Spark,"Take any of your cards that is covered by an opponent�s cards and play it onto a different space. In case of stacks, you can choose any of your covered cards."},
 		{PowerCardType::Squall,"Return to the opponent�s hand any one of his visible cards on the playing f ield"},
