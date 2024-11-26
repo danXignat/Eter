@@ -8,7 +8,7 @@
 #include "Board.h"
 
 int main() {
-	//system("start powershell -Command \"Get-Content -Path 'log.txt' -Wait\"");
+	system("start powershell -Command \"Get-Content -Path 'log.txt' -Wait\"");
 
 	base::GameModePtr game_mode = base::GameModeFactory::get("2000000", "titi", "gigi");
 
