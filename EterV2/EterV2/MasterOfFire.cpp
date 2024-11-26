@@ -131,9 +131,39 @@ namespace base {
         m_ability = MageTypeAbility::Bury;
     }
 
-    void MasterOfEarthFront::apply(Board& board, Player& player) {
-        // TODO: Implement the ability logic for Bury
+    std::vector<Coord> MasterOfEarthFront::getChoices(Board& board, const Player& player){
+        std::vector<Coord>choices;
+        for (const auto& [coord, stack] : board) {
+            if (!stack.empty() && stack.back().getColor() != player.getColor()) {
+                choices.emplace_back(coord);
+            }
+        }
+        return choices;
     }
+    void MasterOfEarthFront::apply(Board& board, Player& player) {
+        bool bury = true;
+        auto choices = getChoices(board, player);
+        if (choices.empty()) {
+            std::cout << "No valid position for using this Mage!\n";
+            return;
+        }
+        std::cout << "Your available choices are: \n";
+        for(const auto& [x,y] : choices) {
+            std::cout << std::format("({},{})", x, y) << "\n";
+        }
+        Coord choice;
+        std::cin >> choice.first >> choice.second;
+        if (std::find(choices.begin(), choices.end(), choice) == choices.end()) {
+            Logger::log(Level::WARNING, "Invalid choice!\n");
+            return;
+        }
+        char card_type;
+        std::cin >> card_type;
+        auto card = player.getCard(charToCombatCard(card_type));
+        board.appendMove(choice, std::move(*card), true);
+        
+    }
+    
 
     // MasterOfEarthBack
     MasterOfEarthBack::MasterOfEarthBack() {

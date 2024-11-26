@@ -18,8 +18,8 @@ namespace base {
 		/*type_p1 = _getTypeChoice(choice_p1);
 		type_p2 = _getTypeChoice(choice_p2);*/
 
-		type_p1 = MageType::Fire;
-		type_p2 = MageType::Fire;
+		type_p1 = MageType::Earth;
+		type_p2 = MageType::Earth;
 	}
 	
 	void MageService::selectMages() {

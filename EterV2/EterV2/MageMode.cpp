@@ -74,7 +74,7 @@ namespace base {
 			std::cout << "Player RED has won";
 		}
 		else {
-			std::cout << "Player RED has won";
+			std::cout << "Player BLUE has won";
 		}
 
 		std::cin.get();
