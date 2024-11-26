@@ -2,9 +2,6 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="GameMode.cpp">
-      <Filter>GameMode</Filter>
-    </ClCompile>
     <ClCompile Include="Player.cpp">
       <Filter>Core</Filter>
     </ClCompile>
@@ -71,6 +68,12 @@
     <ClCompile Include="PowerCards.cpp">
       <Filter>Cards\Power</Filter>
     </ClCompile>
+    <ClCompile Include="GameModeType.h">
+      <Filter>Enums</Filter>
+    </ClCompile>
+    <ClCompile Include="InputHandler.cpp">
+      <Filter>GameMode\Managers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="GameMode">
@@ -109,9 +112,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="IGameMode.h">
-      <Filter>GameMode</Filter>
-    </ClInclude>
-    <ClInclude Include="GameMode.h">
       <Filter>GameMode</Filter>
     </ClInclude>
     <ClInclude Include="Board.h">
@@ -197,6 +197,9 @@
     </ClInclude>
     <ClInclude Include="PowerCards.h">
       <Filter>Cards\Power</Filter>
+    </ClInclude>
+    <ClInclude Include="InputHandler.h">
+      <Filter>GameMode\Managers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

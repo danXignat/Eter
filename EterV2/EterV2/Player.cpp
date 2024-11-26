@@ -55,16 +55,7 @@ namespace base {
         return !m_cards.empty();
     }
 
-    std::optional<CombatCard> Player::getCard(CombatCardType type, bool illusion) { // getting card ptr or nothing if there is no card
-        if (illusion) {
-            if (m_illusion_used) {
-                return std::nullopt;
-            }
-            else {
-                m_illusion_used = true;
-            }
-        }
-
+    std::optional<CombatCard> Player::getCard(CombatCardType type) { // getting card ptr or nothing if there is no card
         auto it = m_cards.find(type);
 
         if (it == m_cards.end()) {
@@ -74,36 +65,10 @@ namespace base {
         CombatCard card = std::move(it->second);
         m_cards.erase(it);
 
-        if (m_illusion_used) {
-            //card.setIllusion();
-        }
-
         return card;
     }
 
     void Player::addCard(CombatCard&& card) {
         m_cards.emplace(card.getType(), std::move(card));
     }
-
-    /*void Player::setMageCard(std::unique_ptr<MageCard>&& mageCard) {
-        m_mage_card = std::move(mageCard);
-    }*/
-   /*
-    MageCard* Player::getMageCard() {
-        return m_mage_card.get();
-    }
-
-    bool Player::useMageCard() {
-        if (!m_mage_card_used && m_mage_card) {
-            m_mage_card_used = true;
-            return true;
-        }
-        return false;
-    }
-
-    bool Player::hasUnusedMageCard() const
-    {
-        return m_mage_card && !m_mage_card_used;
-    }*/
-
 }

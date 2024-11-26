@@ -1,26 +1,12 @@
-#include "GameMode.h"
+#include "InputHandler.h"
 
-#include <unordered_set>
+#include <string>
+#include <iostream>
+#include <sstream>
+#include <regex>
 
 namespace base {
-
-	GameMode::GameMode() : m_current_player{ 0 } {
-
-	}
-
-	//--------------------------------------------------Methods-----------------------------------
-
-	void GameMode::_switchPlayer() {
-		m_current_player = !m_current_player;
-	}
-
-	Player& GameMode::_currPlayer() {
-		return (m_current_player == 0) ? m_player1.value() : m_player2.value();
-	}
-
-	//-------------------------------------------Input Manager---------------------------------------------
-
-	void GameMode::InputHandler::read() {
+	void InputHandler::read() {
 		std::string input;
 		std::getline(std::cin, input);
 

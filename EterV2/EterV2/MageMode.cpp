@@ -1,39 +1,40 @@
 #include "MageMode.h"
 
-
-#include "TrainingMode.h"
-
 #include <format>
 
+#include "InputHandler.h"
 #include "logger.h"
 
 using namespace logger;
 
 namespace base {
 	//---------------------------------------Constructor-------------------------------------
-	MageMode::MageMode(bool illusion, bool explosion, const std::string& player1_name, const std::string& player2_name)
+	MageMode::MageMode(const std::vector<ServiceType>& services, const std::string& player1_name, const std::string& player2_name)
 		: m_board{ 3 },
 		m_win_manager{ m_board },
-		m_mage_service{ m_board }
-	{
-		m_player1.emplace(player1_name, color::ColorType::RED);
-		m_player2.emplace(player2_name, color::ColorType::BLUE);
+		m_player_red{ player1_name, color::ColorType::RED },
+		m_player_blue{ player2_name, color::ColorType::BLUE },
+		curr_player{ m_player_red },
+		m_mage_service{ m_board } {
 
-		if (illusion) {
-			m_illusion_service.emplace(m_board);
-		}
-
-		if (explosion) {
-			m_explosion_service.emplace(m_board, m_player1.value(), m_player2.value());
+		for (ServiceType service : services) {
+			switch (service) {
+				using enum ServiceType;
+			case ILLUSION:
+				m_illusion_service.emplace(m_board);
+				break;
+			case EXPLOSION:
+				m_explosion_service.emplace(m_board, m_player_red, m_player_blue);
+				break;
+			default:
+				break;
+			}
 		}
 	}
 
 	//---------------------------------------Events----------------------------------------------
 
 	void MageMode::run() {
-		m_mage_service.selectMages();
-		system("cls");
-
 		this->render();
 
 		while (m_win_manager.won() == false) {
@@ -48,20 +49,37 @@ namespace base {
 				continue;
 			}
 
+			if (m_explosion_service) {
+				bool is_explosion = input.service_type && input.service_type == ServiceType::EXPLOSION;
+				if (is_explosion) {
+					m_explosion_service->setting();
+					m_explosion_service->apply();
+					system("cls");
+					this->render();
+					continue;
+				}
+			}
+
 			if (input.service_type.has_value() && input.service_type == ServiceType::MAGE) {
-				m_mage_service.apply(_currPlayer());
+				m_mage_service.apply(curr_player.get());
 				std::cin.get();
 				_switchPlayer();
 			}
-			else if (auto card = _currPlayer().getCard(input.card_type.value())) {
-
+			else if (auto card = curr_player.get().getCard(input.card_type.value())) {
 				Coord coord{ input.x.value(), input.y.value() };
+
+				if (m_illusion_service) {
+					bool is_illusion = input.service_type && input.service_type == ServiceType::ILLUSION;
+					if (is_illusion) {
+						m_illusion_service->add(card.value());
+					}
+				}
 
 				m_board.appendMove(coord, std::move(*card));
 
 				m_win_manager.addCard(coord);
 
-				_switchPlayer();
+				switchPlayer();
 			}
 			else {
 				Logger::log(Level::WARNING, "No more cards of this type");
@@ -71,7 +89,7 @@ namespace base {
 			this->render();
 		}
 
-		if (_currPlayer().getColor() == color::ColorType::BLUE) {
+		if (curr_player.get().getColor() == color::ColorType::BLUE) {
 			std::cout << "Player RED has won";
 		}
 		else {
@@ -82,6 +100,15 @@ namespace base {
 	}
 
 	////------------------------------------------------Methods-------------------------------------------------
+
+	void MageMode::switchPlayer() {
+		if (curr_player.get().getColor() == color::ColorType::RED) {
+			curr_player = m_player_blue;
+		}
+		else {
+			curr_player = m_player_red;
+		}
+	}
 
 	void MageMode::render() {
 		m_board.render();
