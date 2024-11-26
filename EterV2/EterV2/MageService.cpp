@@ -18,8 +18,8 @@ namespace base {
 		/*type_p1 = _getTypeChoice(choice_p1);
 		type_p2 = _getTypeChoice(choice_p2);*/
 
-		type_p1 = MageType::Fire;
-		type_p2 = MageType::Fire;
+		m_type_p1 = MageType::Earth;
+		m_type_p2 = MageType::Earth;
 	}
 	
 	void MageService::selectMages() {
@@ -29,16 +29,16 @@ namespace base {
 
 	void MageService::apply(Player& player) {
 		if (player.getColor() == color::ColorType::RED) {
-			card_p1->apply(m_board, player);
+			m_card_p1->apply(m_board, player);
 		}
 		else {
-			card_p2->apply(m_board, player);
+			m_card_p2->apply(m_board, player);
 		}
 	}
 
 	void MageService::_setPlayerMage(bool player) {
 		std::cout << ((player == 0) ? "Player 1" : "Player 2") << " choose mage:\n";
-		MageType type = (player == 0) ? type_p1 : type_p2;
+		MageType type = (player == 0) ? m_type_p1 : m_type_p2;
 		std::cout << "Mage: " << typeToStrings(type) << "\n";
 
 		auto abilities = _getAbilityForType(type);
@@ -52,18 +52,18 @@ namespace base {
 		{
 		case 1:
 			if (player == 0) {
-				card_p1 = _factory(abilities.first);
+				m_card_p1 = _factory(abilities.first);
 			}
 			else {
-				card_p2 = _factory(abilities.first);
+				m_card_p2 = _factory(abilities.first);
 			}
 			break;
 		case 2:
 			if (player == 0) {
-				card_p1 = _factory(abilities.second);
+				m_card_p1 = _factory(abilities.second);
 			}
 			else {
-				card_p2 = _factory(abilities.second);
+				m_card_p2 = _factory(abilities.second);
 			}
 			break;
 		default:
@@ -135,7 +135,7 @@ namespace base {
 			return std::make_unique<MasterOfAirBack>();
 
 		case Boat:
-			return std::make_unique<MasterOfWaterBack>();
+			return std::make_unique<MasterOfWaterFront>();
 
 		case BoatRowOrColumn:
 			return std::make_unique<MasterOfWaterBack>();

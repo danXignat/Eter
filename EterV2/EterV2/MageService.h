@@ -30,10 +30,10 @@ namespace base {
     private:
         Board& m_board;
 
-        MageType type_p1;
-        MageType type_p2;
+        MageType m_type_p1;
+        MageType m_type_p2;
 
-        std::unique_ptr<MageCard> card_p1;
-        std::unique_ptr<MageCard> card_p2;
+        std::unique_ptr<MageCard> m_card_p1;
+        std::unique_ptr<MageCard> m_card_p2;
     };
 }

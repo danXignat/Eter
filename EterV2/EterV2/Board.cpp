@@ -19,12 +19,12 @@ namespace base {
 
 	//----------------------------Public-Methods--------------------------------
 
-	void Board::appendMove(const Coord& coord, CombatCard&& card) {
+	void Board::appendMove(const Coord& coord, CombatCard&& card, bool bury) {
 		auto top_card = this->getTopCard(coord);
 		if (top_card.has_value() && top_card->get().isIllusion()) {
 			IllusionService::event(top_card->get(), card);
 		}
-		else if (_isValidMove(coord, card)) {
+		else if (_isValidMove(coord, card, bury)) {
 			m_bounding_rect.add(coord);
 
 			m_combat_cards[coord].emplace_back(std::move(card));
@@ -128,8 +128,30 @@ namespace base {
 	}
 
 	void Board::moveStack(const Coord& from_coord, const Coord& to_coord) {
-		
+		auto it = m_combat_cards.find(from_coord);
+		if (it == m_combat_cards.end()) {
+			Logger::log(Level::ERROR, "No stack at ({},{})\n", from_coord.first, from_coord.second);
+			return;
+		}
+		if (m_combat_cards.contains(to_coord)) {
+			Logger::log(Level::ERROR, "Destination must be an empty space!\n", from_coord.first, from_coord.second);
+			return;
+		}
+		if (!m_available_spaces.contains(to_coord)) {
+			Logger::log(Level::ERROR, "Destination is not a valid space!\n", from_coord.first, from_coord.second);
+			return;
+		}
+
+		m_combat_cards[to_coord] = std::move(it->second);
+		m_combat_cards.erase(it);
+
+		_reinitialise();
+
+		Logger::log(Level::INFO, "Stack moved from ({}, {}) to ({}, {})",
+			from_coord.first, from_coord.second, to_coord.first, to_coord.second);
+
 	}
+
 
 	void Board::swapStacks(const Coord& from_coord, const Coord& to_coord) {
 
@@ -164,11 +186,11 @@ namespace base {
 	}
 
 	//----------------------------Private Methods--------------------------------
-	bool Board::_isValidMove(const Coord& coord, const CombatCard& card) {
+	bool Board::_isValidMove(const Coord& coord, const CombatCard& card, bool bury) {
 		if (m_combat_cards.contains(coord)) {
 			bool bigger = card.getType() > m_combat_cards[coord].back().getType();
-			
-			if (!bigger) {
+
+			if (!bigger && !bury) {
 				Logger::log(Level::WARNING, "card too small");
 				return false;
 			}
@@ -238,7 +260,7 @@ namespace base {
 	}
 
 	Board::BoundingRect::BoundingRect(uint16_t size, const Coord& coord) :
-		size{size},
+		size{ size },
 		corner1{ coord.first, coord.second }, corner2{ coord.first, coord.second },
 		fixed_width{ false }, fixed_height{ false } {
 

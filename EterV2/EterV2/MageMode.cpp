@@ -51,6 +51,7 @@ namespace base {
 			if (input.service_type.has_value() && input.service_type == ServiceType::MAGE) {
 				m_mage_service.apply(_currPlayer());
 				std::cin.get();
+				_switchPlayer();
 			}
 			else if (auto card = _currPlayer().getCard(input.card_type.value())) {
 
@@ -74,7 +75,7 @@ namespace base {
 			std::cout << "Player RED has won";
 		}
 		else {
-			std::cout << "Player RED has won";
+			std::cout << "Player BLUE has won";
 		}
 
 		std::cin.get();
