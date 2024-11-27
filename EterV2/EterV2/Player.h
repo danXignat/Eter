@@ -17,6 +17,7 @@ namespace base {
         std::string getName() const;
         color::ColorType getColor() const;
         std::optional<CombatCard> getCard(CombatCardType, bool = false);
+         std::unordered_multimap<CombatCardType, CombatCard> getCards();
         bool hasCards() const;
 
         void setName(std::string_view name);

@@ -32,14 +32,19 @@ namespace base {
     }
 
     void Flame::apply(Board& board, const Player& player) {
-       /* for (const auto& [coord, stack] : board) {
+        for (const auto& [coord, stack] : board) {
             auto top_card = board.getTopCard(coord);
             CombatCard& card = top_card->get();
-            if (card.getColor()!=player.getColor()&&card.isIllusion()) {
+            if (card.getColor() != player.getColor() && card.isIllusion()) {
                 card.flip();
             }
+           /* if (player.hasCards()) {
+                auto& player_cards = player.getCards();
+                board.appendMove(coord, player_cards);
+                
+            }*/
+            break;
         }
-        return;*/
     }
 
     Fire::Fire() {
@@ -67,8 +72,33 @@ namespace base {
     Squall::Squall() {
         m_ability = PowerCardType::Squall;
     }
+    std::vector<std::pair<Coord, CombatCard>> Squall::opponentCards(Board& board, const Player& opponent) {
+        std::vector<std::pair<Coord, CombatCard>> visible_cards;
+        for (auto& [coord, stack] : board) {
+            auto top_card = board.getTopCard(coord);
+
+            if (top_card && top_card->get().getColor() == opponent.getColor()) {
+                visible_cards.emplace_back(coord, top_card->get());
+            }
+        }
+
+        return visible_cards;
+    }
 
     void Squall::apply(Board& board, const Player& player) {
+        auto visible_cards = opponentCards(board, player);
+        std::cout << "Select a card to return to the opponent's hand" << '\n';
+
+        for (auto& [coord, stack] : visible_cards) {
+            std::cout << "Card at " << coord.second << ", " << coord.first << ":" << '\n';
+        }
+        uint8_t choice;
+        std::cout << "Enter the number of the card you want to return: ";
+        std::cin >> choice;
+        
+        auto& [coord, card] = visible_cards[choice - 1];
+        board.removeTopCardAt(coord);
+        Logger::log(Level::INFO, "Squall ability: Returned a visible card to the opponent's hand.");
     }
 
     Gale::Gale() {

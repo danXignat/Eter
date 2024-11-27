@@ -47,6 +47,10 @@ namespace base {
         return m_color;
     }
 
+     std::unordered_multimap<CombatCardType, CombatCard> Player::getCards() {
+        return m_cards;
+    }
+
     void Player::setName(std::string_view name) {
         m_name = name;
     }

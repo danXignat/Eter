@@ -61,6 +61,7 @@ namespace base {
 	class Squall :public PowerCard {
 	public:
 		Squall();
+		std::vector<std::pair<Coord, CombatCard>>opponentCards( Board& board, const Player& opponent);
 
 		void apply(Board& board, const Player& player) override;
 

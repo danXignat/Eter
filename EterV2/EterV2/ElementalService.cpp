@@ -17,8 +17,8 @@ namespace base {
 		/*type_p1 = static_cast<PowerCardType>(choices[0]);
 		type_p2 = static_cast<PowerCardType>(choices[1]);*/
 
-		type_p1 = PowerCardType::Flame;
-		type_p2 = PowerCardType::Flame;
+		type_p1 = PowerCardType::Squall;
+		type_p2 = PowerCardType::Squall;
 	}
 	void ElementalService::selectPowerCards() {
 		_setPlayerPowerCard(0);
