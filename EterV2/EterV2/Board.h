@@ -28,7 +28,7 @@ namespace base {
 		std::optional<std::reference_wrapper<CombatCard>> getTopCard(Coord pos);
 		Coord getLeftCorner() const;
 
-		void appendMove(const Coord&, CombatCard&&);
+		void appendMove(const Coord&, CombatCard&&,bool buty=false);
 		void removeTopCardAt(const Coord& coord);
 		void removeStack(const Coord& coord);
 		void removeRow(uint16_t x);
@@ -37,7 +37,7 @@ namespace base {
 		void swapStacks(const Coord& from_coord, const Coord& to_coord);
 
 	private:
-		bool _isValidMove(const Coord&, const CombatCard&);
+		bool _isValidMove(const Coord&, const CombatCard&,bool bury=false);
 		void _updateAvailableSpaces(Coord);
 		void _reinitialise();
 

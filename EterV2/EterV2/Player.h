@@ -6,18 +6,17 @@
 
 #include "CombatCard.h"
 #include "colors.h"
-#include "typedefs.h"
 
 namespace base {
-
     class Player {
+    public:
+
     public:
         Player(std::string_view, color::ColorType);
 
         std::string getName() const;
         color::ColorType getColor() const;
-        std::optional<CombatCard> getCard(CombatCardType, bool = false);
-         std::unordered_multimap<CombatCardType, CombatCard> getCards();
+        std::optional<CombatCard> getCard(CombatCardType);
         bool hasCards() const;
 
         void setName(std::string_view name);
@@ -42,4 +41,6 @@ namespace base {
         // std::unique_ptr<MageCard> m_mage_card;
         //bool m_mage_card_used;
     };
+
+    using PlayerRef = std::reference_wrapper<Player>;
 }

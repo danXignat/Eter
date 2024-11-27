@@ -4,7 +4,7 @@
 #include<unordered_map>
 
 namespace base {
-    enum class MageTypeAbility :uint16_t {
+	enum class MageTypeAbility :uint16_t {
 		None,
 
 		Burn,

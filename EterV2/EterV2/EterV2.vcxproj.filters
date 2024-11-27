@@ -2,9 +2,6 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="GameMode.cpp">
-      <Filter>GameMode</Filter>
-    </ClCompile>
     <ClCompile Include="Player.cpp">
       <Filter>Core</Filter>
     </ClCompile>
@@ -44,22 +41,7 @@
     <ClCompile Include="ExplosionCard.cpp">
       <Filter>Cards</Filter>
     </ClCompile>
-    <ClCompile Include="MasterOfFire.cpp">
-      <Filter>Cards\Mage</Filter>
-    </ClCompile>
-    <ClCompile Include="MageTypeAbility.h">
-      <Filter>Cards\Mage</Filter>
-    </ClCompile>
     <ClCompile Include="MageCard.cpp">
-      <Filter>Cards\Mage</Filter>
-    </ClCompile>
-    <ClCompile Include="MasterOfEarth.cpp">
-      <Filter>Cards\Mage</Filter>
-    </ClCompile>
-    <ClCompile Include="MasterOfAir.cpp">
-      <Filter>Cards\Mage</Filter>
-    </ClCompile>
-    <ClCompile Include="MasterOfWater.cpp">
       <Filter>Cards\Mage</Filter>
     </ClCompile>
     <ClCompile Include="ElementalService.cpp">
@@ -70,6 +52,15 @@
     </ClCompile>
     <ClCompile Include="PowerCards.cpp">
       <Filter>Cards\Power</Filter>
+    </ClCompile>
+    <ClCompile Include="GameModeType.h">
+      <Filter>Enums</Filter>
+    </ClCompile>
+    <ClCompile Include="InputHandler.cpp">
+      <Filter>GameMode\Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="Masters.cpp">
+      <Filter>Cards\Mage</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -109,9 +100,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="IGameMode.h">
-      <Filter>GameMode</Filter>
-    </ClInclude>
-    <ClInclude Include="GameMode.h">
       <Filter>GameMode</Filter>
     </ClInclude>
     <ClInclude Include="Board.h">
@@ -174,29 +162,26 @@
     <ClInclude Include="MageCard.h">
       <Filter>Cards\Mage</Filter>
     </ClInclude>
-    <ClInclude Include="MasterOfFire.h">
-      <Filter>Cards\Mage</Filter>
-    </ClInclude>
-    <ClInclude Include="MasterOfEarth.h">
-      <Filter>Cards\Mage</Filter>
-    </ClInclude>
-    <ClInclude Include="MasterOfAir.h">
-      <Filter>Cards\Mage</Filter>
-    </ClInclude>
-    <ClInclude Include="MasterOfWater.h">
-      <Filter>Cards\Mage</Filter>
-    </ClInclude>
     <ClInclude Include="ElementalService.h">
       <Filter>GameMode\Services</Filter>
-    </ClInclude>
-    <ClInclude Include="PowerCardType.h">
-      <Filter>Cards\Power</Filter>
     </ClInclude>
     <ClInclude Include="PowerCard.h">
       <Filter>Cards\Power</Filter>
     </ClInclude>
     <ClInclude Include="PowerCards.h">
       <Filter>Cards\Power</Filter>
+    </ClInclude>
+    <ClInclude Include="InputHandler.h">
+      <Filter>GameMode\Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="MageTypeAbility.h">
+      <Filter>Enums</Filter>
+    </ClInclude>
+    <ClInclude Include="Masters.h">
+      <Filter>Cards\Mage</Filter>
+    </ClInclude>
+    <ClInclude Include="PowerCardType.h">
+      <Filter>Enums</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

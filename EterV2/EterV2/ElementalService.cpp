@@ -1,40 +1,74 @@
 #include"ElementalService.h"
 
-#include<cstdint>
-#include<random>
-#include<memory>
+#include <cstdint>
+#include <random>
+#include <memory>
 #include <algorithm>
 
+#include "logger.h"
+#include "utils.h"
+
+using namespace logger;
+
 namespace base {
-	ElementalService::ElementalService(Board& board) :m_board{ board } {
+	ElementalService::ElementalService(Board& board) : m_board{ board } {
 		std::random_device rd;
 		std::mt19937 gen(rd());
 
-		std::array<uint16_t, ElementalService::power_number>choices;
+		std::array<uint16_t, ElementalService::power_number> choices;
 		std::iota(choices.begin(), choices.end(), 0);
 		std::shuffle(choices.begin(), choices.end(), gen);
 
 		/*type_p1 = static_cast<PowerCardType>(choices[0]);
 		type_p2 = static_cast<PowerCardType>(choices[1]);*/
 
-		type_p1 = PowerCardType::Squall;
-		type_p2 = PowerCardType::Squall;
-	}
-	void ElementalService::selectPowerCards() {
-		_setPlayerPowerCard(0);
-			_setPlayerPowerCard(1);
+		type_card1 = PowerCardType::Flame;
+		type_card2 = PowerCardType::Flame;
+
+		card1 = _factory(type_card1);
+		card2 = _factory(type_card2);
 	}
 
-	void ElementalService::apply(Player& player) {
-		if (player.getColor() == color::ColorType::RED) {
-			card_p1->apply(m_board, player);
+	void ElementalService::apply(char choice, Player& player) {
+		switch (choice) {
+		case '1': {
+			card1->apply(m_board, player);
+			card1.reset();
+			break;
 		}
-		else {
-			card_p2->apply(m_board, player);
+
+		case '2': {
+			card2->apply(m_board, player);
+			card2.reset();
+			break;
+		}
+
+		default: {
+			Logger::log(Level::WARNING, "choice invalid");
+			break;
+		}
+
+		}
+		
+	}
+
+	void ElementalService::renderCards() const {
+		if (card1) {
+			utils::printAtCoordinate(
+				std::format("Power 1 << {} >> {}", typeToStrings(type_card1), abilityToString(type_card1)),
+				1, 15
+			);
+		}
+
+		if (card2) {
+			utils::printAtCoordinate(
+				std::format("Power 2 << {} >> {}", typeToStrings(type_card2), abilityToString(type_card2)),
+				1, 16
+			);
 		}
 	}
 
-		void ElementalService::_setPlayerPowerCard(bool player) {
+	/*	void ElementalService::_setPlayerPowerCard(bool player) {
 			std::cout << ((player == 0) ? "Player 1" : "Player 2") << " choose powerCard:" << "\n";
 			PowerCardType type=(player == 0) ? type_p1 : type_p2;
 			std::cout << "Power card 1: " <<typeToStrings(type_p1)<<": "<< abilityToString(type_p1) << '\n';
@@ -66,11 +100,11 @@ namespace base {
 				std::cout << "Invalid input";
 				break;
 			}
-		}
+		}*/
 
-		PowerCardType ElementalService::_getPowerCard(PowerCardType type) {
+		/*PowerCardType ElementalService::_getPowerCard(PowerCardType type) {
 			return type;
-		}
+		} ???????????*/
 
 		std::unique_ptr<PowerCard>ElementalService::_factory(PowerCardType ability) {
 			switch (ability){

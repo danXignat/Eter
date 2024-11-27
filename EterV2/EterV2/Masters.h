@@ -24,7 +24,7 @@ namespace base {
 		void apply(Board& board, Player& player) override;
 
 		std::pair<std::vector<uint16_t>, std::vector<uint16_t>> getChoices(const Board& board, const Player& player);
-		
+
 	};
 
 	class MasterOfEarthFront : public MageCard {
@@ -32,6 +32,7 @@ namespace base {
 		MasterOfEarthFront();
 
 		void apply(Board& board, Player& player) override;
+		std::vector<Coord> getChoices(Board& board, const Player& player);
 	};
 
 	class MasterOfEarthBack : public MageCard {
@@ -46,6 +47,7 @@ namespace base {
 		MasterOfAirFront();
 
 		void apply(Board& board, Player& player) override;
+		std::vector<Coord> getChoices(Board& board, const Player& player);
 	};
 
 	class MasterOfAirBack : public MageCard {
@@ -60,6 +62,7 @@ namespace base {
 		MasterOfWaterFront();
 
 		void apply(Board& board, Player& player) override;
+		std::vector<Coord> getChoices(Board& board, Player& player);
 	};
 
 	class MasterOfWaterBack : public MageCard {
