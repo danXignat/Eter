@@ -19,6 +19,7 @@ namespace base {
         std::optional<CombatCard> getCard(CombatCardType);
         bool hasCards() const;
 
+        void renderCards() const;
         void setName(std::string_view name);
         void addCard(CombatCard&&);
 

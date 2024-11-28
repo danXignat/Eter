@@ -114,7 +114,8 @@ namespace base {
 	void ElementalMode::render() {
 		m_board.render();
 		m_elemental_service.renderCards();
-
+		m_player_red.renderCards();
+		m_player_blue.renderCards();
 		if (m_explosion_service) {
 			m_explosion_service->render_explosion();
 		}

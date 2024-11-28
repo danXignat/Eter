@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="BaseGameMode.cpp" />
     <ClCompile Include="Board.cpp" />
     <ClCompile Include="CombatCard.cpp" />
     <ClCompile Include="ElementalMode.cpp" />
@@ -42,6 +43,7 @@
     <ClCompile Include="WinManager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BaseGameMode.h" />
     <ClInclude Include="Board.h" />
     <ClInclude Include="colors.h" />
     <ClInclude Include="CombatCard.h" />

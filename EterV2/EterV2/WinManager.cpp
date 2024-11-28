@@ -79,7 +79,7 @@ namespace base {
 	}
 
 	int16_t WinManager::_getIncrement(const Coord& coord) {
-		int16_t increment = 0;
+		int16_t increment{0};
 
 		if (auto card = board.getTopCard(coord)) {
 			increment = (card->get().getColor() == color::ColorType::BLUE) ? 1 : -1;

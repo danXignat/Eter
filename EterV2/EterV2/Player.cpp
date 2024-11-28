@@ -1,5 +1,7 @@
 #include "Player.h"
 
+#include "utils.h"
+
 namespace base {
 
     //--------------------------------------Constructors Destructor----------------------------------
@@ -70,5 +72,29 @@ namespace base {
 
     void Player::addCard(CombatCard&& card) {
         m_cards.emplace(card.getType(), std::move(card));
+    }
+
+    //---------------------------------------------------------------------
+
+    void Player::renderCards() const {
+        if (m_color == color::ColorType::RED) {
+            utils::printAtCoordinate("Player RED cards: ", 50, 2);
+
+            int i = 0;
+            for (const auto&[type, card] : m_cards) {
+                utils::printAtCoordinate(card, 50 + i, 3);
+                i += 2;
+            }
+        }
+        else {
+            utils::printAtCoordinate("Player BLUE cards: ", 50, 4);
+
+            int i = 0;
+            for (const auto& [type, card] : m_cards) {
+                utils::printAtCoordinate(card, 50 + i, 5);
+                i += 2;
+            }
+
+        }
     }
 }

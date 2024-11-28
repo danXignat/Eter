@@ -62,6 +62,9 @@
     <ClCompile Include="Masters.cpp">
       <Filter>Cards\Mage</Filter>
     </ClCompile>
+    <ClCompile Include="BaseGameMode.cpp">
+      <Filter>GameMode</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="GameMode">
@@ -182,6 +185,9 @@
     </ClInclude>
     <ClInclude Include="PowerCardType.h">
       <Filter>Enums</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseGameMode.h">
+      <Filter>GameMode</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
