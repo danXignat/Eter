@@ -5,6 +5,7 @@
 #include"Player.h"
 #include"typedefs.h"
 #include"PowerCardType.h"
+#include "GameModeType.h"
 
 namespace base {
 	class PowerCard {

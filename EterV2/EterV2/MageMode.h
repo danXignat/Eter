@@ -2,31 +2,24 @@
 #include <string>
 #include <optional>
 
-#include "IGameMode.h"
+#include "BaseGameMode.h"
 #include "WinManager.h"
 #include "IllusionService.h"
 #include "ExplosionService.h"
 #include "MageService.h"
 #include "ServiceType.h"
+#include "GameModeType.h"
 
 namespace base {
-	class MageMode : public IGameMode {
+	class MageMode : public BaseGameMode {
 	public:
-		MageMode(const std::vector<ServiceType>&, const std::string&, const std::string&);
-		void run();
+		MageMode(const std::vector<ServiceType>&, const std::pair<std::string, std::string>&);
+		void run() override;
 		void render();
-		void switchPlayer();
 
 	private:
-		Board m_board;
-		WinManager m_win_manager;
-
 		std::optional<IllusionService> m_illusion_service;
 		std::optional<ExplosionService> m_explosion_service;
 		MageService m_mage_service;
-
-		PlayerRef curr_player;
-		Player m_player_red;
-		Player m_player_blue;
 	};
 }

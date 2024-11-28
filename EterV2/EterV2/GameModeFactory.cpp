@@ -4,19 +4,18 @@
 #include "ElementalMode.h"
 
 namespace base {
-	GameModePtr GameModeFactory::get(const std::string& id, const std::string& name1, const std::string& name2) {
+	GameModePtr GameModeFactory::get(const std::string& id, const std::pair<std::string, std::string>& player_names) {
 		auto services = GameModeFactory::getServiceConfig(id);
 
 		switch (GameModeFactory::getGameModeType(id)) {
 		case GameModeType::TrainingMode: {
-			return std::make_unique<TrainingMode>(services, name1, name2);
+			return std::make_unique<TrainingMode>(services, player_names);
 		}
 		case GameModeType::MageMode: {
-			//return std::unique_ptr<MageDuelMode>();
-			return std::make_unique<MageMode>(services, name1, name2);
+			return std::make_unique<MageMode>(services, player_names);
 		}
 		case GameModeType::ElementalPowerMode: {
-			return std::make_unique<ElementalMode>(services, name1, name2);
+			return std::make_unique<ElementalMode>(services, player_names);
 		}
 		case GameModeType::TournamentMode: {
 			//return std::unique_ptr<TournamentMode>();

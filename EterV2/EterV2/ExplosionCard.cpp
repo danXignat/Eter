@@ -75,7 +75,9 @@ namespace base {
 	}
 
 	void Explosion::render() {
-		Coord print_point{ 26, 2 };
+		Coord print_point{ 26, 14 };
+
+		utils::printAtCoordinate("Explosion:", print_point.first, print_point.second);
 
 		std::unordered_map<Effect, char> effect_map = {
 			{Effect::HAND, 'B'},
@@ -89,13 +91,13 @@ namespace base {
 					utils::printAtCoordinate(
 						std::format("{}{}",
 							effect_map[m_effects[i][j].value()], ' '),
-						print_point.first + 2 * j, print_point.second + i
+						print_point.first + 2 * j, print_point.second + i + 1
 					);
 				}
 				else {
 					utils::printAtCoordinate(
 						"- ",
-						print_point.first + 2 * j, print_point.second + i
+						print_point.first + 2 * j, print_point.second + i + 1
 					);
 				}
 			}

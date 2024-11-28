@@ -2,7 +2,7 @@
 #include <string>
 #include <optional>
 
-#include "IGameMode.h"
+#include "BaseGameMode.h"
 #include "WinManager.h"
 #include "IllusionService.h"
 #include "ExplosionService.h"
@@ -10,23 +10,15 @@
 #include "ServiceType.h"
 
 namespace base {
-	class ElementalMode : public IGameMode {
+	class ElementalMode : public BaseGameMode {
 	public:
-		ElementalMode(const std::vector<ServiceType>&, const std::string&, const std::string&);
-		void run();
+		ElementalMode(const std::vector<ServiceType>&, const std::pair<std::string, std::string>&);
+		void run() override;
 		void render();
-		void switchPlayer();
 
 	private:
-		Board m_board;
-		WinManager m_win_manager;
-
 		std::optional<IllusionService> m_illusion_service;
 		std::optional<ExplosionService> m_explosion_service;
 		ElementalService m_elemental_service;
-
-		PlayerRef curr_player;
-		Player m_player_red;
-		Player m_player_blue;
 	};
 }

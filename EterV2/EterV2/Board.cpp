@@ -17,6 +17,41 @@ namespace base {
 
 	}
 
+	Board::Board(GameSizeType size_type) :
+		m_size{ static_cast<uint16_t>(size_type) },
+		m_bounding_rect{ static_cast<uint16_t>(size_type) },
+		m_available_spaces{Board::START_POS} {
+
+	}
+
+	Board::Board(Board&& other) noexcept {
+		m_size = other.m_size;
+		m_bounding_rect = other.m_bounding_rect;
+		m_combat_cards = std::move(other.m_combat_cards);
+		m_available_spaces = std::move(other.m_available_spaces);
+
+		other.m_size = 0;
+		other.m_bounding_rect = BoundingRect();
+		other.m_combat_cards.clear();
+		other.m_available_spaces.clear();
+	}
+
+	Board& Board::operator=(Board&& other) noexcept {
+		if (&other != this) {
+			m_size = other.m_size;
+			m_bounding_rect = other.m_bounding_rect;
+			m_combat_cards = std::move(other.m_combat_cards);
+			m_available_spaces = std::move(other.m_available_spaces);
+
+			other.m_size = 0;
+			other.m_bounding_rect = BoundingRect();
+			other.m_combat_cards.clear();
+			other.m_available_spaces.clear();
+		}
+
+		return *this;
+	}
+
 	//----------------------------Public-Methods--------------------------------
 
 	void Board::appendMove(const Coord& coord, CombatCard&& card, bool bury) {
@@ -49,6 +84,46 @@ namespace base {
 		}
 
 	}
+	void Board::sideViewRender() {
+		Coord print_pos{ 30, 1 };
+
+		std::vector<std::pair<Coord, std::vector<CombatCardRef>>> cards;
+
+		for (auto& [coord, stack] : m_combat_cards) {
+			std::vector<CombatCardRef> card_refs;
+			
+			for (CombatCard& card : stack) {
+				card_refs.emplace_back(card);
+			}
+
+			cards.emplace_back(coord, card_refs);
+		}
+
+
+		std::sort(cards.begin(), cards.end(), [](const auto& el1, const auto& el2) {
+			return el1.first < el2.first; // Sort based on coordinates
+			});
+
+		utils::printAtCoordinate("List of cards", print_pos.first, print_pos.second);
+		uint16_t i = 1;
+		for (const auto& [coord, stack] : cards) {
+			std::string pos = std::format("({}, {}) -> ", coord.first, coord.second);
+
+			utils::printAtCoordinate(pos, print_pos.first, print_pos.second + i);
+			uint16_t j = 0;
+			for (const auto& card : stack) {
+				utils::printAtCoordinate(card.get(),  // Dereference the unique_ptr
+					print_pos.first + pos.size() + j,
+					print_pos.second + i
+				);
+				j += 2;
+			}
+
+			i++;
+		}
+	}
+
+
 
 	std::optional<CombatCardRef> Board::getTopCard(Coord pos) {
 		if (m_combat_cards.contains(pos)) {
@@ -251,6 +326,13 @@ namespace base {
 	}
 
 	///--------------------------------Inner Classes-------------------------------------
+
+	Board::BoundingRect::BoundingRect()
+		: size{ 0 },
+		corner1{ 0, 0 }, corner2{ 0, 0 },
+		fixed_width{ false }, fixed_height{ false } {
+
+	}
 
 	Board::BoundingRect::BoundingRect(uint16_t size) :
 		size{ size },

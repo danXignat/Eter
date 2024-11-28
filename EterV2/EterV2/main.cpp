@@ -9,12 +9,19 @@
 #include"ElementalMode.h"
 
 int main() {
-	system("start powershell -Command \"Get-Content -Path 'log.txt' -Wait\"");
+	//system("start powershell -Command \"Get-Content -Path 'log.txt' -Wait\"");
 
-	base::GameModePtr game_mode = base::GameModeFactory::get("312", "titi", "gigi");
+	base::GameModePtr game_mode = base::GameModeFactory::get("212", { "titi", "gigi" });
+	/// 1 training
+	/// 2 mage 
+	/// 3 power
+	/// 112 training mode cu explozii si iluzii
+	/// 212 mage mode cu explozii si iluzii
+	/// 312 power mode cu explozii si iluzii
 
 	game_mode->run();
 	
+
 	/*base::MageService service;
 
 	service.selectMages();*/

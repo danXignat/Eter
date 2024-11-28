@@ -9,13 +9,10 @@ using namespace logger;
 
 namespace base {
 	//---------------------------------------Constructor-------------------------------------
-	MageMode::MageMode(const std::vector<ServiceType>& services, const std::string& player1_name, const std::string& player2_name)
-		: m_board{ 3 },
-		m_win_manager{ m_board },
-		m_player_red{ player1_name, color::ColorType::RED },
-		m_player_blue{ player2_name, color::ColorType::BLUE },
-		curr_player{ m_player_red },
-		m_mage_service{ m_board } {
+	MageMode::MageMode(const std::vector<ServiceType>& services, const std::pair<std::string, std::string>& player_names) :
+		BaseGameMode{GameSizeType::BIG, player_names},
+		m_mage_service{ m_board }
+	{
 
 		for (ServiceType service : services) {
 			switch (service) {
@@ -64,11 +61,11 @@ namespace base {
 			}
 
 			if (input.service_type.has_value() && input.service_type == ServiceType::MAGE) {
-				m_mage_service.apply(curr_player.get());
+				m_mage_service.apply(m_curr_player.get());
 				std::cin.get();
-				switchPlayer();
+				_switchPlayer();
 			}
-			else if (auto card = curr_player.get().getCard(input.card_type.value())) {
+			else if (auto card = m_curr_player.get().getCard(input.card_type.value())) {
 				Coord coord{ input.x.value(), input.y.value() };
 
 				if (m_illusion_service) {
@@ -82,7 +79,7 @@ namespace base {
 
 				m_win_manager.addCard(coord);
 
-				switchPlayer();
+				_switchPlayer();
 			}
 			else {
 				Logger::log(Level::WARNING, "No more cards of this type");
@@ -92,7 +89,7 @@ namespace base {
 			this->render();
 		}
 
-		if (curr_player.get().getColor() == color::ColorType::BLUE) {
+		if (m_curr_player.get().getColor() == color::ColorType::BLUE) {
 			std::cout << "Player RED has won";
 		}
 		else {
@@ -104,17 +101,9 @@ namespace base {
 
 	////------------------------------------------------Methods-------------------------------------------------
 
-	void MageMode::switchPlayer() {
-		if (curr_player.get().getColor() == color::ColorType::RED) {
-			curr_player = m_player_blue;
-		}
-		else {
-			curr_player = m_player_red;
-		}
-	}
-
 	void MageMode::render() {
 		m_board.render();
+		m_board.sideViewRender();
 		m_player_red.renderCards();
 		m_player_blue.renderCards();
 		if (m_explosion_service) {

@@ -10,6 +10,7 @@
 #include "Player.h"
 #include "utils.h"
 #include "colors.h"
+#include "GameModeType.h"
 #include "typedefs.h"
 
 using namespace utils;
@@ -18,14 +19,23 @@ namespace base {
 	
 	class Board {
 	public:
+		static constexpr const std::pair<uint16_t, uint16_t> START_POS{10, 5};
+
 		Board(uint16_t);
+		Board(GameSizeType);
+		Board(const Board&) = delete;
+		Board& operator=(const Board&) = delete;
+		Board(Board&&) noexcept;
+		Board& operator=(Board&&) noexcept;
 		uint16_t size() const;
 
 		void render() const;
+		void sideViewRender();
+
 		bool isFixed() const;
 		bool isCardOfColorAt(color::ColorType, const Coord&) const;
 		uint16_t getSize() const;
-		std::optional<std::reference_wrapper<CombatCard>> getTopCard(Coord pos);
+		std::optional<CombatCardRef> getTopCard(Coord pos);
 		Coord getLeftCorner() const;
 
 		void appendMove(const Coord&, CombatCard&&,bool buty=false);
@@ -47,6 +57,7 @@ namespace base {
 			Coord corner1, corner2;
 			bool fixed_width, fixed_height;
 
+			BoundingRect();
 			BoundingRect(uint16_t);
 			BoundingRect(uint16_t size, const Coord& coord);
 
