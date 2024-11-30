@@ -69,6 +69,12 @@ namespace base {
         return !m_cards.empty();
     }
 
+    bool Player::hasCard(CombatCardType type){
+        if (m_cards.find(type) == m_cards.end())
+            return false;
+        return true;
+    }
+
     std::optional<CombatCard> Player::getCard(CombatCardType type) { // getting card ptr or nothing if there is no card
         auto it = m_cards.find(type);
 
@@ -81,7 +87,7 @@ namespace base {
 
         return card;
     }
-
+   
     void Player::addCard(CombatCard&& card) {
         m_cards.emplace(card.getType(), std::move(card));
     }

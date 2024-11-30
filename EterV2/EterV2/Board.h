@@ -38,16 +38,19 @@ namespace base {
 		std::optional<CombatCardRef> getTopCard(Coord pos);
 		Coord getLeftCorner() const;
 
-		void appendMove(const Coord&, CombatCard&&,bool buty=false);
+		void appendMove(const Coord&, CombatCard&&);
 		void removeTopCardAt(const Coord& coord);
 		void removeStack(const Coord& coord);
 		void removeRow(uint16_t x);
 		void removeColumn(uint16_t y);
 		void moveStack(const Coord& from_coord, const Coord& to_coord);
 		void swapStacks(const Coord& from_coord, const Coord& to_coord);
-
+		bool isValidMove(const Coord&, const CombatCard&, bool bury = false);
+		std::vector<Coord> availableSpaces();
+		std::optional<std::vector<std::vector<Coord>>> getBorders() const;
+		
+	
 	private:
-		bool _isValidMove(const Coord&, const CombatCard&,bool bury=false);
 		void _updateAvailableSpaces(Coord);
 		void _reinitialise();
 

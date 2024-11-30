@@ -40,6 +40,7 @@ namespace base {
 		MasterOfEarthBack();
 
 		void apply(Board& board, Player& player) override;
+		
 	};
 
 	class MasterOfAirFront : public MageCard {
@@ -48,6 +49,7 @@ namespace base {
 
 		void apply(Board& board, Player& player) override;
 		std::vector<Coord> getChoices(Board& board, const Player& player);
+
 	};
 
 	class MasterOfAirBack : public MageCard {

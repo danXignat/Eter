@@ -15,11 +15,11 @@ namespace base {
 		uint16_t choice_p1 = choices[0];
 		uint16_t choice_p2 = choices[1];
 
-		/*type_p1 = _getTypeChoice(choice_p1);
-		type_p2 = _getTypeChoice(choice_p2);*/
+		m_type_p1 = _getTypeChoice(choice_p1);
+		m_type_p2 = _getTypeChoice(choice_p2);
 
-		m_type_p1 = MageType::Earth;
-		m_type_p2 = MageType::Earth;
+		/*m_type_p1 = MageType::Earth;
+		m_type_p2 = MageType::Earth;*/
 	}
 	
 	void MageService::selectMages() {

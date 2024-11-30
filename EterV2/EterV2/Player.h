@@ -25,6 +25,7 @@ namespace base {
         color::ColorType getColor() const;
         std::optional<CombatCard> getCard(CombatCardType);
         bool hasCards() const;
+        bool hasCard(CombatCardType);
 
         void renderCards() const;
         void setName(std::string_view name);

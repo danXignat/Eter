@@ -35,7 +35,6 @@ namespace base {
 		m_mage_service.selectMages();
 		system("cls");
 
-
 		this->render();
 		while (m_win_manager.won() == false) {
 			InputHandler input;
@@ -59,27 +58,31 @@ namespace base {
 					continue;
 				}
 			}
-
 			if (input.service_type.has_value() && input.service_type == ServiceType::MAGE) {
 				m_mage_service.apply(m_curr_player.get());
 				std::cin.get();
 				_switchPlayer();
 			}
-			else if (auto card = m_curr_player.get().getCard(input.card_type.value())) {
+			else if (m_curr_player.get().hasCard(input.card_type.value())){
+
 				Coord coord{ input.x.value(), input.y.value() };
+				auto type = input.card_type.value();
+				CombatCard combat_card(type, m_curr_player.get().getColor());
 
-				if (m_illusion_service) {
-					bool is_illusion = input.service_type && input.service_type == ServiceType::ILLUSION;
-					if (is_illusion) {
-						m_illusion_service->add(card.value());
+				if (m_board.isValidMove(coord, combat_card)) {
+					auto card = m_curr_player.get().getCard(input.card_type.value());
+
+					if (m_illusion_service) {
+						bool is_illusion = input.service_type && input.service_type == ServiceType::ILLUSION;
+						if (is_illusion) {
+							m_illusion_service->add(card.value());
+						}
 					}
+					m_board.appendMove(coord, std::move(*card));
+					m_win_manager.addCard(coord);
+					_switchPlayer();
 				}
-
-				m_board.appendMove(coord, std::move(*card));
-
-				m_win_manager.addCard(coord);
-
-				_switchPlayer();
+				
 			}
 			else {
 				Logger::log(Level::WARNING, "No more cards of this type");
