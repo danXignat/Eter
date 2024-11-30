@@ -17,26 +17,95 @@ namespace base {
 
 	}
 
+	Board::Board(GameSizeType size_type) :
+		m_size{ static_cast<uint16_t>(size_type) },
+		m_bounding_rect{ static_cast<uint16_t>(size_type) },
+		m_available_spaces{Board::START_POS} {
+
+	}
+
+	Board::Board(Board&& other) noexcept {
+		m_size = other.m_size;
+		m_bounding_rect = other.m_bounding_rect;
+		m_combat_cards = std::move(other.m_combat_cards);
+		m_available_spaces = std::move(other.m_available_spaces);
+
+		other.m_size = 0;
+		other.m_bounding_rect = BoundingRect();
+		other.m_combat_cards.clear();
+		other.m_available_spaces.clear();
+	}
+
+	Board& Board::operator=(Board&& other) noexcept {
+		if (&other != this) {
+			m_size = other.m_size;
+			m_bounding_rect = other.m_bounding_rect;
+			m_combat_cards = std::move(other.m_combat_cards);
+			m_available_spaces = std::move(other.m_available_spaces);
+
+			other.m_size = 0;
+			other.m_bounding_rect = BoundingRect();
+			other.m_combat_cards.clear();
+			other.m_available_spaces.clear();
+		}
+
+		return *this;
+	}
+
 	//----------------------------Public-Methods--------------------------------
 
-	void Board::appendMove(const Coord& coord, CombatCard&& card, bool bury) {
+	void Board::appendMove(const Coord& coord, CombatCard&& card) {
 		auto top_card = this->getTopCard(coord);
 		if (top_card.has_value() && top_card->get().isIllusion()) {
 			IllusionService::event(top_card->get(), card);
 		}
-		else if (_isValidMove(coord, card, bury)) {
-			m_bounding_rect.add(coord);
+		m_bounding_rect.add(coord);
 
-			m_combat_cards[coord].emplace_back(std::move(card));
+		m_combat_cards[coord].emplace_back(std::move(card));
 
-			_updateAvailableSpaces(coord);
+		_updateAvailableSpaces(coord);
 
-			Logger::log(
-				Level::INFO,
-				"card({}) appended at ({}, {})",
-				combatCardToChar(m_combat_cards[coord].back().getType()), coord.first, coord.second
-			);
+		Logger::log(
+			Level::INFO,
+			"card({}) appended at ({}, {})",
+			combatCardToChar(m_combat_cards[coord].back().getType()), coord.first, coord.second
+		);
+	}
+
+	bool Board::isValidMove(const Coord& coord, const CombatCard& card, bool bury) {
+		if (m_combat_cards.contains(coord)) {
+
+			if (card.getType() == CombatCardType::ETER || card.getType() == CombatCardType::HOLE) {
+				Logger::log(Level::WARNING, "This card must be played on an empty space");
+			}
+
+			if (m_combat_cards[coord].back().getType() == CombatCardType::ETER) {
+				Logger::log(Level::WARNING, "Cannot place card on top of an ETER card");
+				return false;
+			}
+			if (m_combat_cards[coord].back().getType() == CombatCardType::HOLE) {
+				Logger::log(Level::WARNING, "There's a hole!");
+				return false;
+			}
+
+			bool bigger = card.getType() > m_combat_cards[coord].back().getType();
+			auto top_card = this->getTopCard(coord);
+			bool illusion = false;
+			if (top_card.has_value() && top_card->get().isIllusion()) {
+				illusion = true;
+			}
+			if (!bigger && !bury && !illusion) {
+					Logger::log(Level::WARNING, "card too small");
+					return false;
+			}
+			
 		}
+		else if (!m_available_spaces.contains(coord)) {
+			Logger::log(Level::WARNING, "not available place");
+			return false;
+		}
+
+		return true;
 	}
 
 	void Board::render() const {
@@ -49,6 +118,46 @@ namespace base {
 		}
 
 	}
+	void Board::sideViewRender() {
+		Coord print_pos{ 30, 1 };
+
+		std::vector<std::pair<Coord, std::vector<CombatCardRef>>> cards;
+
+		for (auto& [coord, stack] : m_combat_cards) {
+			std::vector<CombatCardRef> card_refs;
+			
+			for (CombatCard& card : stack) {
+				card_refs.emplace_back(card);
+			}
+
+			cards.emplace_back(coord, card_refs);
+		}
+
+
+		std::sort(cards.begin(), cards.end(), [](const auto& el1, const auto& el2) {
+			return el1.first < el2.first; // Sort based on coordinates
+			});
+
+		utils::printAtCoordinate("List of cards", print_pos.first, print_pos.second);
+		uint16_t i = 1;
+		for (const auto& [coord, stack] : cards) {
+			std::string pos = std::format("({}, {}) -> ", coord.first, coord.second);
+
+			utils::printAtCoordinate(pos, print_pos.first, print_pos.second + i);
+			uint16_t j = 0;
+			for (const auto& card : stack) {
+				utils::printAtCoordinate(card.get(),  // Dereference the unique_ptr
+					print_pos.first + pos.size() + j,
+					print_pos.second + i
+				);
+				j += 2;
+			}
+
+			i++;
+		}
+	}
+
+
 
 	std::optional<CombatCardRef> Board::getTopCard(Coord pos) {
 		if (m_combat_cards.contains(pos)) {
@@ -157,6 +266,53 @@ namespace base {
 
 	}
 
+	std::vector<Coord> Board::availableSpaces() {
+		std::vector<Coord> choices;
+		for (const auto& coord : m_available_spaces) {
+			choices.emplace_back(coord);
+		}
+		return choices;
+	}
+
+	std::optional<std::vector<std::vector<Coord>>> Board::getBorders() const {
+		std::vector<std::vector<Coord>> borders;
+
+		auto addBorderIfValid = [&borders](std::vector<Coord>& border) {
+			if (border.size() >= 3) {
+				if (std::find(borders.begin(), borders.end(), border) == borders.end()) {
+					borders.push_back(std::move(border));
+				}
+			}
+		};
+
+		std::vector<Coord> top_border, bottom_border;
+		for (uint16_t point_x = m_bounding_rect.corner1.first; point_x <= m_bounding_rect.corner2.first; point_x += 2) {
+			if (m_combat_cards.contains({ point_x, m_bounding_rect.corner1.second })) {
+				top_border.push_back({ point_x, m_bounding_rect.corner1.second });
+			}
+			if (m_combat_cards.contains({ point_x, m_bounding_rect.corner2.second })) {
+				bottom_border.push_back({ point_x, m_bounding_rect.corner2.second });
+			}
+		}
+		addBorderIfValid(top_border);
+		addBorderIfValid(bottom_border);
+
+		std::vector<Coord> left_border, right_border;
+		for (uint16_t point_y = m_bounding_rect.corner1.second; point_y <= m_bounding_rect.corner2.second; point_y++) {
+			if (m_combat_cards.contains({ m_bounding_rect.corner1.first, point_y })) {
+				left_border.push_back({ m_bounding_rect.corner1.first, point_y });
+			}
+			if (m_combat_cards.contains({ m_bounding_rect.corner2.first, point_y })) {
+				right_border.push_back({ m_bounding_rect.corner2.first, point_y });
+			}
+		}
+		addBorderIfValid(left_border);
+		addBorderIfValid(right_border);
+
+		return borders.empty() ? std::nullopt : std::make_optional(borders);
+	}
+
+
 	//------------------------------Setter Getter------------------------------------
 
 	uint16_t Board::size() const {
@@ -186,22 +342,7 @@ namespace base {
 	}
 
 	//----------------------------Private Methods--------------------------------
-	bool Board::_isValidMove(const Coord& coord, const CombatCard& card, bool bury) {
-		if (m_combat_cards.contains(coord)) {
-			bool bigger = card.getType() > m_combat_cards[coord].back().getType();
 
-			if (!bigger && !bury) {
-				Logger::log(Level::WARNING, "card too small");
-				return false;
-			}
-		}
-		else if (!m_available_spaces.contains(coord)) {
-			Logger::log(Level::WARNING, "not available place");
-			return false;
-		}
-
-		return true;
-	}
 
 	void Board::_updateAvailableSpaces(Coord coord) {
 		std::array<Coord, 8> offsets = { {
@@ -251,6 +392,13 @@ namespace base {
 	}
 
 	///--------------------------------Inner Classes-------------------------------------
+
+	Board::BoundingRect::BoundingRect()
+		: size{ 0 },
+		corner1{ 0, 0 }, corner2{ 0, 0 },
+		fixed_width{ false }, fixed_height{ false } {
+
+	}
 
 	Board::BoundingRect::BoundingRect(uint16_t size) :
 		size{ size },

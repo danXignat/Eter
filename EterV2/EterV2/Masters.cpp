@@ -5,6 +5,9 @@
 using namespace logger;
 
 namespace base {
+
+  
+
     ///----------------------------------------------------MasterOfFire----------------------------------------
     ///---------Burn------------
 
@@ -160,8 +163,9 @@ namespace base {
         char card_type;
         std::cin >> card_type;
         auto card = player.getCard(charToCombatCard(card_type));
-        board.appendMove(choice, std::move(*card), true);
-
+        if (board.isValidMove(choice, *card, true)) {
+            board.appendMove(choice, std::move(*card));
+        }
     }
     ///---------Hole----------
 
@@ -171,8 +175,25 @@ namespace base {
     }
 
     void MasterOfEarthBack::apply(Board& board, Player& player) {
-
+        auto choices = board.availableSpaces();
+        if (!choices.empty()) {
+            std::cout << "Your choices are: ";
+            for (const auto& choice : choices) {
+                std::cout << choice.first << " " << choice.second << '\n';
+            }
+            std::cout << "Pick one";
+            Coord input;
+            std::cin >> input.first >> input.second;
+            CombatCard card  (CombatCardType::HOLE, player.getColor());
+            if (board.isValidMove(input,card)) {
+                board.appendMove(input, std::move(card));
+            }
+        }
+        else {
+            std::cout << "No available choices for this mage rn";
+        }
     }
+
 
     /// ---------------------------------------MasterOfAir----------------------------------------
     /// ---------BlowAway--------
@@ -234,7 +255,23 @@ namespace base {
     }
 
     void MasterOfAirBack::apply(Board& board, Player& player) {
-
+        std::vector<Coord>choices = board.availableSpaces();
+        if (!choices.empty()) {
+            std::cout << "Your choices for additional Eter card are: \n";
+            for (const auto& choice : choices) {
+                std::cout << choice.first << " " << choice.second << '\n';
+            }
+            Coord input;
+            std::cin >> input.first >> input.second;
+            CombatCard eter(CombatCardType::ETER, player.getColor());
+            if (board.isValidMove(input, eter)) {
+                board.appendMove(input, std::move(eter));
+            }
+        }
+        else {
+            std::cout << "No available options for this mage rn";
+        }
+    
     }
 
     //----------------------------------------- MasterOfWater---------------------------------------
@@ -290,13 +327,30 @@ namespace base {
     }
 
     // -----------BoatRowOrColumn--------------
+
     MasterOfWaterBack::MasterOfWaterBack() {
         m_type = MageType::Water;
         m_ability = MageTypeAbility::BoatRowOrColumn;
     }
 
     void MasterOfWaterBack::apply(Board& board, Player& player) {
+        std::optional<std::vector<std::vector<Coord>>> borders = board.getBorders();
+
+        if (borders) {
+            for (const auto& border : *borders) {
+                std::cout << "Border: ";
+                for (const auto& coord : border) {
+                    std::cout << "(" << coord.first << ", " << coord.second << ") ";
+                }
+                std::cout << "\n";
+            }
+        }
+        else {
+            std::cout << "No borders found.\n";
+        }
+        for (const auto& [coord, stack] : board) {
+
+        }
 
     }
-
 }

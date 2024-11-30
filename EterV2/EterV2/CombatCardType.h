@@ -26,6 +26,8 @@ namespace base {
 			return FOUR;
 		case 'E':
 			return ETER;
+		case 'H':
+			return HOLE;
 		default:
 			return NONE;
 		}
@@ -44,6 +46,8 @@ namespace base {
 			return '4';
 		case ETER: 
 			return 'E';
+		case HOLE:
+			return 'H';
 		default: 
 			return 'N';
 		}

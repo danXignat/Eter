@@ -10,4 +10,9 @@ namespace base {
 		TournamentMode,
 		TimedMode
 	};
+
+	enum class GameSizeType : uint16_t {
+		SMALL = 3,
+		BIG = 4
+	};
 }

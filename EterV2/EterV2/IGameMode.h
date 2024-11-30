@@ -5,8 +5,5 @@ namespace base {
 		virtual void run() = 0;
 
 		virtual ~IGameMode() = default;
-
-	protected:
-		virtual void switchPlayer() = 0;
 	};
 }

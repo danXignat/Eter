@@ -6,41 +6,41 @@
 
 #include "CombatCard.h"
 #include "colors.h"
+#include "GameModeType.h"
 
 namespace base {
     class Player {
     public:
+        static const std::unordered_map<GameSizeType, std::unordered_map<CombatCardType, uint16_t>> card_configs;
 
-    public:
-        Player(std::string_view, color::ColorType);
+        Player(std::string_view, color::ColorType, GameSizeType);
+
+        Player(const Player&) = delete;
+        Player& operator=(const Player&) = delete;
+
+        Player(Player&&) noexcept;
+        Player& operator=(Player&&) noexcept;
 
         std::string getName() const;
         color::ColorType getColor() const;
         std::optional<CombatCard> getCard(CombatCardType);
         bool hasCards() const;
+        bool hasCard(CombatCardType);
 
+        void renderCards() const;
         void setName(std::string_view name);
         void addCard(CombatCard&&);
 
-        //void setMageCard(std::unique_ptr<MageCard>&& mageCard);
-        /* 
-        MageCard* getMageCard();
-        bool useMageCard();
-        bool hasUnusedMageCard() const;*/
-
     private:
-        void _initializeCards();
+        void _initializeCards(GameSizeType);
         void _addCard(CombatCardType, uint16_t);
 
     private:
         color::ColorType m_color;
         std::string m_name;
         std::unordered_multimap<CombatCardType, CombatCard> m_cards;
-        bool m_illusion_used;
-
-        // std::unique_ptr<MageCard> m_mage_card;
-        //bool m_mage_card_used;
     };
 
     using PlayerRef = std::reference_wrapper<Player>;
+    
 }
