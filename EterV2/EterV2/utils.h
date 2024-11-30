@@ -24,17 +24,17 @@ namespace utils {
 
 	inline void printAtCoordinate(std::string_view content, uint16_t x = 0, uint16_t y = 10) {
 		std::cout << "\033[" << y << ";" << x << "H" << content;
-		std::cout << "\033[" << 20 << ";" << 0 << "H" << std::flush;
+		std::cout << "\033[" << 22 << ";" << 0 << "H" << std::flush;
 	}
 
 	inline void printAtCoordinate(std::string_view content, base::Coord coord) {
 		std::cout << "\033[" << coord.second << ";" << coord.first << "H" << content;
-		std::cout << "\033[" << 20 << ";" << 0 << "H" << std::flush;
+		std::cout << "\033[" << 22 << ";" << 0 << "H" << std::flush;
 	}
 
 	inline void printAtCoordinate(const base::CombatCard& card, uint16_t x, uint16_t y) {
 		std::cout << "\033[" << y << ";" << x << "H" << card;
-		std::cout << "\033[" << 20 << ";" << 0 << "H" << std::flush;
+		std::cout << "\033[" << 22 << ";" << 0 << "H" << std::flush;
 	}
 
 	inline bool isValidPos(const std::string& str) {
