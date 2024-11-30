@@ -177,6 +177,11 @@ namespace base {
 			auto& card_stack = it->second;
 
 			card_stack.pop_back();
+		
+			if (card_stack.empty()) {
+				m_combat_cards.erase(it);
+				_reinitialise();
+			}
 
 			Logger::log(Level::INFO, "Removed last card from the stack at ({}, {})", coord.first, coord.second);
 		}

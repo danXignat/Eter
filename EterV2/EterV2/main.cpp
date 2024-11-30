@@ -4,14 +4,15 @@
 #include "IGameMode.h"
 #include "GameModeFactory.h"
 #include "typedefs.h"
-#include "MageService.h"
+//#include "MageService.h"
 #include "Board.h"
 #include"ElementalMode.h"
+#include"ElementalService.h"
 
 int main() {
 	system("start powershell -Command \"Get-Content -Path 'log.txt' -Wait\"");
 
-	base::GameModePtr game_mode = base::GameModeFactory::get("200", { "titi", "gigi" });
+	base::GameModePtr game_mode = base::GameModeFactory::get("312", { "titi", "gigi" });
 	/// 1 training
 	/// 2 mage 
 	/// 3 power

@@ -14,15 +14,14 @@ namespace base {
 	public:
 		ControllerExplosion();
 
-		void apply(Board& board, const Player& player) override;
+		void apply(Board& board, Player& player) override;
 
 	};
 
 	class Destruction :public PowerCard {
 	public:
 		Destruction();
-
-		void apply( Board& board, const Player& player) override;
+		void apply( Board& board, Player& player) override;
 
 	};
 
@@ -30,7 +29,7 @@ namespace base {
 	public:
 		Flame();
 
-		void apply(Board& board, const Player& player) override;
+		void apply(Board& board, Player& player) override;
 
 	};
 
@@ -38,7 +37,7 @@ namespace base {
 	public:
 		Fire();
 
-		void apply(Board& board, const Player& player) override;
+		void apply(Board& board, Player& player) override;
 
 	};
 
@@ -46,7 +45,7 @@ namespace base {
 	public:
 		Ash();
 
-		void apply(Board& board, const Player& player) override;
+		void apply(Board& board, Player& player) override;
 
 	};
 
@@ -54,16 +53,16 @@ namespace base {
 	public:
 		Spark();
 
-		void apply(Board& board, const Player& player) override;
+		void apply(Board& board, Player& player) override;
 
 	};
 
 	class Squall :public PowerCard {
 	public:
 		Squall();
-		std::vector<std::pair<Coord, CombatCard>>opponentCards( Board& board, const Player& opponent);
+		std::vector<std::pair<Coord, CombatCard>>opponentCards( Board& board, Player& opponent);
 
-		void apply(Board& board, const Player& player) override;
+		void apply(Board& board, Player& player) override;
 
 	};
 
@@ -71,7 +70,7 @@ namespace base {
 	public:
 		Gale();
 
-		void apply(Board& board, const Player& player) override;
+		void apply(Board& board, Player& player) override;
 
 	};
 
@@ -79,7 +78,7 @@ namespace base {
 	public:
 		Hurricane();
 
-		void apply(Board& board, const Player& player) override;
+		void apply(Board& board, Player& player) override;
 
 	};
 
@@ -87,7 +86,7 @@ namespace base {
 	public:
 		Gust();
 
-		void apply(Board& board, const Player& player) override;
+		void apply(Board& board, Player& player) override;
 
 	};
 
@@ -95,7 +94,7 @@ namespace base {
 	public:
 		Mirrage();
 
-		void apply(Board& board, const Player& player) override;
+		void apply(Board& board, Player& player) override;
 
 	};
 
@@ -103,7 +102,7 @@ namespace base {
 	public:
 		Storm();
 
-		void apply(Board& board, const Player& player) override;
+		void apply(Board& board, Player& player) override;
 
 	};
 
@@ -111,7 +110,7 @@ namespace base {
 	public:
 		Tide();
 
-		void apply(Board& board, const Player& player) override;
+		void apply(Board& board, Player& player) override;
 
 	};
 
@@ -119,7 +118,7 @@ namespace base {
 	public:
 		Mist();
 
-		void apply(Board& board, const Player& player) override;
+		void apply(Board& board, Player& player) override;
 
 	};
 
@@ -127,7 +126,7 @@ namespace base {
 	public:
 		Wave();
 
-		void apply(Board& board, const Player& player) override;
+		void apply(Board& board, Player& player) override;
 
 	};
 
@@ -135,7 +134,7 @@ namespace base {
 	public:
 		Whirlpool();
 
-		void apply(Board& board, const Player& player) override;
+		void apply(Board& board, Player& player) override;
 
 	};
 
@@ -143,7 +142,7 @@ namespace base {
 	public:
 		Blizzard();
 
-		void apply(Board& board, const Player& player) override;
+		void apply(Board& board, Player& player) override;
 
 	};
 
@@ -151,7 +150,7 @@ namespace base {
 	public:
 		Waterfall();
 
-		void apply(Board& board, const Player& player) override;
+		void apply(Board& board, Player& player) override;
 
 	};
 
@@ -159,7 +158,7 @@ namespace base {
 	public:
 		Support();
 
-		void apply(Board& board, const Player& player) override;
+		void apply(Board& board, Player& player) override;
 
 	};
 
@@ -167,7 +166,7 @@ namespace base {
 	public:
 		Earthquake();
 
-		void apply(Board& board, const Player& player) override;
+		void apply(Board& board, Player& player) override;
 
 	};
 
@@ -175,7 +174,7 @@ namespace base {
 	public:
 		Crumble();
 
-		void apply(Board& board, const Player& player) override;
+		void apply(Board& board, Player& player) override;
 
 	};
 
@@ -183,7 +182,7 @@ namespace base {
 	public:
 		Border();
 
-		void apply(Board& board, const Player& player) override;
+		void apply(Board& board, Player& player) override;
 
 	};
 
@@ -191,7 +190,7 @@ namespace base {
 	public:
 		Avalanche();
 
-		void apply(Board& board, const Player& player) override;
+		void apply(Board& board, Player& player) override;
 
 	};
 
@@ -199,7 +198,7 @@ namespace base {
 	public:
 		Rock();
 
-		void apply(Board& board, const Player& player) override;
+		void apply(Board& board, Player& player) override;
 
 	};
 

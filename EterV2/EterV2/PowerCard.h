@@ -15,7 +15,7 @@ namespace base {
 
 		std::string_view getAbilityName() const;
 
-		virtual void apply(Board& board, const Player& player) = 0;
+		virtual void apply(Board& board, Player& player) = 0;
 
 	protected:
 
