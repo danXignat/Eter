@@ -12,7 +12,7 @@
 int main() {
 	system("start powershell -Command \"Get-Content -Path 'log.txt' -Wait\"");
 
-	base::GameModePtr game_mode = base::GameModeFactory::get("310", { "titi", "gigi" });
+	base::GameModePtr game_mode = base::GameModeFactory::get("212", { "titi", "gigi" });
 	/// 1 training
 	/// 2 mage 
 	/// 3 power

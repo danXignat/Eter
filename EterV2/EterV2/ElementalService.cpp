@@ -56,14 +56,14 @@ namespace base {
 		if (card1) {
 			utils::printAtCoordinate(
 				std::format("Power 1 << {} >> {}", typeToStrings(type_card1), abilityToString(type_card1)),
-				1, 15
+				1, 20
 			);
 		}
 
 		if (card2) {
 			utils::printAtCoordinate(
 				std::format("Power 2 << {} >> {}", typeToStrings(type_card2), abilityToString(type_card2)),
-				1, 16
+				1, 21
 			);
 		}
 	}
