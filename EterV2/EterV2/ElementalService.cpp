@@ -22,8 +22,8 @@ namespace base {
 		/*type_p1 = static_cast<PowerCardType>(choices[0]);
 		type_p2 = static_cast<PowerCardType>(choices[1]);*/
 
-		type_card1 = PowerCardType::Flame;
-		type_card2 = PowerCardType::Destruction;
+		type_card1 = PowerCardType::Fire;
+		type_card2 = PowerCardType::Fire;
 
 		card1 = _factory(type_card1);
 		card2 = _factory(type_card2);
@@ -68,43 +68,6 @@ namespace base {
 		}
 	}
 
-	/*	void ElementalService::_setPlayerPowerCard(bool player) {
-			std::cout << ((player == 0) ? "Player 1" : "Player 2") << " choose powerCard:" << "\n";
-			PowerCardType type=(player == 0) ? type_p1 : type_p2;
-			std::cout << "Power card 1: " <<typeToStrings(type_p1)<<": "<< abilityToString(type_p1) << '\n';
-			std::cout << "Power card 2: " << typeToStrings(type_p2) << ": " << abilityToString(type_p2) << "\n";
-
-			auto abilities = _getPowerCard(type);
-			uint16_t choice;
-			std::cin >> choice;
-
-			switch (choice)
-			{
-			case 1:
-				if (player == 0) {
-					card_p1 = _factory(abilities);
-				}
-				else {
-					card_p2 = _factory(abilities);
-				}
-				break;
-			case 2:
-				if (player == 0) {
-					card_p1 = _factory(abilities);
-				}
-				else {
-					card_p2 = _factory(abilities);
-				}
-				break;
-			default:
-				std::cout << "Invalid input";
-				break;
-			}
-		}*/
-
-		/*PowerCardType ElementalService::_getPowerCard(PowerCardType type) {
-			return type;
-		} ???????????*/
 
 		std::unique_ptr<PowerCard>ElementalService::_factory(PowerCardType ability) {
 			switch (ability){

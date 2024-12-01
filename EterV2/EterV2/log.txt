@@ -1,11 +1,12 @@
-[INFO] explosion effect [3, 1] -> 0
-[INFO] explosion effect [2, 3] -> 1
-[INFO] explosion effect [1, 2] -> 1
-[INFO] explosion effect [2, 2] -> 0
-[INFO] explosion effect [3, 0] -> 0
-[INFO] explosion effect [1, 0] -> 0
-[INFO] card(1) appended at (10, 5)
-[INFO] The opponent's Illusion has been revealed
-[INFO] Flame power was used
+[INFO] card(2) appended at (10, 5)
+[INFO] card(1) appended at (10, 6)
 [INFO] card(2) appended at (12, 5)
-[INFO] card(3) appended at (10, 5)
+[INFO] card(1) appended at (10, 7)
+[INFO] card(2) appended at (14, 5)
+[INFO] card(2) appended at (10, 8)
+[INFO] Removed last card from the stack at (10, 5)
+[INFO] Fire power removed top cards and put then back in the player's hand
+[INFO] Removed last card from the stack at (12, 5)
+[INFO] Fire power removed top cards and put then back in the player's hand
+[INFO] Removed last card from the stack at (14, 5)
+[INFO] Fire power removed top cards and put then back in the player's hand

@@ -38,7 +38,7 @@ namespace base {
 		while (m_win_manager.won() == false) {
 			InputHandler input;
 			try {
-				input.read();								//asta da handle la inputu de la tastatura
+				input.read();				
 			}
 			catch (const std::runtime_error& err) {
 				Logger::log(Level::ERROR, err.what());
@@ -62,6 +62,7 @@ namespace base {
 				std::cin >> choice;
 				m_elemental_service.apply(choice, m_curr_player.get());
 				std::cin.get();
+				_switchPlayer();
 			}
 			else if (m_curr_player.get().hasCard(input.card_type.value())) {
 
