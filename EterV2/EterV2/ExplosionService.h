@@ -7,7 +7,7 @@
 namespace base {
 	class ExplosionService {
 	public:
-		ExplosionService(Board& board, Player& p1, Player& p2);
+		ExplosionService(Board& board);
 
 		void apply();
 		void setting();
@@ -15,7 +15,6 @@ namespace base {
 
 	private:
 		Board& m_board;
-		Player& m_p1, & m_p2;
 
 		Explosion m_card;
 	};

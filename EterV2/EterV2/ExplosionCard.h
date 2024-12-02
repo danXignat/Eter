@@ -1,6 +1,7 @@
 #pragma once
 #include <random>
 
+#include "Board.h"
 #include "typedefs.h"
 
 namespace base {
@@ -15,6 +16,7 @@ namespace base {
 	public:
 		Explosion(uint16_t);
 
+		void apply(Board&);
 		void render();
 		void rotateLeft();
 		void rotateRight();

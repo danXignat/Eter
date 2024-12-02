@@ -20,15 +20,11 @@ namespace base {
 	}
 
 	bool BaseGameMode::_handleEvent(const InputHandler& input) {
-		switch (input.event_type) {
-		case GameEventType::BoardCard:
+		if (input.event_type == GameEventType::BoardCard) {
 			return _handleBoardEvent(input);
-			break;
-		case GameEventType::SpecialCard:
-			_handleSpecialEvent(input);
-			break;
-		default:
-			break;
+		}
+		else if (input.event_type == GameEventType::SpecialCard) {
+			return _handleSpecialEvent(input);
 		}
 	}
 

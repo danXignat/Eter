@@ -3,10 +3,9 @@
 #include "conio.h"
 
 namespace base {
-	ExplosionService::ExplosionService(Board& board, Player& p1, Player& p2)
+	ExplosionService::ExplosionService(Board& board)
 		: m_board{board},
-		m_card{board.size()},
-		m_p1{ p1 }, m_p2{ p2 } {
+		m_card{board.size()} {
 		
 	}
 

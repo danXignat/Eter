@@ -17,7 +17,7 @@ namespace base {
 			switch (service) {
 				using enum ServiceType;
 			case ILLUSION:
-				m_illusion_service.emplace(m_board);
+				m_illusion_service.emplace(m_board, m_win_manager);
 				break;
 			case EXPLOSION:
 				m_explosion_service.emplace(m_board, m_player_red, m_player_blue);
@@ -60,26 +60,39 @@ namespace base {
 			std::cout << "Player RED has won";
 		}
 		else {
-			std::cout << "Player RED has won";
+			std::cout << "Player BLUE has won";
 		}
 
 		std::cin.get();
 	}
 
-	void TrainingMode::_handleSpecialEvent(const InputHandler& input) {
+	bool TrainingMode::_handleSpecialEvent(const InputHandler& input) {
+
 		switch (input.service_type) {
 			using enum ServiceType;
 
 		case ILLUSION: {
 			if (m_illusion_service) {
+				Coord coord = input.coord;
+				CombatCardType card_type = input.card_type;
+				CombatCard card = m_curr_player.get().getCard(card_type);
 
+				bool has_illusion = m_illusion_service->hasPlayerIllusion(m_curr_player.get().getColor());
+				if (has_illusion && m_board.isValidMove(coord, card)) {
+					m_illusion_service->placeIllusion(coord, std::move(card));
+
+					return true;
+				}
 			}
 			break;
 		}
 
 		case EXPLOSION:{
 			if (m_explosion_service) {
+				m_explosion_service->setting();
+				m_explosion_service->apply();
 
+				return true;
 			}
 			break;
 		}
@@ -87,6 +100,8 @@ namespace base {
 		default:
 			break;
 		}
+
+		return false;
 	}
 
 	////------------------------------------------------Methods-------------------------------------------------

@@ -30,6 +30,10 @@ namespace base {
 
 	}
 
+	void Explosion::apply(Board& board) {
+
+	}
+
 	uint16_t Explosion::_generateEffectCount(std::mt19937& gen) {
 		uint16_t begin = (m_board_size == 3) ? MIN_EFFECTS_3x3 : MIN_EFFECTS_4x4;
 		uint16_t end = (m_board_size == 3) ? MAX_EFFECTS_3x3 : MAX_EFFECTS_4x4;

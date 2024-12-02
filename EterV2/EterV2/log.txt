@@ -1,2 +1,7 @@
-[INFO] explosion effect [2, 2] -> 0
+[INFO] explosion effect [1, 0] -> 0
 [INFO] explosion effect [2, 0] -> 0
+[INFO] explosion effect [2, 1] -> 0
+[INFO] explosion effect [1, 1] -> 1
+[INFO] failed action
+[INFO] card(1) appended at (10, 5)
+[INFO] succesful action

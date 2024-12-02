@@ -19,7 +19,7 @@ namespace base {
 			switch (service) {
 				using enum ServiceType;
 			case ILLUSION:
-				m_illusion_service.emplace(m_board);
+				m_illusion_service.emplace(m_board, m_win_manager);
 				break;
 			case EXPLOSION:
 				m_explosion_service.emplace(m_board, m_player_red, m_player_blue);
@@ -103,8 +103,8 @@ namespace base {
 
 
 
-	void ElementalMode::_handleSpecialEvent(const InputHandler& input) {
-
+	bool ElementalMode::_handleSpecialEvent(const InputHandler& input) {
+		return true;
 	}
 	////------------------------------------------------Methods-------------------------------------------------
 

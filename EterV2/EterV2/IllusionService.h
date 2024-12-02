@@ -6,6 +6,7 @@
 #include "Board.h"
 #include "Player.h"
 #include "CombatCard.h"
+#include "WinManager.h"
 
 #include "typedefs.h"
 #include "logger.h"
@@ -13,15 +14,20 @@
 namespace base {
 	class IllusionService {
 	public:
-		IllusionService(Board&);
+		IllusionService(Board&, WinManager&);
 
-		void add(CombatCard& card);
-		static void event(CombatCard& illusion, CombatCard& other);
+		void placeIllusion(const Coord&, CombatCard&& card);
+		bool hasPlayerIllusion(color::ColorType);
+		static bool hasIllusionWon(CombatCard& illusion, CombatCard& other);
 
 	private:
+		Board& board;
+		WinManager& win_manager;
+
 		bool m_p1_has_illusion;
 		bool m_p2_has_illusion;
 
-		Board& board;
+		std::optional<Coord> m_p1_illusion_coord;
+		std::optional<Coord> m_p2_illusion_coord;
 	};
 }

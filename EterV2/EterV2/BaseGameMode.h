@@ -21,7 +21,7 @@ namespace base {
 	protected:
 		bool _handleEvent(const InputHandler&);
 		bool _handleBoardEvent(const InputHandler&);
-		virtual void _handleSpecialEvent(const InputHandler&) = 0;
+		virtual bool _handleSpecialEvent(const InputHandler&) = 0;
 
 		void _switchPlayer();
 

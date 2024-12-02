@@ -56,9 +56,12 @@ namespace base {
 
 	void Board::appendMove(const Coord& coord, CombatCard&& card) {
 		auto top_card = this->getTopCard(coord);
-		if (top_card.has_value() && top_card->get().isIllusion()) {
-			IllusionService::event(top_card->get(), card);
+		bool is_illusion_event = top_card.has_value() && top_card->get().isIllusion();
+
+		if (is_illusion_event && IllusionService::hasIllusionWon(top_card->get(), card)) {
+			return;
 		}
+
 		m_bounding_rect.add(coord);
 
 		m_combat_cards[coord].emplace_back(std::move(card));
@@ -76,6 +79,11 @@ namespace base {
 
 		if (m_combat_cards.contains(coord)) {
 			if (card.getType() == CombatCardType::ETER) {
+				Logger::log(Level::WARNING, "This card must be played on an empty space");
+				return false;
+			}
+
+			if (card.isIllusion()) {
 				Logger::log(Level::WARNING, "This card must be played on an empty space");
 				return false;
 			}
