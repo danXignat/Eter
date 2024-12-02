@@ -17,6 +17,7 @@ namespace base {
 		TrainingMode(const std::vector<ServiceType>&, const std::pair<std::string, std::string>&);
 		void run();
 		void render();
+		bool _handleSpecialEvent(const InputHandler&) override;
 
 	private:
 		std::optional<IllusionService> m_illusion_service;

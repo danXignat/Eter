@@ -23,6 +23,7 @@ namespace base {
 		bool isIllusion() const;
 
 		bool operator<(const CombatCard& other) const;
+		bool operator>=(const CombatCard& other) const;
 		bool operator==(const CombatCard& other) const;
 
 		friend std::ostream& operator<<(std::ostream& out, const CombatCard& other);

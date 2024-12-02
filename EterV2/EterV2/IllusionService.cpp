@@ -3,13 +3,23 @@
 using namespace logger;
 
 namespace base {
-	IllusionService::IllusionService(Board& board) 
+	IllusionService::IllusionService(Board& board, WinManager& win_manager) 
 		: m_p1_has_illusion{ true },
 		m_p2_has_illusion{ true },
-		board{ board } {
+		board{ board },
+		win_manager{ win_manager } {
 	}
 
-	void IllusionService::add(CombatCard& card) {
+	bool IllusionService::hasPlayerIllusion(color::ColorType color) {
+		if (color == color::ColorType::RED) {
+			return m_p1_has_illusion;
+		}
+		else {
+			return m_p2_has_illusion;
+		}
+	}
+
+	void IllusionService::placeIllusion(const Coord& coord, CombatCard&& card) {
 		if (card.getColor() == color::ColorType::RED) {
 			if (!m_p1_has_illusion) {
 				Logger::log(
@@ -19,6 +29,9 @@ namespace base {
 			}
 			else {
 				card.flip();
+				board.appendMove(coord, std::move(card));
+				win_manager.addCard(coord);
+				m_p1_illusion_coord.emplace(coord);
 				m_p1_has_illusion = false;
 			}
 		}
@@ -31,20 +44,23 @@ namespace base {
 			}
 			else {
 				card.flip();
+				board.appendMove(coord, std::move(card));
+				win_manager.addCard(coord);
+				m_p2_illusion_coord.emplace(coord);
 				m_p2_has_illusion = false;
 			}
 		}
 	}
 
-	void IllusionService::event(CombatCard& illusion, CombatCard& other) {
-		if (illusion.getType() > other.getType()) {
-			illusion.flip();
+	bool IllusionService::hasIllusionWon(CombatCard& illusion, CombatCard& other) {
+		illusion.flip();
 
+		if (other < illusion) {
+			return true;
 			Logger::log(Level::INFO, "Illusion wins and reveal");
 		}
 		else {
-			std::swap(illusion, other);
-
+			return false;
 			Logger::log(Level::INFO, "Attacker defeats illusion");
 		}
 	}

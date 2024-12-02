@@ -56,9 +56,12 @@ namespace base {
 
 	void Board::appendMove(const Coord& coord, CombatCard&& card) {
 		auto top_card = this->getTopCard(coord);
-		if (top_card.has_value() && top_card->get().isIllusion()) {
-			IllusionService::event(top_card->get(), card);
+		bool is_illusion_event = top_card.has_value() && top_card->get().isIllusion();
+
+		if (is_illusion_event && IllusionService::hasIllusionWon(top_card->get(), card)) {
+			return;
 		}
+
 		m_bounding_rect.add(coord);
 
 		m_combat_cards[coord].emplace_back(std::move(card));
@@ -72,35 +75,25 @@ namespace base {
 		);
 	}
 
-	bool Board::isValidMove(const Coord& coord, const CombatCard& card, bool bury) {
+	bool Board::isValidMove(const Coord& coord, const CombatCard& card) {
+
 		if (m_combat_cards.contains(coord)) {
-
-			if (card.getType() == CombatCardType::ETER || card.getType() == CombatCardType::HOLE) {
+			if (card.getType() == CombatCardType::ETER) {
 				Logger::log(Level::WARNING, "This card must be played on an empty space");
-			}
-
-			if (m_combat_cards[coord].back().getType() == CombatCardType::ETER) {
-				Logger::log(Level::WARNING, "Cannot place card on top of an ETER card");
-				return false;
-			}
-			if (m_combat_cards[coord].back().getType() == CombatCardType::HOLE) {
-				Logger::log(Level::WARNING, "There's a hole!");
 				return false;
 			}
 
-			bool bigger = card.getType() > m_combat_cards[coord].back().getType();
-			auto top_card = this->getTopCard(coord);
-			bool illusion = false;
-			if (top_card.has_value() && top_card->get().isIllusion()) {
-				illusion = true;
+			if (card.isIllusion()) {
+				Logger::log(Level::WARNING, "This card must be played on an empty space");
+				return false;
 			}
-			if (!bigger && !bury && !illusion) {
-					Logger::log(Level::WARNING, "card too small");
-					return false;
+
+			if (this->getTopCard(coord)->get() >= card) {
+				Logger::log(Level::WARNING, "Card too small");
+				return false;
 			}
-			
 		}
-		else if (!m_available_spaces.contains(coord)) {
+		else if (m_available_spaces.contains(coord) == false) {
 			Logger::log(Level::WARNING, "not available place");
 			return false;
 		}
@@ -147,7 +140,7 @@ namespace base {
 			uint16_t j = 0;
 			for (const auto& card : stack) {
 				utils::printAtCoordinate(card.get(),  // Dereference the unique_ptr
-					print_pos.first + pos.size() + j,
+					print_pos.first + uint16_t(pos.size()) + j,
 					print_pos.second + i
 				);
 				j += 2;
@@ -156,8 +149,6 @@ namespace base {
 			i++;
 		}
 	}
-
-
 
 	std::optional<CombatCardRef> Board::getTopCard(Coord pos) {
 		if (m_combat_cards.contains(pos)) {
@@ -341,7 +332,7 @@ namespace base {
 	}
 
 
-	//------------------------------Setter Getter------------------------------------
+	///------------------------------Setter Getter------------------------------------
 
 	uint16_t Board::size() const {
 		return m_size;
@@ -349,6 +340,10 @@ namespace base {
 
 	bool Board::isFixed() const {
 		return m_bounding_rect.isFixed();
+	}
+
+	bool Board::hasStack(const Coord& coord) const {
+		return m_combat_cards.contains(coord);
 	}
 
 	bool Board::isCardOfColorAt(color::ColorType color, const Coord& coord) const {
@@ -369,7 +364,11 @@ namespace base {
 		return m_size;
 	}
 
-	//----------------------------Private Methods--------------------------------
+	const std::vector<CombatCard>& Board::operator[](const Coord& coord) {
+		return m_combat_cards.at(coord);
+	}
+
+	///----------------------------Private Methods--------------------------------
 
 
 	void Board::_updateAvailableSpaces(Coord coord) {

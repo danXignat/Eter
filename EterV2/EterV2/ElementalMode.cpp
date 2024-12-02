@@ -19,7 +19,7 @@ namespace base {
 			switch (service) {
 				using enum ServiceType;
 			case ILLUSION:
-				m_illusion_service.emplace(m_board);
+				m_illusion_service.emplace(m_board, m_win_manager);
 				break;
 			case EXPLOSION:
 				m_explosion_service.emplace(m_board, m_player_red, m_player_blue);
@@ -35,73 +35,77 @@ namespace base {
 	void ElementalMode::run() {
 		this->render();
 
-		while (m_win_manager.won() == false) {
-			InputHandler input;
-			try {
-				input.read();				
-			}
-			catch (const std::runtime_error& err) {
-				Logger::log(Level::ERROR, err.what());
-				system("cls");
-				this->render();
-				continue;
-			}
+		while (m_win_manager.won() == false) {}
+		//	InputHandler input;
+		//	try {
+		//		input.read();								//asta da handle la inputu de la tastatura
+		//	}
+		//	catch (const std::runtime_error& err) {
+		//		Logger::log(Level::ERROR, err.what());
+		//		system("cls");
+		//		this->render();
+		//		continue;
+		//	}
 
-			if (m_explosion_service) {
-				bool is_explosion = input.service_type && input.service_type == ServiceType::EXPLOSION;
-				if (is_explosion) {
-					m_explosion_service->setting();
-					m_explosion_service->apply();
-					system("cls");
-					this->render();
-					continue;
-				}
-			}
-			if (input.service_type.has_value() && input.service_type == ServiceType::ELEMENTAL) {
-				char choice;
-				std::cin >> choice;
-				m_elemental_service.apply(choice, m_curr_player.get());
-				std::cin.get();
-				_switchPlayer();
-			}
-			else if (m_curr_player.get().hasCard(input.card_type.value())) {
+		//	if (m_explosion_service) {
+		//		bool is_explosion = input.service_type && input.service_type == ServiceType::EXPLOSION;
+		//		if (is_explosion) {
+		//			m_explosion_service->setting();
+		//			m_explosion_service->apply();
+		//			system("cls");
+		//			this->render();
+		//			continue;
+		//		}
+		//	}
+		//	if (input.service_type.has_value() && input.service_type == ServiceType::ELEMENTAL) {
+		//		char choice;
+		//		std::cin >> choice;
+		//		m_elemental_service.apply(choice, m_curr_player.get());
+		//		std::cin.get();
+		//	}
+		//	else if (m_curr_player.get().hasCard(input.card_type.value())) {
 
-				Coord coord{ input.x.value(), input.y.value() };
-				auto type = input.card_type.value();
-				CombatCard combat_card(type, m_curr_player.get().getColor());
+		//		Coord coord{ input.x.value(), input.y.value() };
+		//		auto type = input.card_type.value();
+		//		CombatCard combat_card(type, m_curr_player.get().getColor());
 
-				if (m_board.isValidMove(coord, combat_card)) {
-					auto card = m_curr_player.get().getCard(input.card_type.value());
+		//		if (m_board.isValidMove(coord, combat_card)) {
+		//			auto card = m_curr_player.get().getCard(input.card_type.value());
 
-					if (m_illusion_service) {
-						bool is_illusion = input.service_type && input.service_type == ServiceType::ILLUSION;
-						if (is_illusion) {
-							m_illusion_service->add(card.value());
-						}
-					}
-					m_board.appendMove(coord, std::move(*card));
-					m_win_manager.addCard(coord);
-					_switchPlayer();
-				}
-			}
-			else {
-				Logger::log(Level::WARNING, "No more cards of this type");
-			}
+		//			if (m_illusion_service) {
+		//				bool is_illusion = input.service_type && input.service_type == ServiceType::ILLUSION;
+		//				if (is_illusion) {
+		//					m_illusion_service->add(card.value());
+		//				}
+		//			}
+		//			m_board.appendMove(coord, std::move(*card));
+		//			m_win_manager.addCard(coord);
+		//			_switchPlayer();
+		//		}
+		//	}
+		//	else {
+		//		Logger::log(Level::WARNING, "No more cards of this type");
+		//	}
 
-			system("cls");
-			this->render();
-		}
+		//	system("cls");
+		//	this->render();
+		//}
 
-		if (m_curr_player.get().getColor() == color::ColorType::BLUE) {
-			std::cout << "Player RED has won";
-		}
-		else {
-			std::cout << "Player RED has won";
-		}
+		//if (m_curr_player.get().getColor() == color::ColorType::BLUE) {
+		//	std::cout << "Player RED has won";
+		//}
+		//else {
+		//	std::cout << "Player RED has won";
+		//}
 
-		std::cin.get();
+		//std::cin.get();
 	}
 
+
+
+	bool ElementalMode::_handleSpecialEvent(const InputHandler& input) {
+		return true;
+	}
 	////------------------------------------------------Methods-------------------------------------------------
 
 	void ElementalMode::render() {
