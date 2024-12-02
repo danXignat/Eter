@@ -38,6 +38,7 @@ namespace base {
 		Fire();
 
 		void apply(Board& board, Player& player) override;
+		std::vector<Coord>getDuplicateCards(Board& board, const Player& player);
 
 	};
 

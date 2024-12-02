@@ -18,9 +18,9 @@ namespace base {
     }
   
     void Destruction::apply(Board& board, Player& player) {
-        for (auto& [coord, stack] : board) {
+        for (const auto& [coord, stack] : board) {
             auto top_card = board.getTopCard(coord);
-            CombatCard& card = top_card->get();
+           const CombatCard& card = top_card->get();
             if (card.getColor() != player.getColor()) {
                 Logger::log(Level::INFO, "Destruction power destroyed the last card");
                 board.removeTopCardAt(coord);
@@ -41,23 +41,71 @@ namespace base {
             if (card.getColor() != player.getColor() && card.isIllusion()) {
                 card.flip();
                 Logger::log(Level::INFO, "The opponent's Illusion has been revealed");
-              
             }
-            Logger::log(Level::INFO, "Flame power was used");
+          
+            Logger::log(Level::INFO, "It's your turn, place a card");
+            Coord new_coord;
+            std::cin >> new_coord.first >> new_coord.second;
+            char card_type;
+            std::cin >> card_type;
 
+
+            auto selected_card = player.getCard(charToCombatCard(card_type));
+            if (!selected_card) {
+                Logger::log(Level::WARNING, "Invalid input");
+                return;
+            }
+
+            if (board.isValidMove(new_coord, *selected_card, false)) {
+                board.appendMove(new_coord, std::move(*selected_card));
+                Logger::log(Level::INFO, "Flame power was used. Card placed at ({}, {})",
+                    new_coord.first, new_coord.second);
+                break;
+            }
+            else {
+                Logger::log(Level::WARNING, "Invalid move!");
+            }
         }
     }
 
-    ////------------------------------------------ Flame -------------------------------------------
+    ////------------------------------------------ Fire -------------------------------------------
 
     Fire::Fire() {
         m_ability = PowerCardType::Fire;
+
     }
 
     void Fire::apply(Board& board, Player& player) {
-        return;
+       std::vector<Coord>duplicateCoord = getDuplicateCards(board, player);
+       if (duplicateCoord.size() > 1) {
+           for (const auto& coord : duplicateCoord) {
+               auto top_card = board.getTopCard(coord);
+               CombatCard& card = top_card->get();
+               player.addCard(std::move(card));
+               board.removeTopCardAt(coord);
+
+               Logger::log(Level::INFO, "Fire power removed top cards and put then back in the player's hand");
+           }
+        }
+       else {
+           Logger::log(Level::WARNING, "No visible cards with the same value on the board");
+       }
     }
 
+    std::vector<Coord>Fire::getDuplicateCards(Board& board, const Player& player) {
+        std::vector<Coord>choices;
+        for (const auto& [coord, stack] : board) {
+           const auto& [x, y] = coord;
+            if (stack.empty()) {
+                continue;
+            }
+            bool is_player_card = stack[stack.size() - 1].getColor() == player.getColor();
+            if(is_player_card && !stack.back().isIllusion()){
+                choices.emplace_back(x, y);
+            }
+        }
+        return choices;
+    }
 
     ////------------------------------------------ Ash -------------------------------------------
     Ash::Ash() {
@@ -75,7 +123,7 @@ namespace base {
 
     void Spark::apply(Board& board, Player& player) {
     }
-
+                
     ////------------------------------------------ Squall -------------------------------------------
     Squall::Squall() {
         m_ability = PowerCardType::Squall;
