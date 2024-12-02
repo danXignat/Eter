@@ -5,7 +5,7 @@
 namespace base {
 	ExplosionService::ExplosionService(Board& board)
 		: m_board{board},
-		m_card{board.size()} {
+		m_card{board.size(), board} {
 		
 	}
 

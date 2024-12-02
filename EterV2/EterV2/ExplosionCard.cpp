@@ -6,8 +6,9 @@
 using namespace logger;
 
 namespace base {
-	Explosion::Explosion(uint16_t size) :
+	Explosion::Explosion(uint16_t size, Board& board) :
 		m_board_size{ size },
+		m_board{board},
 		m_effects{ size, std::vector<std::optional<Effect>>(size) } {
 
 		std::random_device rd;
@@ -30,7 +31,7 @@ namespace base {
 
 	}
 
-	void Explosion::apply(Board& board) {
+	void Explosion::apply() {
 
 	}
 

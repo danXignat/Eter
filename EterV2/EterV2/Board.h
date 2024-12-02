@@ -37,6 +37,9 @@ namespace base {
 		uint16_t getSize() const;
 		std::optional<CombatCardRef> getTopCard(Coord pos);
 		Coord getLeftCorner() const;
+		std::pair<Coord, Coord> getBoudingRect() const;
+		std::pair<uint16_t, uint16_t> getBoundingRectSize() const;
+
 
 		const std::vector<CombatCard>& operator[](const Coord& coord);
 

@@ -14,9 +14,9 @@ namespace base {
 
 	class Explosion {
 	public:
-		Explosion(uint16_t);
+		Explosion(uint16_t, Board&);
 
-		void apply(Board&);
+		void apply();
 		void render();
 		void rotateLeft();
 		void rotateRight();
@@ -33,7 +33,9 @@ namespace base {
 		std::vector<Effect> _generateEffectType(std::mt19937&);
 
 	private:
-		const uint16_t m_board_size;
+		uint16_t m_board_size;
+		Board& m_board;
+
 		uint16_t m_effect_count;
 		std::vector<std::vector<std::optional<Effect>>> m_effects;
 	};

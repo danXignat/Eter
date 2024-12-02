@@ -20,7 +20,7 @@ namespace base {
 				m_illusion_service.emplace(m_board, m_win_manager);
 				break;
 			case EXPLOSION:
-				m_explosion_service.emplace(m_board, m_player_red, m_player_blue);
+				m_explosion_service.emplace(m_board);
 				break;
 			default:
 				break;
