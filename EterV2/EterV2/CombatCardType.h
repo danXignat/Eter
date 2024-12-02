@@ -3,14 +3,14 @@
 
 namespace base {
 	enum class CombatCardType : uint16_t {
-		NONE,
 		BORDER,
 		ONE,
 		TWO,
 		THREE,
 		FOUR,
 		ETER,
-		HOLE
+		HOLE,
+		NONE
 	};
 
 	inline CombatCardType charToCombatCard(char ch) {

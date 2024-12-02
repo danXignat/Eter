@@ -60,8 +60,15 @@ namespace base {
 			Coord pos1{ x + 2 * i, y + i };
 			Coord pos2{ x + 2 * (board_size - 1 - i), y + i };
 
-			m_diag1 += _getIncrement(pos1);
-			m_diag2 += _getIncrement(pos2);
+			auto getIncrement = [&](const Coord& coord) {
+				if (board.getTopCard(coord)->get().getColor() == color::ColorType::BLUE)
+					return blue_increment;
+				else
+					return red_increment;
+				};
+
+			m_diag1 += board.hasStack(pos1) ?  getIncrement(pos1) : 0;
+			m_diag2 += board.hasStack(pos2) ?  getIncrement(pos2) : 0;
 		}
 
 		m_are_diags_init = true;
@@ -79,10 +86,24 @@ namespace base {
 	}
 
 	int16_t WinManager::_getIncrement(const Coord& coord) {
-		int16_t increment{0};
+		using namespace color;
 
-		if (auto card = board.getTopCard(coord)) {
-			increment = (card->get().getColor() == color::ColorType::BLUE) ? 1 : -1;
+		int16_t increment{0};
+		size_t stack_size = board[coord].size();
+		ColorType color_last = board[coord][stack_size - 1].getColor();
+
+		if (stack_size == 1) {
+			increment = (color_last == color::ColorType::BLUE) ? blue_increment : red_increment;
+		}
+		else if (stack_size > 1){
+			ColorType color_last_but_one = board[coord][stack_size - 2].getColor();
+
+			if (color_last == ColorType::RED && color_last_but_one == ColorType::BLUE) {
+				increment = 2 * red_increment;
+			}
+			else if (color_last == ColorType::BLUE && color_last_but_one == ColorType::RED) {
+				increment = 2 * blue_increment;
+			}
 		}
 
 		return increment;

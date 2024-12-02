@@ -8,6 +8,7 @@
 #include "IllusionService.h"
 #include "ExplosionService.h"
 #include "GameModeType.h"
+#include "InputHandler.h"
 
 namespace base {
 	class BaseGameMode : public IGameMode {
@@ -18,6 +19,10 @@ namespace base {
 		virtual void run() = 0;
 
 	protected:
+		bool _handleEvent(const InputHandler&);
+		bool _handleBoardEvent(const InputHandler&);
+		virtual void _handleSpecialEvent(const InputHandler&) = 0;
+
 		void _switchPlayer();
 
 	protected:

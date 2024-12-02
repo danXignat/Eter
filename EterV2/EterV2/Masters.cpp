@@ -163,8 +163,8 @@ namespace base {
         char card_type;
         std::cin >> card_type;
         auto card = player.getCard(charToCombatCard(card_type));
-        if (board.isValidMove(choice, *card, true)) {
-            board.appendMove(choice, std::move(*card));
+        if (board.isValidMove(choice, card)) {
+            board.appendMove(choice, std::move(card));
         }
     }
     ///---------Hole----------

@@ -58,6 +58,10 @@ namespace base {
 		return m_type < other.m_type;
 	}
 
+	bool CombatCard:: operator>=(const CombatCard& other) const {
+		return m_type >= other.m_type;
+	}
+
 	bool CombatCard::operator==(const CombatCard& other)const {
 		return m_type == other.m_type;
 	}

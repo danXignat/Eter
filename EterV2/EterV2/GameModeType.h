@@ -15,4 +15,10 @@ namespace base {
 		SMALL = 3,
 		BIG = 4
 	};
+
+	enum class GameEventType : uint16_t {
+		NONE, 
+		BoardCard,
+		SpecialCard
+	};
 }
