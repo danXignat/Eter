@@ -23,7 +23,8 @@ namespace base {
 
         std::string getName() const;
         color::ColorType getColor() const;
-        std::optional<CombatCard> getCard(CombatCardType);
+        CombatCard getCard(CombatCardType);
+        const CombatCard& viewCard(CombatCardType);
         bool hasCards() const;
         bool hasCard(CombatCardType);
 
