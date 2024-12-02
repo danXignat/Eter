@@ -161,6 +161,17 @@ namespace base {
 		return m_bounding_rect.corner1;
 	}
 
+	std::pair<Coord, Coord> Board::getBoudingRect() const {
+		return { m_bounding_rect.corner1, m_bounding_rect.corner2 };
+	}
+
+	std::pair<uint16_t, uint16_t> Board::getBoundingRectSize() const {
+		return {
+			(m_bounding_rect.corner2.first - m_bounding_rect.corner1.first + 1) /2,
+			m_bounding_rect.corner2.second - m_bounding_rect.corner1.second + 1
+		};
+	}
+
 	void Board::removeTopCardAt(const Coord& coord) {
 		auto it = m_combat_cards.find(coord);
 
