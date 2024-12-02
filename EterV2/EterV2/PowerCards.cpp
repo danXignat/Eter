@@ -122,6 +122,80 @@ namespace base {
     }
 
     void Spark::apply(Board& board, Player& player) {
+        std::vector<std::pair<Coord, CombatCardType>>choices = coverCards(board, player);
+
+        if (choices.empty()) {
+            Logger::log(Level::WARNING, "No covered cards");
+            return;
+        }
+        Logger::log(Level::INFO, "It's your turn, place a card");
+
+        for (auto& choice : choices) {
+            const Coord& coord = choice.first;
+            const CombatCardType& card = choice.second;
+            Logger::log(Level::INFO, "Card found at ({}, {})", coord.first,coord.second);
+            Logger::log(Level::INFO, "Card:{}",combatCardToChar(card));
+        }
+        Logger::log(Level::INFO, "It's your turn");
+        Coord coord_from;
+        Coord new_coord;
+        char card_type_char;
+
+        std::cout << "Move from coordinates:" << "\n";
+        std::cin >> coord_from.first >> coord_from.second;
+
+        std::cout << "Covered card:"<<"\n";
+        std::cin >> card_type_char;
+
+        std::cout << "To coordinates:"<<"\n";
+        std::cin >> new_coord.first >> new_coord.second;
+
+
+        CombatCardType card_type = charToCombatCard(card_type_char); 
+        CombatCard card(card_type, player.getColor());
+
+        bool valid_card = false;
+        bool valid_coord = false;
+        for (const auto& choice : choices) {
+            if (choice.first == coord_from) {
+                valid_coord = true;
+            }
+            if (choice.second == card_type)
+            {
+                valid_card = true;
+            }
+        }
+        if (valid_card&& valid_coord) {
+            board.removeCardFromStackAt(coord_from, card);
+            board.appendMove(new_coord, std::move(card));
+        }
+        if(!valid_card) {
+            Logger::log(Level::WARNING, "Invalid card selected.");
+            return;
+        }
+        if (!valid_coord) {
+            Logger::log(Level::WARNING, "Invalid coordinates.");
+            return;
+        }
+    }
+
+    std::vector<std::pair<Coord, CombatCardType>>Spark::coverCards(const Board& board, const Player& player) {
+        std::vector<std::pair<Coord, CombatCardType>>choices;
+        for (const auto& [coord, stack] : board) {
+            if (stack.empty()) {
+                continue;
+            }
+            for (size_t i = 0; i < stack.size() - 1; ++i) {
+                const CombatCard& card = stack[i];
+                bool player_card = card.getColor() == player.getColor();
+
+                if (player_card) {
+                    CombatCardType card_type = card.getType();
+                    choices.emplace_back(coord, card_type);
+                }
+            }
+        }
+        return choices;
     }
                 
     ////------------------------------------------ Squall -------------------------------------------

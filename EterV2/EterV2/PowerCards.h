@@ -55,6 +55,7 @@ namespace base {
 		Spark();
 
 		void apply(Board& board, Player& player) override;
+		std::vector<std::pair<Coord, CombatCardType>> coverCards(const Board& board, const Player& player);
 
 	};
 

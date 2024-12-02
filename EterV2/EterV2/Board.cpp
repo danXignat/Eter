@@ -189,6 +189,29 @@ namespace base {
 			Logger::log(Level::WARNING, "No stack or only one card present at ({}, {})", coord.first, coord.second);
 		}
 	}
+	void Board::removeCardFromStackAt(const Coord& coord, const CombatCard& card_to_remove) {
+		auto it = m_combat_cards.find(coord);
+
+		if (it != m_combat_cards.end()) {
+			auto& card_stack = it->second;
+			auto card_it = std::find(card_stack.begin(), card_stack.end(), card_to_remove);
+			if (card_it != card_stack.end()) {
+				card_stack.erase(card_it);
+				if (card_stack.empty()) {
+					m_combat_cards.erase(it);
+					_reinitialise(); 
+				}
+
+				Logger::log(Level::INFO, "Removed card from the stack at ({}, {})", coord.first, coord.second);
+			}
+			else {
+				Logger::log(Level::WARNING, "Card not found in the stack at ({}, {})", coord.first, coord.second);
+			}
+		}
+		else {
+			Logger::log(Level::WARNING, "No stack found at ({}, {})", coord.first, coord.second);
+		}
+	}
 
 	void Board::removeStack(const Coord& coord) {
 		auto it = m_combat_cards.find(coord);

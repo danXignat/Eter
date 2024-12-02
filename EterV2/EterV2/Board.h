@@ -40,6 +40,7 @@ namespace base {
 
 		void appendMove(const Coord&, CombatCard&&);
 		void removeTopCardAt(const Coord& coord);
+		void removeCardFromStackAt(const Coord& coord, const CombatCard& card_to_remove);
 		void removeStack(const Coord& coord);
 		void removeRow(uint16_t x);
 		void removeColumn(uint16_t y);
