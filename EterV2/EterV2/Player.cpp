@@ -76,27 +76,17 @@ namespace base {
         return true;
     }
 
-    CombatCard Player::getCard(CombatCardType type) {
-        if (this->hasCard(type) == false) {
-            throw std::runtime_error("player does not have this card");
-        }
-
+    std::optional<CombatCard> Player::getCard(CombatCardType type) { // getting card ptr or nothing if there is no card
         auto it = m_cards.find(type);
+
+        if (it == m_cards.end()) {
+            return std::nullopt;
+        }
 
         CombatCard card = std::move(it->second);
         m_cards.erase(it);
 
         return card;
-    }
-
-    const CombatCard& Player::viewCard(CombatCardType type) {
-        if (this->hasCard(type) == false) {
-            throw std::runtime_error("player does not have this card");
-        }
-
-        auto it = m_cards.find(type);
-
-        return it->second;
     }
 
     void Player::addCard(CombatCard&& card) {
@@ -123,6 +113,7 @@ namespace base {
                 utils::printAtCoordinate(card, 1 + i, 17);
                 i += 2;
             }
+
         }
     }
 

@@ -6,14 +6,6 @@
 #include <regex>
 
 namespace base {
-	InputHandler::InputHandler() :
-		coord{0, 0},
-		card_type{ CombatCardType::NONE },
-		service_type{ ServiceType::NONE },
-		event_type{ GameEventType::NONE } {
-
-	}
-
 	void InputHandler::read() {
 		std::string input;
 		std::getline(std::cin, input);
@@ -39,32 +31,6 @@ namespace base {
 			else {
 				throw std::runtime_error("Invalid special card");
 			}
-
-			event_type = GameEventType::SpecialCard;
-		}
-		else if (tokens.size() > 1 && tokens.size() <= 3) {
-			std::regex coord_pattern{ R"(^\d{0,2}$)" };
-			std::regex card_pattern{ R"(^[1234E]$)" };
-
-			std::string pos1{ tokens[0] }, pos2{ tokens[1] };
-			std::string card_type_str{ tokens[2] };
-
-			if (!std::regex_match(pos1, coord_pattern)) {
-				throw std::runtime_error("Invalid x-coordinate");
-			}
-			coord.first = std::stoi(pos1);
-
-			if (!std::regex_match(pos2, coord_pattern)) {
-				throw std::runtime_error("Invalid y-coordinate");
-			}
-			coord.second = std::stoi(pos2);
-
-			if (!std::regex_match(card_type_str, card_pattern)) {
-				throw std::runtime_error("Invalid card choice");
-			}
-			card_type = charToCombatCard(card_type_str.front());
-
-			event_type = GameEventType::BoardCard;
 		}
 		else if (tokens.size() > 1 && tokens.size() <= 4) {
 			std::regex coord_pattern{ R"(^\d{0,2}$)" };
@@ -76,12 +42,12 @@ namespace base {
 			if (!std::regex_match(pos1, coord_pattern)) {
 				throw std::runtime_error("Invalid x-coordinate");
 			}
-			coord.first = std::stoi(pos1);
+			x = std::stoi(pos1);
 
 			if (!std::regex_match(pos2, coord_pattern)) {
 				throw std::runtime_error("Invalid y-coordinate");
 			}
-			coord.second = std::stoi(pos2);
+			y = std::stoi(pos2);
 
 			if (!std::regex_match(card_type_str, card_pattern)) {
 				throw std::runtime_error("Invalid card choice");
@@ -94,8 +60,6 @@ namespace base {
 				}
 				service_type = charToService(tokens[3].front());
 			}
-
-			event_type = GameEventType::SpecialCard;
 		}
 		else {
 			throw std::runtime_error("Invalid argument number");

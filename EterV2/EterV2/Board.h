@@ -16,6 +16,7 @@
 using namespace utils;
 
 namespace base {
+	
 	class Board {
 	public:
 		static constexpr const std::pair<uint16_t, uint16_t> START_POS{10, 5};
@@ -31,14 +32,11 @@ namespace base {
 		void render() const;
 		void sideViewRender();
 
-		bool hasStack(const Coord&) const;
 		bool isFixed() const;
 		bool isCardOfColorAt(color::ColorType, const Coord&) const;
 		uint16_t getSize() const;
 		std::optional<CombatCardRef> getTopCard(Coord pos);
 		Coord getLeftCorner() const;
-
-		const std::vector<CombatCard>& operator[](const Coord& coord);
 
 		void appendMove(const Coord&, CombatCard&&);
 		void removeTopCardAt(const Coord& coord);
@@ -47,7 +45,7 @@ namespace base {
 		void removeColumn(uint16_t y);
 		void moveStack(const Coord& from_coord, const Coord& to_coord);
 		void swapStacks(const Coord& from_coord, const Coord& to_coord);
-		bool isValidMove(const Coord&, const CombatCard&);
+		bool isValidMove(const Coord&, const CombatCard&, bool bury = false);
 		std::vector<Coord> availableSpaces();
 		std::optional<std::vector<std::vector<Coord>>> getBorders() const;
 		
@@ -57,7 +55,6 @@ namespace base {
 		void _reinitialise();
 
 	private:
-
 		struct BoundingRect {
 			uint16_t size;
 			Coord corner1, corner2;

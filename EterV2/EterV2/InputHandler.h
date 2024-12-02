@@ -1,19 +1,16 @@
 #pragma once
-#include <tuple>
+#include <optional>
 
 #include "ServiceType.h"
 #include "CombatCardType.h"
-#include "GameModeType.h"
 
 namespace base {
 	struct InputHandler {
-		InputHandler();
+		InputHandler() = default;
 		void read();
 
-		std::pair<uint16_t, uint16_t> coord;
-		CombatCardType card_type;
-		ServiceType service_type;
-		GameEventType event_type;
+		std::optional<uint16_t> x, y;
+		std::optional<CombatCardType> card_type;
+		std::optional<ServiceType> service_type;
 	};
-	
 }

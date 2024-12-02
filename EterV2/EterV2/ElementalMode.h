@@ -14,7 +14,6 @@ namespace base {
 		ElementalMode(const std::vector<ServiceType>&, const std::pair<std::string, std::string>&);
 		void run() override;
 		void render();
-		void _handleSpecialEvent(const InputHandler&) override;
 
 	private:
 		std::optional<IllusionService> m_illusion_service;

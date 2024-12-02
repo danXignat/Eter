@@ -9,7 +9,6 @@
 namespace base {
 	class WinManager {
 	public:
-
 		WinManager(Board&);
 		bool won() const;
 		void addCard(const Coord&);
@@ -20,11 +19,7 @@ namespace base {
 		void _trySetWin(const Coord& coord);
 		int16_t _getIncrement(const Coord&);
 
-	public:
-		static constexpr const int16_t blue_increment = 1;
-		static constexpr const int16_t red_increment = -1;
-
-	public:
+	private:
 		Board& board;
 		uint16_t board_size;
 
