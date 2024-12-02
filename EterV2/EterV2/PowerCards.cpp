@@ -51,13 +51,9 @@ namespace base {
 
 
             auto selected_card = player.getCard(charToCombatCard(card_type));
-            if (!selected_card) {
-                Logger::log(Level::WARNING, "Invalid input");
-                return;
-            }
-
-            if (board.isValidMove(new_coord, *selected_card, false)) {
-                board.appendMove(new_coord, std::move(*selected_card));
+            
+            if (board.isValidMove(new_coord, selected_card)) {
+                board.appendMove(new_coord, std::move(selected_card));
                 Logger::log(Level::INFO, "Flame power was used. Card placed at ({}, {})",
                     new_coord.first, new_coord.second);
                 break;

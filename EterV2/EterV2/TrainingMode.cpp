@@ -34,15 +34,6 @@ namespace base {
 		this->render();
 
 		while (m_win_manager.won() == false) {
-
-			for (auto& [x, count] : m_win_manager.m_cols) {
-				std::cout << x << " -> " << count << "\n";
-			}
-			for (auto& [x, count] : m_win_manager.m_rows) {
-				std::cout << x << " -> " << count << "\n";
-			}
-			std::cout << m_win_manager.m_diag1 << " " << m_win_manager.m_diag2 << "\n";
-
 			InputHandler input;
 			try {
 				input.read();								//asta da handle la inputu de la tastatura
