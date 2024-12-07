@@ -5,8 +5,6 @@
 
 namespace base {
 	enum class MageTypeAbility :uint16_t {
-		None,
-
 		Burn,
 		BurnRowOrColumn,
 
@@ -17,15 +15,17 @@ namespace base {
 		BlowEter,
 
 		Boat,
-		BoatRowOrColumn
+		BoatRowOrColumn,
+
+		None
 	};
 
 	enum class MageType : uint16_t {
-		None,
 		Fire,
 		Earth,
 		Air,
-		Water
+		Water,
+		None
 	};
 
 	const std::unordered_map<MageType, std::string_view> mapMageTypes = {
@@ -33,6 +33,17 @@ namespace base {
 		{MageType::Earth, "Earth"},
 		{MageType::Air, "Air"},
 		{MageType::Water, "Water"}
+	};
+
+	const std::unordered_map<MageTypeAbility, std::string_view> mapMageMasters = {
+		{MageTypeAbility::Burn, "Burn"},
+		{MageTypeAbility::BurnRowOrColumn, "BurnRowOrColumn"},
+		{MageTypeAbility::Bury, "Bury"},
+		{MageTypeAbility::Hole, "Hole"},
+		{MageTypeAbility::BlowAway, "BlowAway"},
+		{MageTypeAbility::BlowEter, "BlowEter"},
+		{MageTypeAbility::Boat, "Boat"},
+		{MageTypeAbility::BoatRowOrColumn, "BoatRowOrColumn"}
 	};
 
 	const std::unordered_map<MageTypeAbility, std::string_view> mapMageTypeAbilities = {
@@ -50,7 +61,11 @@ namespace base {
 		return mapMageTypes.at(type);
 	}
 
-	inline std::string_view abilityToString(MageTypeAbility ability) {
+	inline std::string_view masterToString(MageTypeAbility type) {
+		return mapMageMasters.at(type);
+	}
+
+	inline std::string_view getMasterDescription(MageTypeAbility ability) {
 		return mapMageTypeAbilities.at(ability);
 	}
 

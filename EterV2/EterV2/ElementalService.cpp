@@ -56,96 +56,93 @@ namespace base {
 		if (card1) {
 			utils::printAtCoordinate(
 				std::format("Power 1 << {} >> {}", typeToStrings(type_card1), abilityToString(type_card1)),
-				1, 15
+				1, 25
 			);
 		}
 
 		if (card2) {
 			utils::printAtCoordinate(
 				std::format("Power 2 << {} >> {}", typeToStrings(type_card2), abilityToString(type_card2)),
-				1, 16
+				1, 26
 			);
 		}
 	}
 
+	std::unique_ptr<PowerCard>ElementalService::_factory(PowerCardType ability) {
+		switch (ability) {
+		case PowerCardType::ControllerExplosion:
+			return std::make_unique<ControllerExplosion>();
 
-		std::unique_ptr<PowerCard>ElementalService::_factory(PowerCardType ability) {
-			switch (ability){
-			case PowerCardType::ControllerExplosion:
-				return std::make_unique<ControllerExplosion>();
+		case PowerCardType::Destruction:
+			return std::make_unique<Destruction>();
 
-			case PowerCardType::Destruction:
-				return std::make_unique<Destruction>();
+		case PowerCardType::Flame:
+			return std::make_unique<Flame>();
 
-			case PowerCardType::Flame:
-				return std::make_unique<Flame>();
+		case PowerCardType::Fire:
+			return std::make_unique<Fire>();
 
-			case PowerCardType::Fire:
-				return std::make_unique<Fire>();
+		case PowerCardType::Ash:
+			return std::make_unique<Ash>();
 
-			case PowerCardType::Ash:
-				return std::make_unique<Ash>();
+		case PowerCardType::Spark:
+			return std::make_unique<Spark>();
 
-			case PowerCardType::Spark:
-				return std::make_unique<Spark>();
+		case PowerCardType::Squall:
+			return std::make_unique<Squall>();
 
-			case PowerCardType::Squall:
-				return std::make_unique<Squall>();
+		case PowerCardType::Gale:
+			return std::make_unique<Gale>();
 
-			case PowerCardType::Gale:
-				return std::make_unique<Gale>();
+		case PowerCardType::Hurricane:
+			return std::make_unique<Hurricane>();
 
-			case PowerCardType::Hurricane:
-				return std::make_unique<Hurricane>();
+		case PowerCardType::Gust:
+			return std::make_unique<Gust>();
 
-			case PowerCardType::Gust:
-				return std::make_unique<Gust>();
+		case PowerCardType::Mirrage:
+			return std::make_unique<Mirrage>();
 
-			case PowerCardType::Mirrage:
-				return std::make_unique<Mirrage>();
+		case PowerCardType::Storm:
+			return std::make_unique<Storm>();
 
-			case PowerCardType::Storm:
-				return std::make_unique<Storm>();
+		case PowerCardType::Tide:
+			return std::make_unique<Tide>();
 
-			case PowerCardType::Tide:
-				return std::make_unique<Tide>();
+		case PowerCardType::Mist:
+			return std::make_unique<Mist>();
 
-			case PowerCardType::Mist:
-				return std::make_unique<Mist>();
+		case PowerCardType::Wave:
+			return std::make_unique<Wave>();
 
-			case PowerCardType::Wave:
-				return std::make_unique<Wave>();
+		case PowerCardType::Whirlpool:
+			return std::make_unique<Whirlpool>();
 
-			case PowerCardType::Whirlpool:
-				return std::make_unique<Whirlpool>();
+		case PowerCardType::Blizzard:
+			return std::make_unique<Blizzard>();
 
-			case PowerCardType::Blizzard:
-				return std::make_unique<Blizzard>();
+		case PowerCardType::Waterfall:
+			return std::make_unique<Waterfall>();
 
-			case PowerCardType::Waterfall:
-				return std::make_unique<Waterfall>();
+		case PowerCardType::Support:
+			return std::make_unique<Support>();
 
-			case PowerCardType::Support:
-				return std::make_unique<Support>();
+		case PowerCardType::Earthquake:
+			return std::make_unique<Earthquake>();
 
-			case PowerCardType::Earthquake:
-				return std::make_unique<Earthquake>();
+		case PowerCardType::Crumble:
+			return std::make_unique<Crumble>();
 
-			case PowerCardType::Crumble:
-				return std::make_unique<Crumble>();
+		case PowerCardType::Border:
+			return std::make_unique<Border>();
 
-			case PowerCardType::Border:
-				return std::make_unique<Border>();
+		case PowerCardType::Avalanche:
+			return std::make_unique<Avalanche>();
 
-			case PowerCardType::Avalanche:
-				return std::make_unique<Avalanche>();
-
-			case PowerCardType::Rock:
-				return std::make_unique<Rock>();
-			default:
-				return nullptr;
-			}
+		case PowerCardType::Rock:
+			return std::make_unique<Rock>();
+		default:
+			return nullptr;
 		}
-
-	
+	}
 }

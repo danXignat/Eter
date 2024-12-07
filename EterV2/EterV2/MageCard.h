@@ -14,8 +14,8 @@ namespace base {
 		MageCard();
 		virtual ~MageCard() = default;
 
-		std::string_view getTypeName() const;
-		std::string_view getAbilityName() const;
+		MageType getType() const;
+		MageTypeAbility getMasterType() const;
 
 		virtual void apply(Board& board, Player& player) = 0;
 		

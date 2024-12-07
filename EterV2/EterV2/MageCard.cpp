@@ -7,12 +7,12 @@ namespace base {
         
     }
 
-    std::string_view MageCard::getTypeName()const {
-        return typeToStrings(m_type) ;
+    MageType MageCard::getType() const {
+        return m_type;
     }
 
-    std::string_view MageCard::getAbilityName() const {
-        return abilityToString(m_ability);
+    MageTypeAbility MageCard::getMasterType() const {
+        return m_ability;
     }
    
 }

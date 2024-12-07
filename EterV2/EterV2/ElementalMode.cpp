@@ -35,85 +35,105 @@ namespace base {
 	void ElementalMode::run() {
 		this->render();
 
-		while (m_win_manager.won() == false) {}
-		//	InputHandler input;
-		//	try {
-		//		input.read();								//asta da handle la inputu de la tastatura
-		//	}
-		//	catch (const std::runtime_error& err) {
-		//		Logger::log(Level::ERROR, err.what());
-		//		system("cls");
-		//		this->render();
-		//		continue;
-		//	}
+		while (m_win_manager.won() == false) {
+			InputHandler input;
+			try {
+				input.read();								//asta da handle la inputu de la tastatura
+			}
+			catch (const std::runtime_error& err) {
+				Logger::log(Level::ERROR, err.what());
+				system("cls");
+				this->render();
+				continue;
+			}
 
-		//	if (m_explosion_service) {
-		//		bool is_explosion = input.service_type && input.service_type == ServiceType::EXPLOSION;
-		//		if (is_explosion) {
-		//			m_explosion_service->setting();
-		//			m_explosion_service->apply();
-		//			system("cls");
-		//			this->render();
-		//			continue;
-		//		}
-		//	}
-		//	if (input.service_type.has_value() && input.service_type == ServiceType::ELEMENTAL) {
-		//		char choice;
-		//		std::cin >> choice;
-		//		m_elemental_service.apply(choice, m_curr_player.get());
-		//		std::cin.get();
-		//	}
-		//	else if (m_curr_player.get().hasCard(input.card_type.value())) {
+			if (_handleEvent(input)) {
+				Logger::log(Level::INFO, "succesful action");
+				_switchPlayer();
+			}
+			else {
+				Logger::log(Level::INFO, "failed action");
+			}
 
-		//		Coord coord{ input.x.value(), input.y.value() };
-		//		auto type = input.card_type.value();
-		//		CombatCard combat_card(type, m_curr_player.get().getColor());
+			this->render();
+		}
 
-		//		if (m_board.isValidMove(coord, combat_card)) {
-		//			auto card = m_curr_player.get().getCard(input.card_type.value());
+		if (m_curr_player.get().getColor() == color::ColorType::BLUE) {
+			std::cout << "Player RED has won";
+		}
+		else {
+			std::cout << "Player BLUE has won";
+		}
 
-		//			if (m_illusion_service) {
-		//				bool is_illusion = input.service_type && input.service_type == ServiceType::ILLUSION;
-		//				if (is_illusion) {
-		//					m_illusion_service->add(card.value());
-		//				}
-		//			}
-		//			m_board.appendMove(coord, std::move(*card));
-		//			m_win_manager.addCard(coord);
-		//			_switchPlayer();
-		//		}
-		//	}
-		//	else {
-		//		Logger::log(Level::WARNING, "No more cards of this type");
-		//	}
-
-		//	system("cls");
-		//	this->render();
-		//}
-
-		//if (m_curr_player.get().getColor() == color::ColorType::BLUE) {
-		//	std::cout << "Player RED has won";
-		//}
-		//else {
-		//	std::cout << "Player RED has won";
-		//}
-
-		//std::cin.get();
+		std::cin.get();
 	}
 
 
 
 	bool ElementalMode::_handleSpecialEvent(const InputHandler& input) {
-		return true;
+
+		switch (input.service_type) {
+			using enum ServiceType;
+
+		case ILLUSION: {
+			if (m_illusion_service) {
+				Coord coord = input.coord;
+				CombatCardType card_type = input.card_type;
+				CombatCard card = m_curr_player.get().getCard(card_type);
+
+				bool has_illusion = m_illusion_service->hasPlayerIllusion(m_curr_player.get().getColor());
+				if (has_illusion && m_board.isValidMove(coord, card)) {
+					m_illusion_service->placeIllusion(coord, std::move(card));
+
+					return true;
+				}
+			}
+			break;
+		}
+
+		case EXPLOSION: {
+			if (m_explosion_service) {
+				m_explosion_service->setting();
+				m_explosion_service->apply();
+
+				return true;
+			}
+			break;
+		}
+		
+		case ELEMENTAL: {
+
+		}
+
+		default:
+			break;
+		}
+
+		return false;
 	}
+
 	////------------------------------------------------Methods-------------------------------------------------
 
 	void ElementalMode::render() {
+		system("cls");
+
 		m_board.render();
 		m_board.sideViewRender();
-		m_elemental_service.renderCards();
 		m_player_red.renderCards();
 		m_player_blue.renderCards();
+		m_elemental_service.renderCards();
+
+		if (m_curr_player.get().getColor() == color::ColorType::RED) {
+			std::cout << color::to_string(color::ColorType::RED);
+			utils::printAtCoordinate("RED turn", { 1, 12 });
+			std::cout << color::to_string(color::ColorType::DEFAULT);
+		}
+		else {
+			std::cout << color::to_string(color::ColorType::BLUE);
+			utils::printAtCoordinate("BLUE turn", { 1, 12 });
+			std::cout << color::to_string(color::ColorType::DEFAULT);
+		}
+
 		if (m_explosion_service) {
 			m_explosion_service->render_explosion();
 		}
