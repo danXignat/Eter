@@ -70,7 +70,7 @@ namespace base {
 	class MasterOfWaterBack : public MageCard {
 	public:
 		MasterOfWaterBack();
-
+		std::optional<std::vector<std::vector<Coord>>> getBorders(Board&board,Player&player) const;
 		void apply(Board& board, Player& player) override;
 	};
 

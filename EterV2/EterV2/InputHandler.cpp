@@ -100,5 +100,6 @@ namespace base {
 		else {
 			throw std::runtime_error("Invalid argument number");
 		}
+		
 	}
 }

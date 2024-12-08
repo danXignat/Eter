@@ -16,11 +16,9 @@ namespace base {
 		MageTypeAbility choice_p1 = static_cast<MageTypeAbility>(choices[0]);
 		MageTypeAbility choice_p2 = static_cast<MageTypeAbility>(choices[1]);
 
-		m_card_p1 = _factory(choice_p1);
-		m_card_p2 = _factory(choice_p2);
+		m_card_p1 = _factory(MageTypeAbility::BoatRowOrColumn);
+		m_card_p2 = _factory(MageTypeAbility::BoatRowOrColumn);
 
-		/*m_type_p1 = MageType::Earth;
-		m_type_p2 = MageType::Earth;*/
 	}
 	
 	bool MageService::apply(Player& player) {
@@ -54,13 +52,13 @@ namespace base {
 		if (player.get().getColor() == color::ColorType::RED) {
 			utils::printAtCoordinate(
 				std::format("Mage << {} >> {}", masterToString(m_card_p1->getMasterType()), getMasterDescription(m_card_p1->getMasterType())),
-				1, 25
+				1, 90
 			);
 		}
 		else {
 			utils::printAtCoordinate(
 				std::format("Mage << {} >> {}", masterToString(m_card_p2->getMasterType()), getMasterDescription(m_card_p2->getMasterType())),
-				1, 25
+				1, 90
 			);
 		}
 	}

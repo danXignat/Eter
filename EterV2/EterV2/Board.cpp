@@ -167,7 +167,7 @@ namespace base {
 
 	std::pair<uint16_t, uint16_t> Board::getBoundingRectSize() const {
 		return {
-			(m_bounding_rect.corner2.first - m_bounding_rect.corner1.first + 1) /2,
+			(m_bounding_rect.corner2.first - m_bounding_rect.corner1.first + 2) /2,
 			m_bounding_rect.corner2.second - m_bounding_rect.corner1.second + 1
 		};
 	}
@@ -240,7 +240,6 @@ namespace base {
 					it++;
 				}
 			}
-
 			_reinitialise();
 		}
 		else {
@@ -265,6 +264,56 @@ namespace base {
 			Logger::log(Level::ERROR, "no card on row{}", x);
 		}
 	}
+
+	void Board::moveRow(uint16_t y, uint16_t newY) {
+		if (y == newY) {
+			Logger::log(Level::WARNING, "Source and destination rows are the same.");
+			return;
+		}
+		std::vector<std::pair<Coord, std::vector<CombatCard>>> rowData;
+		for (auto it = m_combat_cards.begin(); it != m_combat_cards.end();) {
+			if (it->first.second == y) {
+				rowData.emplace_back(it->first, std::move(it->second));
+				it = m_combat_cards.erase(it);
+			}
+			else {
+				++it;
+			}
+		}
+		for (auto& pair : rowData) {
+			Coord newCoord = { pair.first.first, newY };
+			m_combat_cards[newCoord] = std::move(pair.second);
+		}
+		_reinitialise();
+		Logger::log(Level::INFO, "Moved row {} to {}", y, newY);
+	}
+
+
+	void Board::moveColumn(uint16_t x, uint16_t newX) {
+		if (x == newX) {
+			Logger::log(Level::WARNING, "Source and destination columns are the same.");
+			return;
+		}
+		std::vector<std::pair<Coord, std::vector<CombatCard>>> columnData;
+
+		for (auto it = m_combat_cards.begin(); it != m_combat_cards.end(); ) {
+			if (it->first.first == x) {
+				columnData.emplace_back(it->first, std::move(it->second));
+				it = m_combat_cards.erase(it);
+			}
+			else {
+				++it;
+			}
+		}
+		for (auto& pair : columnData) {
+			Coord newCoord = { newX, pair.first.second };
+			m_combat_cards[newCoord] = std::move(pair.second);
+		}
+		_reinitialise();
+		Logger::log(Level::INFO, "Moved column {} to {}", x, newX);
+	}
+
+
 
 	void Board::moveStack(const Coord& from_coord, const Coord& to_coord) {
 		auto it = m_combat_cards.find(from_coord);
@@ -302,44 +351,6 @@ namespace base {
 			choices.emplace_back(coord);
 		}
 		return choices;
-	}
-
-	std::optional<std::vector<std::vector<Coord>>> Board::getBorders() const {
-		std::vector<std::vector<Coord>> borders;
-
-		auto addBorderIfValid = [&borders](std::vector<Coord>& border) {
-			if (border.size() >= 3) {
-				if (std::find(borders.begin(), borders.end(), border) == borders.end()) {
-					borders.push_back(std::move(border));
-				}
-			}
-		};
-
-		std::vector<Coord> top_border, bottom_border;
-		for (uint16_t point_x = m_bounding_rect.corner1.first; point_x <= m_bounding_rect.corner2.first; point_x += 2) {
-			if (m_combat_cards.contains({ point_x, m_bounding_rect.corner1.second })) {
-				top_border.push_back({ point_x, m_bounding_rect.corner1.second });
-			}
-			if (m_combat_cards.contains({ point_x, m_bounding_rect.corner2.second })) {
-				bottom_border.push_back({ point_x, m_bounding_rect.corner2.second });
-			}
-		}
-		addBorderIfValid(top_border);
-		addBorderIfValid(bottom_border);
-
-		std::vector<Coord> left_border, right_border;
-		for (uint16_t point_y = m_bounding_rect.corner1.second; point_y <= m_bounding_rect.corner2.second; point_y++) {
-			if (m_combat_cards.contains({ m_bounding_rect.corner1.first, point_y })) {
-				left_border.push_back({ m_bounding_rect.corner1.first, point_y });
-			}
-			if (m_combat_cards.contains({ m_bounding_rect.corner2.first, point_y })) {
-				right_border.push_back({ m_bounding_rect.corner2.first, point_y });
-			}
-		}
-		addBorderIfValid(left_border);
-		addBorderIfValid(right_border);
-
-		return borders.empty() ? std::nullopt : std::make_optional(borders);
 	}
 
 

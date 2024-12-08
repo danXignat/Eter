@@ -1,4 +1,4 @@
-#include"Masters.h"
+﻿#include"Masters.h"
 
 #include <format>
 
@@ -77,19 +77,19 @@ namespace base {
         std::cout << '\n';
 
         uint16_t choice;
-        char line_or_col;
-        std::cin >> choice >> line_or_col;
+        char row_or_col;
+        std::cin >> choice >> row_or_col;
 
-        if (line_or_col == 'l') {
+        if (row_or_col == 'r') {
             board.removeRow(choice);
         }
-        else if (line_or_col == 'c') {
+        else if (row_or_col == 'c') {
             board.removeColumn(choice);
         }
         else {
             Logger::log(Level::INFO, "invalid input");
         }
-
+        
         Logger::log(Level::INFO, "Mage fire ability remove top card used");
     }
 
@@ -163,9 +163,7 @@ namespace base {
         char card_type;
         std::cin >> card_type;
         auto card = player.getCard(charToCombatCard(card_type));
-        if (board.isValidMove(choice, card)) {
-            board.appendMove(choice, std::move(card));
-        }
+        board.appendMove(choice, std::move(card)); 
     }
     ///---------Hole----------
 
@@ -332,25 +330,107 @@ namespace base {
         m_type = MageType::Water;
         m_ability = MageTypeAbility::BoatRowOrColumn;
     }
+    std::optional<std::vector<std::vector<Coord>>> MasterOfWaterBack::getBorders(Board&board,Player&player) const {
+        std::vector<std::vector<Coord>> borders;
+
+        auto [corner1, corner2] = board.getBoudingRect(); // Utilizează getBoundingRect pentru coordonatele colțurilor
+        auto [width, height] = board.getBoundingRectSize(); // Utilizează getBoundingRectSize pentru dimensiunile dreptunghiului
+
+        // Lambda pentru a verifica și adăuga bordurile valide
+        auto addBorderIfValid = [&borders](std::vector<Coord>& border) {
+            if (border.size() >= 3) {
+                if (std::find(borders.begin(), borders.end(), border) == borders.end()) {
+                    borders.push_back(std::move(border));
+                }
+            }
+            };
+
+        std::vector<Coord> top_border, bottom_border, left_border, right_border;
+
+        for (uint16_t x = corner1.first; x <= corner2.first; x++) {
+            if (board.hasStack({ x, corner1.second })) {
+                top_border.push_back({ x, corner1.second });
+            }
+            if (board.hasStack({x, corner2.second})) {
+                bottom_border.push_back({ x, corner2.second });
+            }
+        }
+        for (uint16_t y = corner1.second; y <= corner2.second; y++) {
+            if (board.hasStack({ corner1.first, y })) {
+                left_border.push_back({ corner1.first, y });
+            }
+            if (board.hasStack({ corner2.first, y })) {
+                right_border.push_back({ corner2.first, y });
+            }
+        }
+
+        addBorderIfValid(top_border);
+        addBorderIfValid(bottom_border);
+        addBorderIfValid(left_border);
+        addBorderIfValid(right_border);
+
+        return borders.empty() ? std::nullopt : std::make_optional(borders);
+    }
 
     void MasterOfWaterBack::apply(Board& board, Player& player) {
-        std::optional<std::vector<std::vector<Coord>>> borders = board.getBorders();
+        std::optional<std::vector<std::vector<Coord>>> borders = getBorders(board,player);
 
-        if (borders) {
+        if (borders && !borders->empty()) {
+            // Afișare borduri disponibile
+            int index = 0;
             for (const auto& border : *borders) {
-                std::cout << "Border: ";
+                std::cout << "Border " << index++ << ": ";
                 for (const auto& coord : border) {
                     std::cout << "(" << coord.first << ", " << coord.second << ") ";
                 }
                 std::cout << "\n";
             }
+            std::cout << std::endl;
+
+            // Solicitarea utilizatorului să aleagă o bordură
+            int selectedBorderIndex;
+            std::cout << "Please select a border index to move: ";
+            std::cin >> selectedBorderIndex;
+
+            if (selectedBorderIndex < 0 || selectedBorderIndex >= borders->size()) {
+                std::cout << "Invalid border index selected.\n";
+                return;
+            }
+
+            const auto& selectedBorder = (*borders)[selectedBorderIndex];
+
+            // Determinarea poziției inițiale și solicitarea destinației
+            char direction = selectedBorder.front().first == selectedBorder.back().first ? 'c' : 'r';
+            uint16_t from_move = (direction == 'r') ? selectedBorder.front().second : selectedBorder.front().first;
+            uint16_t to_move;
+
+            // Afișarea opțiunilor valide de destinație
+            auto [corner1, corner2] = board.getBoudingRect();
+            std::cout << "Valid destinations for the " << (direction == 'r' ? "row" : "column") << " are:\n";
+            if (direction == 'r') {
+                std::cout << "Move to row at top boundary: " << corner1.second - 1 << "\n";
+                std::cout << "Move to row at bottom boundary: " << corner2.second + 1 << "\n";
+            }
+            else {
+                std::cout << "Move to column at left boundary: " << corner1.first - 1 << "\n";
+                std::cout << "Move to column at right boundary: " << corner2.first + 1 << "\n";
+            }
+
+            // Solicitarea și validarea destinației
+            std::cout << "Enter the destination (boundary position): ";
+            std::cin >> to_move;
+
+            // Executarea mutării
+            if (direction == 'r') {
+                board.moveRow(from_move, to_move);
+            }
+            else {
+                board.moveColumn(from_move, to_move);
+            }
         }
         else {
             std::cout << "No borders found.\n";
         }
-        for (const auto& [coord, stack] : board) {
-
-        }
-
     }
+
 }
