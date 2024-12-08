@@ -1,4 +1,4 @@
-#include"Masters.h"
+﻿#include"Masters.h"
 
 #include <format>
 
@@ -77,19 +77,19 @@ namespace base {
         std::cout << '\n';
 
         uint16_t choice;
-        char line_or_col;
-        std::cin >> choice >> line_or_col;
+        char row_or_col;
+        std::cin >> choice >> row_or_col;
 
-        if (line_or_col == 'l') {
+        if (row_or_col == 'r') {
             board.removeRow(choice);
         }
-        else if (line_or_col == 'c') {
+        else if (row_or_col == 'c') {
             board.removeColumn(choice);
         }
         else {
             Logger::log(Level::INFO, "invalid input");
         }
-
+        
         Logger::log(Level::INFO, "Mage fire ability remove top card used");
     }
 
@@ -163,9 +163,7 @@ namespace base {
         char card_type;
         std::cin >> card_type;
         auto card = player.getCard(charToCombatCard(card_type));
-        if (board.isValidMove(choice, card)) {
-            board.appendMove(choice, std::move(card));
-        }
+        board.appendMove(choice, std::move(card)); 
     }
     ///---------Hole----------
 
@@ -333,24 +331,119 @@ namespace base {
         m_ability = MageTypeAbility::BoatRowOrColumn;
     }
 
-    void MasterOfWaterBack::apply(Board& board, Player& player) {
-        std::optional<std::vector<std::vector<Coord>>> borders = board.getBorders();
 
-        if (borders) {
+    std::optional<std::unordered_map<BorderType, std::vector<Coord>>> MasterOfWaterBack::getBorders(Board& board, Player& player) const {
+        std::unordered_map<BorderType, std::vector<Coord>> borders;
+
+        auto [corner1, corner2] = board.getBoudingRect();
+        auto [width, height] = board.getBoundingRectSize();
+
+        std::vector<Coord> top_border, bottom_border, left_border, right_border;
+       
+
+        for (uint16_t x = corner1.first; x <= corner2.first; x+=2) {
+            if (board.hasStack({ x, corner1.second })) {
+                top_border.push_back({ x, corner1.second });
+            }
+            if (height>1 && board.hasStack({ x, corner2.second })) {
+                bottom_border.push_back({ x, corner2.second });
+            }
+        }
+        for (uint16_t y = corner1.second; y <= corner2.second; y++) {
+            if (board.hasStack({ corner1.first, y })) {
+                left_border.push_back({ corner1.first, y });
+            }
+            if (width>1 && board.hasStack({ corner2.first, y })) {
+                right_border.push_back({ corner2.first, y });
+            }
+        }
+
+        auto addBorder = [&borders]( std::vector<Coord>& border, BorderType type) {
+            if (border.size() >= 3) {
+                borders[type] = std::move(border);
+            }
+        };
+         
+        addBorder(top_border, BorderType::Top); 
+        addBorder(bottom_border, BorderType::Bottom); 
+        addBorder(left_border, BorderType::Left); 
+        addBorder(right_border, BorderType::Right); 
+        
+
+        return borders.empty() ? std::nullopt : std::make_optional(borders);
+    }
+
+    void MasterOfWaterBack::apply(Board& board, Player& player) {
+        auto borders = getBorders(board, player);
+
+        if (borders && !borders->empty()) {
+           
+            int index = 0;
             for (const auto& border : *borders) {
-                std::cout << "Border: ";
-                for (const auto& coord : border) {
+                std::string borderName;
+                switch (border.first) {
+                case BorderType::Top: borderName = "Top"; break;
+                case BorderType::Bottom: borderName = "Bottom"; break;
+                case BorderType::Left: borderName = "Left"; break;
+                case BorderType::Right: borderName = "Right"; break;
+                }
+                std::cout << "Border " << index++ << " (" << borderName << "): ";
+                for (const auto& coord : border.second) {
                     std::cout << "(" << coord.first << ", " << coord.second << ") ";
                 }
                 std::cout << "\n";
+            }
+            std::cout << std::endl;
+
+            int selectedBorderIndex;
+            std::cout << "Please select a border index to move: ";
+            std::cin >> selectedBorderIndex;
+
+            if (selectedBorderIndex < 0 || selectedBorderIndex >= borders->size()) {
+                std::cout << "Invalid border index selected.\n";
+                return;
+            }
+
+            auto selectedBorderIt = std::next(borders->begin(), selectedBorderIndex);
+            const auto& selectedBorder = selectedBorderIt->second;
+
+            char direction = (selectedBorderIt->first == BorderType::Left || selectedBorderIt->first == BorderType::Right) ? 'c' : 'r';
+            uint16_t from_move = (direction == 'r') ? selectedBorder.front().second : selectedBorder.front().first;
+            uint16_t to_move;
+
+            auto [corner1, corner2] = board.getBoudingRect();
+            std::cout << "Valid destinations for the " << (direction == 'r' ? "row" : "column") << " are:\n";
+            if (direction == 'r') {
+                if (selectedBorderIt->first == BorderType::Top) {
+                    std::cout << "Move to bottom:" << corner2.second + 1 << "\n";
+                }
+                else {  
+                    std::cout << "Move to top:" << corner1.second - 1 << "\n";
+                }
+            }
+            else {
+                if (selectedBorderIt->first == BorderType::Left) {
+                    std::cout << "Move to right: " << corner2.first + 2 << "\n";
+                }
+                else {  
+                    std::cout << "Move to left: " << corner1.first - 2 << "\n";
+                }
+            }
+
+            std::cout << "Enter the destination (boundary position): ";
+            std::cin >> to_move;
+
+            if (direction == 'r') {
+                board.moveRow(from_move, to_move);
+            }
+            else {
+                board.moveColumn(from_move, to_move);
             }
         }
         else {
             std::cout << "No borders found.\n";
         }
-        for (const auto& [coord, stack] : board) {
-
-        }
-
     }
+    
+
 }
