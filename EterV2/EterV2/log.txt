@@ -1,14 +1,14 @@
-[INFO] explosion effect [1, 2] -> 0
-[INFO] explosion effect [1, 0] -> 1
-[INFO] explosion effect [0, 2] -> 1
+[INFO] explosion effect [2, 2] -> 1
+[INFO] explosion effect [3, 3] -> 1
+[INFO] explosion effect [3, 0] -> 0
 [INFO] card(1) appended at (10, 5)
 [INFO] succesful action
-[INFO] card(2) appended at (12, 5)
+[INFO] card(4) appended at (12, 5)
 [INFO] succesful action
-[INFO] card(3) appended at (14, 5)
+[INFO] card(2) appended at (10, 4)
 [INFO] succesful action
-[INFO] card(4) appended at (16, 5)
+[INFO] card(2) appended at (10, 3)
 [INFO] succesful action
-[INFO] Moved row 5 to 4
+[INFO] Moved column 10 to 14
 [INFO] succesful action
 [ERROR] No arguments

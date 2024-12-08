@@ -40,7 +40,7 @@ namespace base {
 		MasterOfEarthBack();
 
 		void apply(Board& board, Player& player) override;
-		
+
 	};
 
 	class MasterOfAirFront : public MageCard {
@@ -66,12 +66,18 @@ namespace base {
 		void apply(Board& board, Player& player) override;
 		std::vector<Coord> getChoices(Board& board, Player& player);
 	};
-
+	enum class BorderType {
+		Top,
+		Bottom,
+		Left,
+		Right
+	};
 	class MasterOfWaterBack : public MageCard {
 	public:
 		MasterOfWaterBack();
-		std::optional<std::vector<std::vector<Coord>>> getBorders(Board&board,Player&player) const;
+		std::optional<std::unordered_map<BorderType, std::vector<Coord>>> getBorders(Board& board, Player& player) const;
 		void apply(Board& board, Player& player) override;
 	};
 
 }
+

@@ -330,28 +330,22 @@ namespace base {
         m_type = MageType::Water;
         m_ability = MageTypeAbility::BoatRowOrColumn;
     }
-    std::optional<std::vector<std::vector<Coord>>> MasterOfWaterBack::getBorders(Board&board,Player&player) const {
-        std::vector<std::vector<Coord>> borders;
 
-        auto [corner1, corner2] = board.getBoudingRect(); // Utilizează getBoundingRect pentru coordonatele colțurilor
-        auto [width, height] = board.getBoundingRectSize(); // Utilizează getBoundingRectSize pentru dimensiunile dreptunghiului
 
-        // Lambda pentru a verifica și adăuga bordurile valide
-        auto addBorderIfValid = [&borders](std::vector<Coord>& border) {
-            if (border.size() >= 3) {
-                if (std::find(borders.begin(), borders.end(), border) == borders.end()) {
-                    borders.push_back(std::move(border));
-                }
-            }
-            };
+    std::optional<std::unordered_map<BorderType, std::vector<Coord>>> MasterOfWaterBack::getBorders(Board& board, Player& player) const {
+        std::unordered_map<BorderType, std::vector<Coord>> borders;
+
+        auto [corner1, corner2] = board.getBoudingRect();
+        auto [width, height] = board.getBoundingRectSize();
 
         std::vector<Coord> top_border, bottom_border, left_border, right_border;
+       
 
-        for (uint16_t x = corner1.first; x <= corner2.first; x++) {
+        for (uint16_t x = corner1.first; x <= corner2.first; x+=2) {
             if (board.hasStack({ x, corner1.second })) {
                 top_border.push_back({ x, corner1.second });
             }
-            if (board.hasStack({x, corner2.second})) {
+            if (height>1 && board.hasStack({ x, corner2.second })) {
                 bottom_border.push_back({ x, corner2.second });
             }
         }
@@ -359,35 +353,48 @@ namespace base {
             if (board.hasStack({ corner1.first, y })) {
                 left_border.push_back({ corner1.first, y });
             }
-            if (board.hasStack({ corner2.first, y })) {
+            if (width>1 && board.hasStack({ corner2.first, y })) {
                 right_border.push_back({ corner2.first, y });
             }
         }
 
-        addBorderIfValid(top_border);
-        addBorderIfValid(bottom_border);
-        addBorderIfValid(left_border);
-        addBorderIfValid(right_border);
+        auto addBorder = [&borders]( std::vector<Coord>& border, BorderType type) {
+            if (border.size() >= 3) {
+                borders[type] = std::move(border);
+            }
+        };
+         
+        addBorder(top_border, BorderType::Top); 
+        addBorder(bottom_border, BorderType::Bottom); 
+        addBorder(left_border, BorderType::Left); 
+        addBorder(right_border, BorderType::Right); 
+        
 
         return borders.empty() ? std::nullopt : std::make_optional(borders);
     }
 
     void MasterOfWaterBack::apply(Board& board, Player& player) {
-        std::optional<std::vector<std::vector<Coord>>> borders = getBorders(board,player);
+        auto borders = getBorders(board, player);
 
         if (borders && !borders->empty()) {
-            // Afișare borduri disponibile
+           
             int index = 0;
             for (const auto& border : *borders) {
-                std::cout << "Border " << index++ << ": ";
-                for (const auto& coord : border) {
+                std::string borderName;
+                switch (border.first) {
+                case BorderType::Top: borderName = "Top"; break;
+                case BorderType::Bottom: borderName = "Bottom"; break;
+                case BorderType::Left: borderName = "Left"; break;
+                case BorderType::Right: borderName = "Right"; break;
+                }
+                std::cout << "Border " << index++ << " (" << borderName << "): ";
+                for (const auto& coord : border.second) {
                     std::cout << "(" << coord.first << ", " << coord.second << ") ";
                 }
                 std::cout << "\n";
             }
             std::cout << std::endl;
 
-            // Solicitarea utilizatorului să aleagă o bordură
             int selectedBorderIndex;
             std::cout << "Please select a border index to move: ";
             std::cin >> selectedBorderIndex;
@@ -397,30 +404,35 @@ namespace base {
                 return;
             }
 
-            const auto& selectedBorder = (*borders)[selectedBorderIndex];
+            auto selectedBorderIt = std::next(borders->begin(), selectedBorderIndex);
+            const auto& selectedBorder = selectedBorderIt->second;
 
-            // Determinarea poziției inițiale și solicitarea destinației
-            char direction = selectedBorder.front().first == selectedBorder.back().first ? 'c' : 'r';
+            char direction = (selectedBorderIt->first == BorderType::Left || selectedBorderIt->first == BorderType::Right) ? 'c' : 'r';
             uint16_t from_move = (direction == 'r') ? selectedBorder.front().second : selectedBorder.front().first;
             uint16_t to_move;
 
-            // Afișarea opțiunilor valide de destinație
             auto [corner1, corner2] = board.getBoudingRect();
             std::cout << "Valid destinations for the " << (direction == 'r' ? "row" : "column") << " are:\n";
             if (direction == 'r') {
-                std::cout << "Move to row at top boundary: " << corner1.second - 1 << "\n";
-                std::cout << "Move to row at bottom boundary: " << corner2.second + 1 << "\n";
+                if (selectedBorderIt->first == BorderType::Top) {
+                    std::cout << "Move to bottom:" << corner2.second + 1 << "\n";
+                }
+                else {  
+                    std::cout << "Move to top:" << corner1.second - 1 << "\n";
+                }
             }
             else {
-                std::cout << "Move to column at left boundary: " << corner1.first - 1 << "\n";
-                std::cout << "Move to column at right boundary: " << corner2.first + 1 << "\n";
+                if (selectedBorderIt->first == BorderType::Left) {
+                    std::cout << "Move to right: " << corner2.first + 2 << "\n";
+                }
+                else {  
+                    std::cout << "Move to left: " << corner1.first - 2 << "\n";
+                }
             }
 
-            // Solicitarea și validarea destinației
             std::cout << "Enter the destination (boundary position): ";
             std::cin >> to_move;
 
-            // Executarea mutării
             if (direction == 'r') {
                 board.moveRow(from_move, to_move);
             }
@@ -432,5 +444,6 @@ namespace base {
             std::cout << "No borders found.\n";
         }
     }
+    
 
 }
