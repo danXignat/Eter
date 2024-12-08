@@ -7,6 +7,7 @@
 #include "ExplosionService.h"
 #include "ElementalService.h"
 #include "ServiceType.h"
+#include "GameModeType.h"
 
 namespace base {
 	class ElementalMode : public BaseGameMode {

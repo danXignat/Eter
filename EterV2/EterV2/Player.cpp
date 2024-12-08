@@ -103,6 +103,14 @@ namespace base {
         m_cards.emplace(card.getType(), std::move(card));
     }
 
+    void Player::setOpponent(Player* opponent) {
+        m_opponent = opponent;
+    }
+
+    Player* Player::getOpponent() const {
+        return m_opponent;
+    }
+
     //---------------------------------------------------------------------
 
     void Player::renderCards() const {

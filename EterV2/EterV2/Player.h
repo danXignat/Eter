@@ -32,6 +32,10 @@ namespace base {
         void setName(std::string_view name);
         void addCard(CombatCard&&);
 
+        void setOpponent(Player* opponent);
+        Player* getOpponent() const;
+
+
     private:
         void _initializeCards(GameSizeType);
         void _addCard(CombatCardType, uint16_t);
@@ -40,6 +44,7 @@ namespace base {
         color::ColorType m_color;
         std::string m_name;
         std::unordered_multimap<CombatCardType, CombatCard> m_cards;
+        Player* m_opponent = nullptr;
     };
 
     using PlayerRef = std::reference_wrapper<Player>;
