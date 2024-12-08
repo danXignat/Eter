@@ -288,6 +288,19 @@ namespace base {
     }
 
     void Storm::apply(Board& board, Player& player) {
+        std::vector<Coord> stacksToRemove;
+
+        for (const auto& [coord, stack] : board) {
+            if (stack.size() > 1) {
+                stacksToRemove.push_back(coord);
+            }
+        }
+
+        for (const auto& coord : stacksToRemove) {
+            board.removeStack(coord);
+            Logger::log(Level::INFO, "A stack with 2 or more cards has been removed from the board");
+            break;
+        }
     }
 
     ////------------------------------------------ Tide -------------------------------------------
@@ -356,6 +369,22 @@ namespace base {
     }
 
     void Earthquake::apply(Board& board, Player& player) {
+        for (const auto& [coord, stack] : board) {
+            if (!stack.empty()) {
+                auto top_card = board.getTopCard(coord);
+                const CombatCard& card = top_card->get();
+
+                if (card.getType() == CombatCardType::ONE) {
+                    Logger::log(Level::INFO, "Earthquake power removed a visible card with number 1.");
+                    board.removeTopCardAt(coord);
+                    board.availableSpaces(); 
+                    break; 
+                }
+                else {
+                    Logger::log(Level::WARNING, "No visible cards with number 1");
+                }
+            }
+        }
     }
         
 
