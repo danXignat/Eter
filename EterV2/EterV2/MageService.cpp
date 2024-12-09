@@ -18,10 +18,10 @@ namespace base {
 
 		m_card_p1 = _factory(MageTypeAbility::Boat);
 		m_card_p2 = _factory(MageTypeAbility::Boat);
-
 	}
 	
 	bool MageService::apply(Player& player) {
+
 		if (player.getColor() == color::ColorType::RED) {
 
 			if (m_card_p1) {
@@ -49,13 +49,13 @@ namespace base {
 	}
 
 	void MageService::renderCard(PlayerRef player) const {
-		if (player.get().getColor() == color::ColorType::RED) {
+		if (player.get().getColor() == color::ColorType::RED && m_card_p1) {
 			utils::printAtCoordinate(
 				std::format("Mage << {} >> {}", masterToString(m_card_p1->getMasterType()), getMasterDescription(m_card_p1->getMasterType())),
 				1, 90
 			);
 		}
-		else {
+		else if (m_card_p2){
 			utils::printAtCoordinate(
 				std::format("Mage << {} >> {}", masterToString(m_card_p2->getMasterType()), getMasterDescription(m_card_p2->getMasterType())),
 				1, 90

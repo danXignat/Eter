@@ -14,5 +14,4 @@ namespace base {
     MageTypeAbility MageCard::getMasterType() const {
         return m_ability;
     }
-   
 }
