@@ -315,19 +315,19 @@ namespace base {
 
 
 
-	void Board::moveStack(const Coord& from_coord, const Coord& to_coord) {
+	bool Board::moveStack(const Coord& from_coord, const Coord& to_coord) {
 		auto it = m_combat_cards.find(from_coord);
 		if (it == m_combat_cards.end()) {
 			Logger::log(Level::ERROR, "No stack at ({},{})\n", from_coord.first, from_coord.second);
-			return;
+			return false;
 		}
 		if (m_combat_cards.contains(to_coord)) {
 			Logger::log(Level::ERROR, "Destination must be an empty space!\n", from_coord.first, from_coord.second);
-			return;
+			return false;
 		}
 		if (!m_available_spaces.contains(to_coord)) {
 			Logger::log(Level::ERROR, "Destination is not a valid space!\n", from_coord.first, from_coord.second);
-			return;
+			return false;
 		}
 
 		m_combat_cards[to_coord] = std::move(it->second);
@@ -337,7 +337,7 @@ namespace base {
 
 		Logger::log(Level::INFO, "Stack moved from ({}, {}) to ({}, {})",
 			from_coord.first, from_coord.second, to_coord.first, to_coord.second);
-
+		return true;
 	}
 
 
