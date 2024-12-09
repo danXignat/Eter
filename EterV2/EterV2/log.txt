@@ -1,16 +1,7 @@
-[INFO] card(2) appended at (10, 5)
+[INFO] card(1) appended at (10, 5)
 [INFO] succesful action
-[INFO] card(3) appended at (12, 5)
+[INFO] card(4) appended at (12, 5)
 [INFO] succesful action
-[INFO] Stack moved from (12, 5) to (10, 4)
-[INFO] Mage Water Boat ability card used
-[INFO] succesful action
-[ERROR] No arguments
-[INFO] Stack moved from (10, 5) to (10, 3)
-[INFO] Mage Water Boat ability card used
-[INFO] succesful action
-[ERROR] No arguments
-[INFO] card(1) appended at (10, 2)
-[INFO] succesful action
-[INFO] card(3) appended at (10, 1)
+[ERROR] Invalid card choice
+[INFO] card(3) appended at (14, 5)
 [INFO] succesful action
