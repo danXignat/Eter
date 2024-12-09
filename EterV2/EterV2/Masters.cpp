@@ -376,86 +376,99 @@ namespace base {
 
          return borders.empty() ? std::nullopt : std::make_optional(borders);
      }
-     int MasterOfWaterBack:: selectBorders(const std::optional<std::unordered_map<BorderType, std::vector<Coord>>>& borders) const {
-         if (!borders || borders->empty()) {
-             std::cout << "No borders found.\n";
-             return -1;
+
+     std::string_view borderToString(BorderType border) {
+
+         switch (border) {
+         case BorderType::Top:
+             return "Top";
+           
+         case BorderType::Bottom:
+             return "Bottom";
+          
+         case BorderType::Left:
+             return "Left";
+          
+         case BorderType::Right:
+             return "Right";
+         
+         default:
+             return "Unknown";
          }
 
+     }
+
+     std::pair<uint16_t,char> MasterOfWaterBack:: selectBorders(const std::optional<std::unordered_map<BorderType, std::vector<Coord>>>& borders,Board&board) const {
+         if (!borders || borders->empty()) {
+             std::cout << "No borders found.\n";
+             Logger::log(Level::ERROR, "Can't use thid card rn");
+             return { -1, '\0' }; 
+         }
          int index = 0;
-         for (const auto& border : *borders) {
-             std::string borderName;
-             switch (border.first) {
-             case BorderType::Top: borderName = "Top"; break;
-             case BorderType::Bottom: borderName = "Bottom"; break;
-             case BorderType::Left: borderName = "Left"; break;
-             case BorderType::Right: borderName = "Right"; break;
-             }
-             std::cout << "Border " << index++ << " (" << borderName << "): ";
-             for (const auto& coord : border.second) {
+         for (const auto& [border,coords] : *borders) {
+             std::cout << "Border number " << index++ << "->"<< borderToString(border) << ", at coords: ";
+             for (const auto& coord : coords) {
                  std::cout << "(" << coord.first << ", " << coord.second << ") ";
              }
              std::cout << "\n";
          }
          std::cout << std::endl;
+
          int selectedBorderIndex;
          std::cout << "Please select a border index to move: ";
          std::cin >> selectedBorderIndex;
-         return selectedBorderIndex;
-
-     }
-     void MasterOfWaterBack::apply(Board& board, Player& player) {
-         auto borders = getBorders(board, player);
-
-         if (borders && !borders->empty()) {
-
-             int selectedBorderIndex=selectBorders(borders);
+         if (selectedBorderIndex < 0 || selectedBorderIndex >= borders->size()) {
+             std::cout << "Invalid index!";
+             Logger::log(Level::ERROR, "Invalid index for border");
+             return { -1, '\0' };
            
-             if (selectedBorderIndex < 0 || selectedBorderIndex >= borders->size()) {
-                 std::cout << "Invalid border index selected.\n";
-                 return;
-             }
+         }
+         auto selectedBorderIt = std::next(borders->begin(), selectedBorderIndex);
+         const auto& selectedBorder = selectedBorderIt->second;
 
-             auto selectedBorderIt = std::next(borders->begin(), selectedBorderIndex);
-             const auto& selectedBorder = selectedBorderIt->second;
+         char direction = (selectedBorderIt->first == BorderType::Left || selectedBorderIt->first == BorderType::Right) ? 'c' : 'r';
+         uint16_t from_move = (direction == 'r') ? selectedBorder.front().second : selectedBorder.front().first;
+         uint16_t to_move;
 
-             char direction = (selectedBorderIt->first == BorderType::Left || selectedBorderIt->first == BorderType::Right) ? 'c' : 'r';
-             uint16_t from_move = (direction == 'r') ? selectedBorder.front().second : selectedBorder.front().first;
-             uint16_t to_move;
-
-             auto [corner1, corner2] = board.getBoudingRect();
-             std::cout << "Valid destinations for the " << (direction == 'r' ? "row" : "column") << " are:\n";
-             if (direction == 'r') {
-                 if (selectedBorderIt->first == BorderType::Top) {
-                     std::cout << "Move to bottom:" << corner2.second + 1 << "\n";
-                 }
-                 else {
-                     std::cout << "Move to top:" << corner1.second - 1 << "\n";
-                 }
+         auto [corner1, corner2] = board.getBoudingRect();
+         std::cout << "Valid destinations for the " << (direction == 'r' ? "row" : "column") << " are:\n";
+         if (direction == 'r') {
+             if (selectedBorderIt->first == BorderType::Top) {
+                 std::cout << "Move to the bottom border:" << corner2.second + 1 << "\n";
              }
              else {
-                 if (selectedBorderIt->first == BorderType::Left) {
-                     std::cout << "Move to right: " << corner2.first + 2 << "\n";
-                 }
-                 else {
-                     std::cout << "Move to left: " << corner1.first - 2 << "\n";
-                 }
-             }
-
-             std::cout << "Enter the destination (boundary position): ";
-             std::cin >> to_move;
-
-             if (direction == 'r') {
-                 board.moveRow(from_move, to_move);
-             }
-             else {
-                 board.moveColumn(from_move, to_move);
+                 std::cout << "Move to the top border:" << corner1.second - 1 << "\n";
              }
          }
          else {
-             std::cout << "No borders found.\n";
+             if (selectedBorderIt->first == BorderType::Left) {
+                 std::cout << "Move to the right border: " << corner2.first + 2 << "\n";
+             }
+             else {
+                 std::cout << "Move to the left border: " << corner1.first - 2 << "\n";
+             }
          }
-         Logger::log(Level::INFO, "Mage Water BoatRowOrColumn ability card used");
+         return { from_move,direction };
+     }
 
+     void MasterOfWaterBack::apply(Board& board, Player& player) {
+         auto borders = getBorders(board, player);
+
+         auto result = selectBorders(borders, board);
+         if (result.first != -1) {
+             int to_move;
+             std::cout << "Enter the destination: ";
+             std::cin >> to_move;
+
+             if (result.second == 'r') {
+                 board.moveRow(result.first, to_move);
+             }
+             else {
+                 board.moveColumn(result.first, to_move);
+             }
+
+             Logger::log(Level::INFO, "Mage Water BoatRowOrColumn ability card used");
+         }
+         return;
      }
 }

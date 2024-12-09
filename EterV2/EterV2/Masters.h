@@ -76,7 +76,7 @@ namespace base {
 	public:
 		MasterOfWaterBack();
 		std::optional<std::unordered_map<BorderType, std::vector<Coord>>> getBorders(Board& board, Player& player) const;
-		int selectBorders(const std::optional<std::unordered_map<BorderType, std::vector<Coord>>>& borders)const ;
+		std::pair<uint16_t,char> selectBorders(const std::optional<std::unordered_map<BorderType, std::vector<Coord>>>& borders,Board&board)const ;
 		void apply(Board& board, Player& player) override;
 
 	};
