@@ -53,7 +53,7 @@ namespace base {
 		{MageTypeAbility::Hole,"Make a hole"},
 		{MageTypeAbility::BlowAway,"Move your cards to a diff, empty space"},
 		{MageTypeAbility::BlowEter,"Additional Eter"},
-		{MageTypeAbility::Boat,"Move ur opponent's card to a diff, empty space"},
+		{MageTypeAbility::Boat,"Move ur opponent's stack to a diff, empty space"},
 		{MageTypeAbility::BoatRowOrColumn,"Redefine the shape of the playing field"}
 	};
 

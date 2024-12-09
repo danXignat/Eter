@@ -16,8 +16,8 @@ namespace base {
 		MageTypeAbility choice_p1 = static_cast<MageTypeAbility>(choices[0]);
 		MageTypeAbility choice_p2 = static_cast<MageTypeAbility>(choices[1]);
 
-		m_card_p1 = _factory(MageTypeAbility::Boat);
-		m_card_p2 = _factory(MageTypeAbility::Boat);
+		m_card_p1 = _factory(choice_p1);
+		m_card_p2 = _factory(choice_p2);
 	}
 	
 	bool MageService::apply(Player& player) {

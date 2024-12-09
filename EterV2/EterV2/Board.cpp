@@ -313,7 +313,7 @@ namespace base {
 		Logger::log(Level::INFO, "Moved column {} to {}", x, newX);
 	}
 
-
+	
 
 	bool Board::moveStack(const Coord& from_coord, const Coord& to_coord) {
 		auto it = m_combat_cards.find(from_coord);
