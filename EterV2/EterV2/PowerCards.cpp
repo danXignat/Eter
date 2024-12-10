@@ -234,10 +234,10 @@ namespace base {
 
     void Gale::apply(Board& board, Player& player) {
       
-        for ( auto& [coord, stack] : board) {
+        /*for ( auto& [coord, stack] : board) {
             if (stack.size() > 1) {
                 for (int i = 0;i < stack.size() - 1;i++) {
-                    CombatCard& card = stack[i];
+                    const CombatCard& card = stack[i];
                     if (player.getColor() == card.getColor()) {
                         player.addCard(std::move(card));
                         board.removeCardFromStackAt(coord, card);
@@ -251,7 +251,7 @@ namespace base {
                     }
                 }
             }
-        }
+        }*/
     }
 
 

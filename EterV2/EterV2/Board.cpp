@@ -364,6 +364,14 @@ namespace base {
 		return m_bounding_rect.isFixed();
 	}
 
+	bool Board::fixedWidth() const {
+		return m_bounding_rect.fixed_width;
+	}
+
+	bool Board::fixedHeight() const {
+		return m_bounding_rect.fixed_height;
+	}
+
 	bool Board::hasStack(const Coord& coord) const {
 		return m_combat_cards.contains(coord);
 	}
@@ -500,14 +508,6 @@ namespace base {
 
 
 	///-----------------------------------------Iterator-------------------------------
-
-	Board::iterator Board::begin() {
-		return m_combat_cards.begin();
-	}
-
-	Board::iterator Board::end() {
-		return m_combat_cards.end();
-	}
 
 	Board::const_iterator Board::begin() const {
 		return m_combat_cards.begin();
