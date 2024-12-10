@@ -97,6 +97,7 @@ namespace base {
 		Mirrage();
 
 		void apply(Board& board, Player& player) override;
+		bool getIllusion(Board& board, Player& player);
 
 	};
 
@@ -113,6 +114,7 @@ namespace base {
 		Tide();
 
 		void apply(Board& board, Player& player) override;
+		std::vector<Coord>getStacks(const Board& board);
 
 	};
 

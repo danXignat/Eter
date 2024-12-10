@@ -1,14 +1,17 @@
+[INFO] explosion effect [1, 1] -> 0
+[INFO] explosion effect [0, 1] -> 0
+[INFO] explosion effect [2, 2] -> 2
+[INFO] explosion effect [1, 0] -> 1
+[INFO] explosion effect [2, 3] -> 0
+[INFO] explosion effect [3, 1] -> 1
 [INFO] card(1) appended at (10, 5)
 [INFO] succesful action
-[INFO] card(2) appended at (12, 5)
+[INFO] card(1) appended at (12, 5)
 [INFO] succesful action
-[INFO] card(3) appended at (12, 5)
+[INFO] card(1) appended at (10, 6)
 [INFO] succesful action
-[INFO] card(4) appended at (12, 5)
-[INFO] succesful action
-[INFO] card(3) appended at (12, 4)
-[INFO] succesful action
-[INFO] Stack moved from (12, 5) to (14, 5)
-[INFO] Mage Water Boat ability card used
-[INFO] succesful action
-[ERROR] No arguments
+[INFO] Removed last card from the stack at (-8739, -8739)
+[INFO] You successfully received the illusion back
+[WARNING] not available place
+[INFO] failed action
+[ERROR] Invalid special card

@@ -234,24 +234,24 @@ namespace base {
 
     void Gale::apply(Board& board, Player& player) {
       
-        for ( auto& [coord, stack] : board) {
+        /*for ( auto& [coord, stack] : board) {
             if (stack.size() > 1) {
                 for (int i = 0;i < stack.size() - 1;i++) {
-                    CombatCard& card = stack[i];
+                     const CombatCard& card = stack[i];
                     if (player.getColor() == card.getColor()) {
                         player.addCard(std::move(card));
                         board.removeCardFromStackAt(coord, card);
                         Logger::log(Level::INFO, "Moved card from board to player hand.");
                     }
                     else {
-                        Player& opponent = *player.getOpponent();
+                        Player& opponent = *player.getOpponent(); 
                         opponent.addCard(std::move(card));
                         board.removeCardFromStackAt(coord, card);
                         Logger::log(Level::INFO, "Moved card from board to opponent's hand.");
                     }
                 }
             }
-        }
+        }*/
     }
 
 
@@ -275,12 +275,49 @@ namespace base {
 
 
     ////------------------------------------------ Mirrage -------------------------------------------
-    Mirrage::Mirrage() {
+    Mirrage::Mirrage() {  //to return
         m_ability = PowerCardType::Mirrage;
     }
 
     void Mirrage::apply(Board& board, Player& player) {
+        if (getIllusion(board, player)) {
+            std::cout << "Choose the coordinates for the new illusion and the new illusion" << std::endl;
+            Coord coord;
+            std::cin >> coord.first >> coord.second;
+
+            char card_type;
+            std::cin >> card_type;
+            auto card = player.getCard(charToCombatCard(card_type));
+            if (board.isValidMove(coord, card)) {
+                card.flip();
+                board.appendMove(coord, std::move(card));
+                Logger::log(Level::INFO, "Mirrage power card was used");
+            }
+        }
     }
+
+    bool Mirrage::getIllusion(Board& board, Player& player) {
+        bool foundIllusion = false;
+        for (const auto& [coord, stack] : board) {
+            auto top_card = board.getTopCard(coord);
+            CombatCard& card = top_card->get();
+            if (card.isIllusion() &&card.getColor()==player.getColor()) {
+                card.flip();
+                player.addCard(std::move(card));
+                CombatCard& card_value = card;
+                board.removeTopCardAt(coord);
+                board.availableSpaces();
+                Logger::log(Level::INFO, "You successfully received the illusion back");
+                foundIllusion = true;
+                break;
+            }
+        }
+        if (!foundIllusion) {
+            Logger::log(Level::INFO, "You don't have any illusion on the board");
+        }
+        return foundIllusion;
+    }
+
 
     ////------------------------------------------ Storm -------------------------------------------
     Storm::Storm() {
@@ -309,6 +346,46 @@ namespace base {
     }
 
     void Tide::apply(Board& board, Player& player) {
+        std::vector<Coord> stacks = getStacks(board);
+        if (stacks.size() > 1) {
+
+            std::cout << "Stack at:" << std::endl;
+            for (const auto& [x, y] : stacks) {
+                std::cout << std::format("({}, {})", x, y) << std::endl;
+            }
+            Coord coord_from;
+            Coord coord_to;
+            std::cout << "Coordinates of the first stack" << std::endl;
+            std::cin >> coord_from.first >> coord_from.second;
+
+            if (std::find(stacks.begin(), stacks.end(), coord_from) == stacks.end()) {
+                Logger::log(Level::WARNING, "No stack at these coordinates");
+            }
+
+            std::cout << "Coordinates of the second stack" << std::endl;
+            std::cin >> coord_to.first >> coord_to.second;
+
+            if (std::find(stacks.begin(), stacks.end(), coord_to) == stacks.end()) {
+                Logger::log(Level::WARNING, "No stack at these coordinates");
+            }
+
+            board.swapStacks(coord_from, coord_to);
+      }
+
+        Logger::log(Level::INFO, "Tide power card was used");
+    }
+
+    std::vector<Coord>Tide::getStacks(const Board& board) {
+        std::vector<Coord>stacks_coord;
+        for (const auto& [coord, stack] : board) {
+            if (stack.size() > 1) {
+                stacks_coord.emplace_back(coord);
+            }
+            else {
+                Logger::log(Level::WARNING, "There are not 2 stacks on the board ");
+            }
+        }
+        return stacks_coord;
     }
 
 

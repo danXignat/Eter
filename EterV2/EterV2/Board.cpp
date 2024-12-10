@@ -342,7 +342,29 @@ namespace base {
 
 
 	void Board::swapStacks(const Coord& from_coord, const Coord& to_coord) {
+		auto from_it = m_combat_cards.find(from_coord);
+		if (from_it == m_combat_cards.end()) {
+			Logger::log(Level::ERROR, "No stack at ({},{})\n", from_coord.first, from_coord.second);
+			return;
+		}
 
+		auto to_it = m_combat_cards.find(to_coord);
+		if (to_it == m_combat_cards.end()) {
+			Logger::log(Level::ERROR, "No stack at ({},{})\n", to_coord.first, to_coord.second);
+			return;
+		}
+
+		auto& from_stack = from_it->second;
+		auto& to_stack = to_it->second;
+
+		std::vector<CombatCard> temp = std::move(from_stack);
+		from_stack = std::move(to_stack);
+		to_stack = std::move(temp);
+
+		_reinitialise();
+
+		Logger::log(Level::INFO, "Stacks swapped between ({}, {}) and ({}, {})",
+			from_coord.first, from_coord.second, to_coord.first, to_coord.second);
 	}
 
 	std::vector<Coord> Board::availableSpaces() {
