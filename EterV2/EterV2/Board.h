@@ -31,6 +31,8 @@ namespace base {
 		void render() const;
 		void sideViewRender();
 
+		bool fixedWidth() const;
+		bool fixedHeight() const;
 		bool hasStack(const Coord&) const;
 		bool isFixed() const;
 		bool isCardOfColorAt(color::ColorType, const Coord&) const;
@@ -95,11 +97,7 @@ namespace base {
 		using ValueType = std::vector<CombatCard>;
 		using MapType = std::unordered_map<KeyType, ValueType>;
 
-		using iterator = MapType::iterator;
 		using const_iterator = MapType::const_iterator;
-
-		iterator begin();
-		iterator end();
 
 		const_iterator begin() const;
 		const_iterator end() const;

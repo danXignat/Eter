@@ -230,6 +230,7 @@ namespace base {
         std::vector<Coord> choices = getChoices(board, player);
         if (choices.empty()) {
             std::cout << "No options available for this mage!\n";
+            Logger::log(Level::WARNING, "You can't use this mage right now!\n");
             return;
         }
         std::cout << "Your choices are: \n";
@@ -255,17 +256,8 @@ namespace base {
     std::vector<Coord> MasterOfAirFront::getChoices(Board& board, const Player& player) {
         std::vector<Coord> choices;
         for (const auto& [coord, stack] : board) {
-            bool player_card_found = false;
-            if (stack.size() >= 1) {
-                for (const auto& combat_card : stack) {
-                    if (combat_card.getColor() == player.getColor()) {
-                        player_card_found = true;
-                        break;
-                    }
-                }
-                if (player_card_found) {
-                    choices.emplace_back(coord);
-                }
+            if (stack.back().getColor() == player.getColor()) {
+                choices.emplace_back(coord);
             }
         }
         return choices;
@@ -306,6 +298,32 @@ namespace base {
     MasterOfWaterFront::MasterOfWaterFront() {
         m_type = MageType::Water;
         m_ability = MageTypeAbility::Boat;
+    }
+
+    bool MasterOfWaterFront::areAdjacentCards(const Coord& coord, Board& board) {
+        std::vector<Coord> directions = {
+            {coord.first - 1, coord.second},
+            {coord.first + 1, coord.second},
+            {coord.first, coord.second - 2},
+            {coord.first, coord.second + 2}
+        };
+
+        for (const auto& dir : directions) {
+            if (!board[dir].empty()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    bool MasterOfWaterFront::allCardsHaveNeighbors( Board&board) {
+        for (const auto& card : board) {
+            if (!areAdjacentCards(card.first,board)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     void MasterOfWaterFront::apply(Board& board, Player& player) {
