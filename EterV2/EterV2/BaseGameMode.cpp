@@ -34,7 +34,7 @@ namespace base {
 
 		const CombatCard& card_view = m_curr_player.get().viewCard(card_type);
 
-		if (m_board.isValidMove(coord, card_view)) {
+		if (m_board.isValidAddMove(coord, card_view)) {
 			CombatCard card = m_curr_player.get().getCard(card_type);
 
 			m_board.appendMove(coord, std::move(card));

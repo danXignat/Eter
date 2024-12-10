@@ -207,7 +207,7 @@ namespace base {
             Coord input;
             std::cin >> input.first >> input.second;
             CombatCard card(CombatCardType::HOLE, player.getColor());
-            if (board.isValidMove(input, card)) {
+            if (board.isValidAddMove(input, card)) {
                 board.appendMove(input, std::move(card));
                 Logger::log(Level::INFO, "Mage Earth Hole ability card used");
             }
@@ -281,7 +281,7 @@ namespace base {
             Coord input;
             std::cin >> input.first >> input.second;
             CombatCard eter(CombatCardType::ETER, player.getColor());
-            if (board.isValidMove(input, eter)) {
+            if (board.isValidAddMove(input, eter)) {
                 board.appendMove(input, std::move(eter));
                 Logger::log(Level::INFO, "Mage Air BlowEter ability card used");
             }

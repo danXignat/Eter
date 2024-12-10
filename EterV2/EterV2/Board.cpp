@@ -75,7 +75,7 @@ namespace base {
 		);
 	}
 
-	bool Board::isValidMove(const Coord& coord, const CombatCard& card) {
+	bool Board::isValidAddMove(const Coord& coord, const CombatCard& card) {
 
 		if (m_combat_cards.contains(coord)) {
 			if (card.getType() == CombatCardType::ETER) {
@@ -98,6 +98,10 @@ namespace base {
 			return false;
 		}
 
+		return true;
+	}
+
+	bool Board::isValidRemoveMove(std::vector<Coord> remove_coords) {
 		return true;
 	}
 
@@ -265,14 +269,14 @@ namespace base {
 		}
 	}
 
-	void Board::moveRow(uint16_t y, uint16_t newY) {
-		if (y == newY) {
+	void Board::moveRow(uint16_t from_y, uint16_t to_y) {
+		if (from_y == to_y) {
 			Logger::log(Level::WARNING, "Source and destination rows are the same.");
 			return;
 		}
 		std::vector<std::pair<Coord, std::vector<CombatCard>>> rowData;
 		for (auto it = m_combat_cards.begin(); it != m_combat_cards.end();) {
-			if (it->first.second == y) {
+			if (it->first.second == from_y) {
 				rowData.emplace_back(it->first, std::move(it->second));
 				it = m_combat_cards.erase(it);
 			}
@@ -281,52 +285,59 @@ namespace base {
 			}
 		}
 		for (auto& pair : rowData) {
-			Coord newCoord = { pair.first.first, newY };
+			Coord newCoord = { pair.first.first, to_y };
 			m_combat_cards[newCoord] = std::move(pair.second);
 		}
 		_reinitialise();
-		Logger::log(Level::INFO, "Moved row {} to {}", y, newY);
+		Logger::log(Level::INFO, "Moved row {} to {}", from_y, to_y);
 	}
 
 
-	void Board::moveColumn(uint16_t x, uint16_t newX) {
-		if (x == newX) {
+	void Board::moveColumn(uint16_t from_x, uint16_t to_x) {
+		if (from_x == to_x) {
 			Logger::log(Level::WARNING, "Source and destination columns are the same.");
 			return;
 		}
-		std::vector<std::pair<Coord, std::vector<CombatCard>>> columnData;
+
+		std::vector<Coord> from_coords;
 
 		for (auto it = m_combat_cards.begin(); it != m_combat_cards.end(); ) {
-			if (it->first.first == x) {
-				columnData.emplace_back(it->first, std::move(it->second));
+			if (it->first.first == from_x) {
+				from_coords.push_back(it->first);
 				it = m_combat_cards.erase(it);
 			}
 			else {
 				++it;
 			}
 		}
-		for (auto& pair : columnData) {
-			Coord newCoord = { newX, pair.first.second };
-			m_combat_cards[newCoord] = std::move(pair.second);
+
+		for (const auto& [x, y] : from_coords) {
+			Coord new_coord { to_x, y };
+
+			m_combat_cards[new_coord] = std::move(
+				m_combat_cards.extract({ x, y }).mapped()
+			);
 		}
+
 		_reinitialise();
-		Logger::log(Level::INFO, "Moved column {} to {}", x, newX);
+
+		Logger::log(Level::INFO, "Moved column {} to {}", from_x, to_x);
 	}
 
-	
+
 
 	bool Board::moveStack(const Coord& from_coord, const Coord& to_coord) {
-		auto it = m_combat_cards.find(from_coord);
-		if (it == m_combat_cards.end()) {
-			Logger::log(Level::ERROR, "No stack at ({},{})\n", from_coord.first, from_coord.second);
-			return false;
-		}
 		if (m_combat_cards.contains(to_coord)) {
 			Logger::log(Level::ERROR, "Destination must be an empty space!\n", from_coord.first, from_coord.second);
 			return false;
 		}
 		if (!m_available_spaces.contains(to_coord)) {
 			Logger::log(Level::ERROR, "Destination is not a valid space!\n", from_coord.first, from_coord.second);
+			return false;
+		}
+		auto it = m_combat_cards.find(from_coord);
+		if (it == m_combat_cards.end()) {
+			Logger::log(Level::ERROR, "No stack at ({},{})\n", from_coord.first, from_coord.second);
 			return false;
 		}
 

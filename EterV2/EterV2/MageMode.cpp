@@ -79,7 +79,7 @@ namespace base {
 				CombatCard card = m_curr_player.get().getCard(card_type);
 
 				bool has_illusion = m_illusion_service->hasPlayerIllusion(m_curr_player.get().getColor());
-				if (has_illusion && m_board.isValidMove(coord, card)) {
+				if (has_illusion && m_board.isValidAddMove(coord, card)) {
 					m_illusion_service->placeIllusion(coord, std::move(card));
 
 					return true;

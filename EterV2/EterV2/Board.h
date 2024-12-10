@@ -51,11 +51,15 @@ namespace base {
 		void removeStack(const Coord& coord);
 		void removeRow(uint16_t x);
 		void removeColumn(uint16_t y);
-		void moveRow(uint16_t y, uint16_t newY);
-		void moveColumn(uint16_t x, uint16_t newX);
+		void moveRow(uint16_t from_y, uint16_t to_y);
+		void moveColumn(uint16_t from_x, uint16_t to_x);
 		bool moveStack(const Coord& from_coord, const Coord& to_coord);
 		void swapStacks(const Coord& from_coord, const Coord& to_coord);
-		bool isValidMove(const Coord&, const CombatCard&);
+
+		bool isValidAddMove(const Coord&, const CombatCard&);
+		bool isValidRemoveMove(std::vector<Coord>);
+		bool isValidMovingMove(std::vector<Coord>);
+
 		std::vector<Coord> availableSpaces();
 		
 		
