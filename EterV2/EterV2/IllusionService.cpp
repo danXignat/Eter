@@ -10,8 +10,8 @@ namespace base {
 		win_manager{ win_manager } {
 	}
 
-	bool IllusionService::hasPlayerIllusion(color::ColorType color) {
-		if (color == color::ColorType::RED) {
+	bool IllusionService::hasIllusion(Player& player) {
+		if (player.getColor() == color::ColorType::RED) {
 			return m_p1_has_illusion;
 		}
 		else {
@@ -28,7 +28,6 @@ namespace base {
 				);
 			}
 			else {
-				card.flip();
 				board.appendMove(coord, std::move(card));
 				win_manager.addCard(coord);
 				m_p1_illusion_coord.emplace(coord);
@@ -43,7 +42,6 @@ namespace base {
 				);
 			}
 			else {
-				card.flip();
 				board.appendMove(coord, std::move(card));
 				win_manager.addCard(coord);
 				m_p2_illusion_coord.emplace(coord);
@@ -52,7 +50,15 @@ namespace base {
 		}
 	}
 
-	bool IllusionService::hasIllusionWon(CombatCard& illusion, CombatCard& other) {
+	bool IllusionService::isValidPlaceCard(const Coord& coord, const CombatCard& card) {
+		if (card.isIllusion() && board.hasStack(coord) == false) {
+			return true;
+		}
+		
+		return false;
+	}
+
+	bool IllusionService::hasIllusionWon(CombatCard& illusion, const CombatCard& other) {
 		illusion.flip();
 
 		if (other < illusion) {

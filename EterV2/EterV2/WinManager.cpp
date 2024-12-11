@@ -67,8 +67,8 @@ namespace base {
 					return red_increment;
 				};
 
-			m_diag1 += board.hasStack(pos1) ?  getIncrement(pos1) : 0;
-			m_diag2 += board.hasStack(pos2) ?  getIncrement(pos2) : 0;
+			m_diag1 += board.hasStack(pos1) ? getIncrement(pos1) : 0;
+			m_diag2 += board.hasStack(pos2) ? getIncrement(pos2) : 0;
 		}
 
 		m_are_diags_init = true;

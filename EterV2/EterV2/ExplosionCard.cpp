@@ -1,15 +1,18 @@
 #include "ExplosionCard.h"
 
+#include <ranges>
+
 #include "logger.h"
 #include "utils.h"
 
 using namespace logger;
 
 namespace base {
-	Explosion::Explosion(uint16_t size) :
-		m_board_size{ size },
-		m_effects{ size, std::vector<std::optional<Effect>>(size) },
-		m_effect_corner1{ 0, 0 }, m_effect_corner2{ size - 1, size - 1 } {
+	Explosion::Explosion(Board& board, Player& player1, Player& player2) :
+		m_board{board},
+		m_player1{ player1 }, m_player2{ player2 },
+		m_effects{ board.size(), std::vector<std::optional<Effect>>(board.size())},
+		m_effect_corner1{ 0, 0 }, m_effect_corner2{ board.size() - 1, board.size() - 1 } {
 
 		std::random_device rd;
 		std::mt19937 gen(rd());
@@ -18,25 +21,78 @@ namespace base {
 		std::vector<Coord> positions{ _generateEffectPos(gen) };
 		std::vector<Effect> effects{ _generateEffectType(gen) };
 
-		for (uint16_t i = 0; i < m_effect_count; ++i) {
-			auto [row, col] = positions[i];
-			m_effects[row][col] = effects[i];
+		for (const auto&[coord, effect] : std::views::zip(positions, effects)) {
+			auto& [row, col] = coord;
+			m_effects[row][col] = effect;
 
 			Logger::log(
 				Level::INFO, "explosion effect [{}, {}] -> {}",
 				row, col,
-				static_cast<int>(effects[i])
+				static_cast<int>(effect)
 			);
 		}
-
 	}
 
 	void Explosion::apply() {
 		for (uint16_t i = m_effect_corner1.second; i <= m_effect_corner2.second; i++) {
 			for (uint16_t j = m_effect_corner1.first; j <= m_effect_corner2.first; j++) {
+				if (m_effects[i][j].has_value() == false) {
+					continue;
+				}
+				
+				switch (m_effects[i][j].value()) {
+				case Effect::HAND:
+					_handleBackToHand({i, j});
+					break;
 
+				case Effect::REMOVE:
+					_handleRemove({ i, j });
+					break;
+
+				case Effect::HOLE:
+					_handleHole({ i, j });
+					break;
+
+				default:
+					break;
+				}
 			}
 		}
+	}
+
+	void Explosion::_handleBackToHand(const Coord& coord) {
+		Coord board_coord{ _getMappedCoord(coord) };
+
+		CombatCard card = std::move(m_board.popTopCardAt(board_coord));
+
+		if (card.getColor() == color::ColorType::RED) {
+			m_player1.addCard(std::move(card));
+		}
+		else {
+			m_player2.addCard(std::move(card));
+		}
+	}
+
+	void Explosion::_handleRemove(const Coord& coord) {
+		Coord board_coord{ _getMappedCoord(coord) };
+
+		m_board.removeTopCardAt(board_coord);
+	}
+
+	void Explosion::_handleHole(const Coord& coord) {
+		Coord board_coord{ _getMappedCoord(coord) };
+
+		m_board.removeStack(board_coord);
+
+		CombatCard hole{ CombatCardType::HOLE, color::ColorType::DEFAULT };
+
+		m_board.appendMove(board_coord, std::move(hole));
+	} 
+
+	Coord Explosion::_getMappedCoord(const Coord& coord) {
+		Coord board_corner{ m_board.getBoudingRect().first };
+
+		return { board_corner.first + coord.first, board_corner.second + coord.second };
 	}
 
 	void Explosion::setEffectForWidth(Board& board) {
@@ -54,7 +110,7 @@ namespace base {
 	void Explosion::moveEffect(Direction dir) {
 		switch (dir) {
 		case base::Direction::RIGHT: {
-			if (m_effect_corner2.first + 1 < m_board_size) {
+			if (m_effect_corner2.first + 1 < m_board.size()) {
 				m_effect_corner1.first++;
 				m_effect_corner2.first++;
 			}
@@ -78,7 +134,7 @@ namespace base {
 		}
 
 		case base::Direction::DOWN: {
-			if (m_effect_corner2.second + 1 < m_board_size) {
+			if (m_effect_corner2.second + 1 < m_board.size()) {
 				m_effect_corner1.second++;
 				m_effect_corner2.second++;
 			}
@@ -91,26 +147,24 @@ namespace base {
 	}
 
 	uint16_t Explosion::_generateEffectCount(std::mt19937& gen) {
-		uint16_t begin = (m_board_size == 3) ? MIN_EFFECTS_3x3 : MIN_EFFECTS_4x4;
-		uint16_t end = (m_board_size == 3) ? MAX_EFFECTS_3x3 : MAX_EFFECTS_4x4;
+		uint16_t begin = (m_board.size() == 3) ? MIN_EFFECTS_3x3 : MIN_EFFECTS_4x4;
+		uint16_t end = (m_board.size() == 3) ? MAX_EFFECTS_3x3 : MAX_EFFECTS_4x4;
 
 		std::uniform_int_distribution<uint16_t> random{ begin, end };
 		return random(gen);
 	}
 
 	std::vector<Coord> Explosion::_generateEffectPos(std::mt19937& gen) {
-		std::vector<Coord> positions;
-		positions.reserve(m_board_size * m_board_size);
-
-		for (uint16_t i = 0; i < m_board_size; ++i) {
-			for (uint16_t j = 0; j < m_board_size; ++j) {
-				positions.push_back({ i, j });
-			}
-		}
-
-		std::shuffle(positions.begin(), positions.end(), gen);
-
-		return { positions.begin(), positions.begin() + m_effect_count };
+		auto positions = std::ranges::cartesian_product_view(
+			std::views::iota(0, int(m_board.size())),
+			std::views::iota(0, int(m_board.size()))
+		);
+		
+		std::vector<Coord> selections;
+		
+		std::sample(positions.begin(), positions.end(), std::back_inserter(selections), m_effect_count, gen);
+		
+		return selections;
 	}
 
 	std::vector<Effect> Explosion::_generateEffectType(std::mt19937& gen) {
@@ -145,8 +199,8 @@ namespace base {
 			{Effect::HOLE, 'H'}
 		};
 
-		for (int16_t i = 0; i < m_board_size; ++i) {
-			for (int16_t j = 0; j < m_board_size; ++j) {
+		for (int16_t i = 0; i < m_board.size(); ++i) {
+			for (int16_t j = 0; j < m_board.size(); ++j) {
 				if (m_effects[i][j]) {
 					std::cout << ((
 						color == true && 
@@ -185,7 +239,7 @@ namespace base {
 	}
 
 	void Explosion::rotateLeft() {
-		uint16_t size = m_board_size;
+		uint16_t size = m_board.size();
 		auto& mat = m_effects;
 
 		for (uint16_t i = 0; i < size / 2; ++i) {
@@ -200,7 +254,7 @@ namespace base {
 	}
 
 	void Explosion::rotateRight() {
-		uint16_t size = m_board_size;
+		uint16_t size = m_board.size();
 		auto& mat = m_effects;
 
 		for (uint16_t i = 0; i < size / 2; ++i) {

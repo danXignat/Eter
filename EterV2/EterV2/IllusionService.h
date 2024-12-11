@@ -17,8 +17,9 @@ namespace base {
 		IllusionService(Board&, WinManager&);
 
 		void placeIllusion(const Coord&, CombatCard&& card);
-		bool hasPlayerIllusion(color::ColorType);
-		static bool hasIllusionWon(CombatCard& illusion, CombatCard& other);
+		bool hasIllusion(Player&);
+		bool isValidPlaceCard(const Coord&, const CombatCard&);
+		static bool hasIllusionWon(CombatCard& illusion, const CombatCard& other);
 
 	private:
 		Board& board;

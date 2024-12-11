@@ -70,13 +70,15 @@ namespace base {
         return !m_cards.empty();
     }
 
-    bool Player::hasCard(CombatCardType type){
-        if (m_cards.find(type) == m_cards.end())
-            return false;
-        return true;
+    bool Player::hasCard(CombatCardType type) const { 
+        return m_cards.contains(type);
     }
 
-    CombatCard Player::getCard(CombatCardType type) {
+    bool Player::hasUsedCard(CombatCardType type) const {
+        return m_used_cards.contains(type);
+    }
+
+    CombatCard&& Player::getCard(CombatCardType type) {
         if (this->hasCard(type) == false) {
             throw std::runtime_error("player does not have this card");
         }
@@ -86,7 +88,20 @@ namespace base {
         CombatCard card = std::move(it->second);
         m_cards.erase(it);
 
-        return card;
+        return std::move(card);
+    }
+
+    CombatCard&& Player::getUsedCard(CombatCardType type) {
+        if (this->hasUsedCard(type) == false) {
+            throw std::runtime_error("player does not have this card");
+        }
+
+        auto it = m_used_cards.find(type);
+
+        CombatCard card = std::move(it->second);
+        m_used_cards.erase(it);
+
+        return std::move(card);
     }
 
     const CombatCard& Player::viewCard(CombatCardType type) {
@@ -101,6 +116,10 @@ namespace base {
 
     void Player::addCard(CombatCard&& card) {
         m_cards.emplace(card.getType(), std::move(card));
+    }
+
+    void Player::addUsedCard(CombatCard&& card) {
+        m_used_cards.emplace(card.getType(), std::move(card));
     }
 
     void Player::setOpponent(Player* opponent) {

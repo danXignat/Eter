@@ -17,6 +17,8 @@ namespace base {
 		void run() override;
 		void render();
 		bool _handleSpecialEvent(const InputHandler&) override;
+		bool isValidMove(const Coord&, const CombatCard&);
+
 	private:
 		std::optional<IllusionService> m_illusion_service;
 		std::optional<ExplosionService> m_explosion_service;

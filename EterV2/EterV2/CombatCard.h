@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <cstdint>
+#include <optional>
 
 #include "CombatCardType.h"
 #include "colors.h"
@@ -33,4 +34,6 @@ namespace base {
 		color::ColorType m_color;
 		bool m_illusion;
 	};
+
+	using CombatCardOpt = std::optional<CombatCard>;
 }
