@@ -198,33 +198,40 @@ namespace base {
     Squall::Squall() {
         m_ability = PowerCardType::Squall;
     }
-    //std::vector<std::pair<Coord, CombatCard>> Squall::opponentCards(Board& board, Player& opponent) {
-    //    std::vector<std::pair<Coord, CombatCard>> visible_cards;
-    //    for (auto& [coord, stack] : board) {
-    //        auto top_card = board.getTopCard(coord);
-
-    //        if (top_card && top_card->get().getColor() == opponent.getColor()) {
-    //            visible_cards.emplace_back(coord, top_card->get());
-    //        }
-    //    }
-
-    //    return visible_cards;
-    //}
 
     void Squall::apply(Board& board, Player& player) {
-    /*    auto visible_cards = opponentCards(board, player);
-        std::cout << "Select a card to return to the opponent's hand" << '\n';
+        auto visible_cards = opponentCards(board, player);
+        std::cout << "Select the coordinates where is the card that you want to return to the opponent's hand" << '\n';
 
-        for (auto& [coord, stack] : visible_cards) {
-            std::cout << "Card at " << coord.second << ", " << coord.first << ":" << '\n';
+
+        Coord coord;
+        std::cin >> coord.first >> coord.second;
+
+        for (auto& pair : visible_cards) {
+            Coord available_coord = pair.first;
+            CombatCard& card = pair.second;
+            if (available_coord!=coord) {
+                Logger::log(Level::WARNING, "No visible card at these coordinates");
+            }
+            else {
+                player.addCard(std::move(card));
+                board.removeTopCardAt(coord);
+                Logger::log(Level::INFO, "Squall ability: Returned a visible card to the opponent's hand.");
+            }
         }
-        uint8_t choice;
-        std::cout << "Enter the number of the card you want to return: ";
-        std::cin >> choice;
-        
-        auto& [coord, card] = visible_cards[choice - 1];
-        board.removeTopCardAt(coord);
-        Logger::log(Level::INFO, "Squall ability: Returned a visible card to the opponent's hand.")*/;
+    }
+
+    std::vector<std::pair<Coord, CombatCard>> Squall::opponentCards( Board& board,const Player& player) const{
+        std::vector<std::pair<Coord, CombatCard>> visible_cards;
+        for (const auto& [coord, stack] : board) {
+            const auto& top_card = board.getTopCard(coord);
+            const CombatCard& card = top_card->get();
+
+            if (card.getColor() != player.getColor()) {
+                visible_cards.emplace_back(coord, std::move(top_card->get()));
+            }
+        }
+        return visible_cards;
     }
 
     ////------------------------------------------ Gale -------------------------------------------
@@ -234,24 +241,23 @@ namespace base {
 
     void Gale::apply(Board& board, Player& player) {
       
-        /*for ( auto& [coord, stack] : board) {
+        for ( auto& [coord, stack] : board) {
             if (stack.size() > 1) {
                 for (int i = 0;i < stack.size() - 1;i++) {
-                    const CombatCard& card = stack[i];
+                    const CombatCardType& card_type = stack[i].getType();
+                    auto card = player.getCard(card_type);
                     if (player.getColor() == card.getColor()) {
-                        player.addCard(std::move(card));
                         board.removeCardFromStackAt(coord, card);
+                        player.addCard(std::move(card));
                         Logger::log(Level::INFO, "Moved card from board to player hand.");
                     }
                     else {
-                        Player& opponent = *player.getOpponent();
-                        opponent.addCard(std::move(card));
                         board.removeCardFromStackAt(coord, card);
-                        Logger::log(Level::INFO, "Moved card from board to opponent's hand.");
+                        player.addCard(std::move(card));
                     }
                 }
             }
-        }*/
+        }
     }
 
 
@@ -275,12 +281,49 @@ namespace base {
 
 
     ////------------------------------------------ Mirrage -------------------------------------------
-    Mirrage::Mirrage() {
+    Mirrage::Mirrage() {  
         m_ability = PowerCardType::Mirrage;
     }
 
     void Mirrage::apply(Board& board, Player& player) {
+        if (getIllusion(board, player)) {
+            std::cout << "Choose the coordinates for the new illusion and the new illusion" << std::endl;
+            Coord coord;
+            std::cin >> coord.first >> coord.second;
+
+            char card_type;
+            std::cin >> card_type;
+            auto card = player.getCard(charToCombatCard(card_type));
+            if (board.isValidMove(coord, card)) {
+                card.flip();
+                board.appendMove(coord, std::move(card));
+                Logger::log(Level::INFO, "Mirrage power card was used");
+            }
+        }
     }
+
+    bool Mirrage::getIllusion(Board& board, Player& player) {
+        bool foundIllusion = false;
+        for (const auto& [coord, stack] : board) {
+            auto top_card = board.getTopCard(coord);
+            CombatCard& card = top_card->get();
+            if (card.isIllusion() &&card.getColor()==player.getColor()) {
+                card.flip();
+                player.addCard(std::move(card));
+                CombatCard& card_value = card;
+                board.removeTopCardAt(coord);
+                board.availableSpaces();
+                Logger::log(Level::INFO, "You successfully received the illusion back");
+                foundIllusion = true;
+                break;
+            }
+        }
+        if (!foundIllusion) {
+            Logger::log(Level::INFO, "You don't have any illusion on the board");
+        }
+        return foundIllusion;
+    }
+
 
     ////------------------------------------------ Storm -------------------------------------------
     Storm::Storm() {
@@ -309,15 +352,77 @@ namespace base {
     }
 
     void Tide::apply(Board& board, Player& player) {
+        std::vector<Coord> stacks = getStacks(board);
+        if (stacks.size() > 1) {
+
+            std::cout << "Stack at:" << std::endl;
+            for (const auto& [x, y] : stacks) {
+                std::cout << std::format("({}, {})", x, y) << std::endl;
+            }
+            Coord coord_from;
+            Coord coord_to;
+            std::cout << "Coordinates of the first stack" << std::endl;
+            std::cin >> coord_from.first >> coord_from.second;
+
+            if (std::find(stacks.begin(), stacks.end(), coord_from) == stacks.end()) {
+                Logger::log(Level::WARNING, "No stack at these coordinates");
+            }
+
+            std::cout << "Coordinates of the second stack" << std::endl;
+            std::cin >> coord_to.first >> coord_to.second;
+
+            if (std::find(stacks.begin(), stacks.end(), coord_to) == stacks.end()) {
+                Logger::log(Level::WARNING, "No stack at these coordinates");
+            }
+
+            board.swapStacks(coord_from, coord_to);
+      }
+
+        Logger::log(Level::INFO, "Tide power card was used");
+    }
+
+    std::vector<Coord>Tide::getStacks(const Board& board) {
+        std::vector<Coord>stacks_coord;
+        for (const auto& [coord, stack] : board) {
+            if (stack.size() > 1) {
+                stacks_coord.emplace_back(coord);
+            }
+            else {
+                Logger::log(Level::WARNING, "There are not 2 stacks on the board ");
+            }
+        }
+        return stacks_coord;
     }
 
 
     ////------------------------------------------ Mist -------------------------------------------
-    Mist::Mist() {
+    Mist::Mist() { //joaca inca o iluzie
         m_ability = PowerCardType::Mist;
+
     }
 
     void Mist::apply(Board& board, Player& player) {
+        
+    }
+    bool Mist::hasIllusion(Board& board, IllusionService& illusionService, Player& player) {
+        auto playerColor = player.getColor();
+        if (illusionService.hasPlayerIllusion(playerColor)) {
+            Logger::log(Level::WARNING, "Player already has an illusion");
+            return false;
+        }
+        else {
+            Logger::log(Level::INFO, "You can play your illusion");
+
+            Coord coord;
+            std::cin >> coord.first >> coord.second;
+
+            char card_type;
+            std::cin >> card_type;
+            auto card = player.getCard(charToCombatCard(card_type));
+
+            illusionService.placeIllusion(coord, std::move(card));
+        }
+        return true;
     }
 
 
@@ -421,6 +526,40 @@ namespace base {
     }
 
     void Rock::apply(Board& board, Player& player) {
+        std::vector<Coord>illusionCoord = getIllusionCoords(board);
+        if (!illusionCoord.empty()&& player.hasCards()) {
+
+            std::cout << "Illusion coordinates: " << std::endl;
+
+            Coord coord;
+            std::cin >> coord.first >> coord.second;
+
+            if (std::find(illusionCoord.begin(), illusionCoord.end(), coord) == illusionCoord.end()) {
+                Logger::log(Level::WARNING, "No illusion at these coordinates");
+            }
+
+            std::cout << "Choose a card to cover the illusion" << std::endl;
+            char card_type;
+            std::cin >> card_type;
+            auto card = player.getCard(charToCombatCard(card_type));
+
+            board.appendMove(coord, std::move(card));
+        }
+        Logger::log(Level::INFO, "Rock power card was used");
+    }
+
+    std::vector<Coord>Rock::getIllusionCoords(const Board& board) const {
+        std::vector<Coord>illusionCoords;
+        for (const auto& [coord, stack] : board) {
+            if (!stack.empty() && stack.back().isIllusion()) {
+                Logger::log(Level::INFO, "Illusion card at ({}, {})", coord.first, coord.second);
+                illusionCoords.emplace_back(coord);
+            }
+            else {
+                Logger::log(Level::WARNING, "No illusions on the board");
+            }
+        }
+        return illusionCoords;
     }
 
 }

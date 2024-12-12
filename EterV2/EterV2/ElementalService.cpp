@@ -22,8 +22,8 @@ namespace base {
 		/*type_p1 = static_cast<PowerCardType>(choices[0]);
 		type_p2 = static_cast<PowerCardType>(choices[1]);*/
 
-		type_card1 = PowerCardType::Mirrage;
-		type_card2 = PowerCardType::Mirrage;
+		type_card1 = PowerCardType::Gale;
+		type_card2 = PowerCardType::Gale;
 
 		card1 = _factory(type_card1);
 		card2 = _factory(type_card2);
@@ -56,14 +56,14 @@ namespace base {
 		if (card1) {
 			utils::printAtCoordinate(
 				std::format("Power 1 << {} >> {}", typeToStrings(type_card1), abilityToString(type_card1)),
-				1, 25
+				1, 28
 			);
 		}
 
 		if (card2) {
 			utils::printAtCoordinate(
 				std::format("Power 2 << {} >> {}", typeToStrings(type_card2), abilityToString(type_card2)),
-				1, 26
+				1, 29
 			);
 		}
 	}

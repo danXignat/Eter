@@ -105,14 +105,11 @@ namespace base {
 			std::cout << "Choose a power card to apply (1 or 2): ";
 
 			char choice;
-			std::cin >> choice;  
+			std::cin >> choice;
 
-			if (choice == '1' || choice == '2') {
-				m_elemental_service.apply(choice, m_curr_player);
-			}
-			else {
-				std::cout << "Invalid choice! Please choose '1' or '2'.\n";
-			}
+			m_elemental_service.apply(choice, m_curr_player);
+			return true;
+
 			break;
 		}
 

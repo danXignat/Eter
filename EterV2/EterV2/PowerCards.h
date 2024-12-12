@@ -3,6 +3,8 @@
 #include "Board.h"
 #include"Player.h"
 #include "PowerCard.h"
+#include"IllusionService.h"
+#include"BaseGameMode.h"
 
 #include<memory>
 #include"typedefs.h"
@@ -62,7 +64,7 @@ namespace base {
 	class Squall :public PowerCard {
 	public:
 		Squall();
-		std::vector<std::pair<Coord, CombatCard>>opponentCards( Board& board, Player& opponent);
+		std::vector<std::pair<Coord, CombatCard>>opponentCards( Board& board,const Player& player) const;
 
 		void apply(Board& board, Player& player) override;
 
@@ -123,6 +125,7 @@ namespace base {
 		Mist();
 
 		void apply(Board& board, Player& player) override;
+		bool hasIllusion(Board& board, IllusionService& illusionService, Player& player);
 
 	};
 
@@ -203,6 +206,8 @@ namespace base {
 		Rock();
 
 		void apply(Board& board, Player& player) override;
+
+		std::vector<Coord>getIllusionCoords(const Board& board) const;
 
 	};
 
