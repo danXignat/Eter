@@ -26,11 +26,11 @@ namespace base {
 		void _switchPlayer();
 
 	protected:
-		Board m_board;
-		WinManager m_win_manager;
-
 		Player m_player_red;
 		Player m_player_blue;
 		PlayerRef m_curr_player;
+
+		Board m_board;
+		WinManager m_win_manager;
 	};
 }

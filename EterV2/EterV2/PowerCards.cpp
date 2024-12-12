@@ -52,7 +52,7 @@ namespace base {
 
             auto selected_card = player.getCard(charToCombatCard(card_type));
             
-            if (board.isValidMove(new_coord, selected_card)) {
+            if (board.isValidPlaceCard(new_coord, selected_card)) {
                 board.appendMove(new_coord, std::move(selected_card));
                 Logger::log(Level::INFO, "Flame power was used. Card placed at ({}, {})",
                     new_coord.first, new_coord.second);

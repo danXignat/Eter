@@ -75,13 +75,22 @@ namespace base {
 			if (m_illusion_service) {
 				Coord coord = input.coord;
 				CombatCardType card_type = input.card_type;
-				CombatCard card = m_curr_player.get().getCard(card_type);
 
-				bool has_illusion = m_illusion_service->hasPlayerIllusion(m_curr_player.get().getColor());
-				if (has_illusion && m_board.isValidMove(coord, card)) {
+				CombatCard card = m_curr_player.get().getCard(card_type);
+				card.flip();
+
+				bool has_illusion = m_illusion_service->hasIllusion(m_curr_player.get());
+				bool valid_move = m_illusion_service->isValidPlaceCard(coord, card);
+
+				if (has_illusion && valid_move) {
 					m_illusion_service->placeIllusion(coord, std::move(card));
 
 					return true;
+				}
+				else {
+					card.flip();
+
+					m_curr_player.get().addCard(std::move(card));
 				}
 			}
 			break;

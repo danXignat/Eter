@@ -207,7 +207,7 @@ namespace base {
             Coord input;
             std::cin >> input.first >> input.second;
             CombatCard card(CombatCardType::HOLE, player.getColor());
-            if (board.isValidMove(input, card)) {
+            if (board.isValidPlaceCard(input, card)) {
                 board.appendMove(input, std::move(card));
                 Logger::log(Level::INFO, "Mage Earth Hole ability card used");
             }
@@ -248,9 +248,9 @@ namespace base {
             Logger::log(Level::WARNING, "Invalid choice!\n");
             return;
         }
-        if (board.moveStack(coord_from, coord_to)) {
+        /*if (board.moveStack(coord_from, coord_to)) {// acuma nu mai e bool e void si e alta fucntie care verifica
             Logger::log(Level::INFO, "Mage Air BlowAway ability card used");
-        }
+        }*/
     }
 
     std::vector<Coord> MasterOfAirFront::getChoices(Board& board, const Player& player) {
@@ -271,7 +271,7 @@ namespace base {
     }
 
     void MasterOfAirBack::apply(Board& board, Player& player) {
-        std::vector<Coord>choices = board.availableSpaces();
+        auto choices = board.availableSpaces();
         if (!choices.empty()) {
             std::cout << "Your choices for additional Eter card are: \n";
             for (const auto& choice : choices) {
@@ -281,7 +281,7 @@ namespace base {
             Coord input;
             std::cin >> input.first >> input.second;
             CombatCard eter(CombatCardType::ETER, player.getColor());
-            if (board.isValidMove(input, eter)) {
+            if (board.isValidPlaceCard(input, eter)) {
                 board.appendMove(input, std::move(eter));
                 Logger::log(Level::INFO, "Mage Air BlowEter ability card used");
             }
@@ -349,9 +349,13 @@ namespace base {
             std::cout << "Invalid choice";
             return;
         }
-        if (board.moveStack(coord_from, coord_to)) {
+        /*if (board.moveStack(coord_from, coord_to)) {
             Logger::log(Level::INFO, "Mage Water Boat ability card used");
-        }
+        }*/
+
+        std::cout << board.isValidMoveStack(coord_from, coord_to);
+        int n;
+        std::cin >> n;
     }
 
     std::vector<Coord> MasterOfWaterFront::getChoices(Board& board, Player& player)

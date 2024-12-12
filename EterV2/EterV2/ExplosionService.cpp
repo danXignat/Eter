@@ -6,12 +6,12 @@ namespace base {
 	ExplosionService::ExplosionService(Board& board, Player& player1, Player& player2)
 		: m_board{board},
 		m_player1{ player1 }, m_player2{ player2 },
-		m_card{board.size()} {
+		m_card{board, player1, player2} {
 		
 	}
 
 	void ExplosionService::apply() {
-		
+		m_card.apply();
 	}
 
 	void ExplosionService::setting() {
