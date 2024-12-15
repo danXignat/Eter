@@ -39,6 +39,7 @@ namespace base {
 		std::pair<Coord, Coord> getBoudingRect() const;
 		std::pair<uint16_t, uint16_t> getBoundingRectSize() const;
 		const std::unordered_set<Coord, CoordFunctor>& availableSpaces() const;
+		std::unordered_map<Coord, Stack, CoordFunctor>& getCombatCards();
 		std::optional<CombatCardRef> getTopCard(const Coord& coord);
 		const std::vector<CombatCard>& operator[](const Coord& coord);
 

@@ -11,7 +11,7 @@ namespace base {
 	public:
 		MasterOfFireFront();
 
-		void apply(Board& board, Player& player) override;
+		 bool apply(Board& board, Player& player) override;
 
 		std::vector<Coord> getChoices(const Board& board, const Player& player);
 
@@ -21,7 +21,7 @@ namespace base {
 	public:
 		MasterOfFireBack();
 
-		void apply(Board& board, Player& player) override;
+		bool apply(Board& board, Player& player) override;
 
 		std::pair<std::vector<uint16_t>, std::vector<uint16_t>> getChoices(const Board& board, const Player& player);
 
@@ -31,7 +31,7 @@ namespace base {
 	public:
 		MasterOfEarthFront();
 
-		void apply(Board& board, Player& player) override;
+		bool apply(Board& board, Player& player) override;
 		bool validPosition(const Coord& coord, Board& board, const Player& player)const;
 		std::vector<Coord> getChoices(Board& board, const Player& player);
 	};
@@ -40,7 +40,7 @@ namespace base {
 	public:
 		MasterOfEarthBack();
 
-		void apply(Board& board, Player& player) override;
+		bool apply(Board& board, Player& player) override;
 
 	};
 
@@ -48,7 +48,7 @@ namespace base {
 	public:
 		MasterOfAirFront();
 
-		void apply(Board& board, Player& player) override;
+		bool apply(Board& board, Player& player) override;
 		std::vector<Coord> getChoices(Board& board, const Player& player);
 
 	};
@@ -57,16 +57,16 @@ namespace base {
 	public:
 		MasterOfAirBack();
 
-		void apply(Board& board, Player& player) override;
+		bool apply(Board& board, Player& player) override;
 	};
 
 	class MasterOfWaterFront : public MageCard {
 	public:
 		MasterOfWaterFront();
-		bool areAdjacentCards(const Coord& coord, Board& board);
-		void apply(Board& board, Player& player) override;
+		//bool areAdjacentCards(const Coord& coord, Board& board);
+		bool apply(Board& board, Player& player) override;
 		std::vector<Coord> getChoices(Board& board, Player& player);
-		bool allCardsHaveNeighbors( Board&board);
+		//bool allCardsHaveNeighbors( Board&board);
 	};
 	enum class BorderType {
 		Top,
@@ -79,7 +79,7 @@ namespace base {
 		MasterOfWaterBack();
 		std::optional<std::unordered_map<BorderType, std::vector<Coord>>> getBorders(Board& board, Player& player) const;
 		std::pair<uint16_t,char> selectBorders(const std::optional<std::unordered_map<BorderType, std::vector<Coord>>>& borders,Board&board)const ;
-		void apply(Board& board, Player& player) override;
+		bool apply(Board& board, Player& player) override;
 
 	};
 

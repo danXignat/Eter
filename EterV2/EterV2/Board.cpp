@@ -37,6 +37,7 @@ namespace base {
 
 	//----------------------------MODIFIERS--------------------------------
 
+
 	void Board::appendMove(const Coord& coord, CombatCard&& card) {
 		if (this->isValidPlaceCard(coord, card) == false) {
 			throw std::runtime_error("move not valid");
@@ -339,6 +340,11 @@ namespace base {
 		return m_available_spaces;
 	}
 
+	std::unordered_map<Coord, std::vector<CombatCard>, CoordFunctor>& Board::getCombatCards() 
+	{
+		return m_combat_cards;
+	}
+
 	//-----------------------------------------------------CHECKERS-----------------------------------------------------
 
 
@@ -386,7 +392,7 @@ namespace base {
 		}
 
 		if (m_available_spaces.contains(to_coord) == false) {
-			Logger::log(Level::WARNING, "not available palce to move stack");
+			Logger::log(Level::WARNING, "not available place to move stack");
 			return false;
 		}
 

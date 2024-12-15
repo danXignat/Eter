@@ -16,11 +16,8 @@ namespace base {
 		MageTypeAbility choice_p1 = static_cast<MageTypeAbility>(choices[0]);
 		MageTypeAbility choice_p2 = static_cast<MageTypeAbility>(choices[1]);
 
-		m_card_p1 = _factory(MageTypeAbility::Boat);
-		m_card_p2 = _factory(MageTypeAbility::Boat);
-
-		/*m_card_p1 = _factory(choice_p1);
-		m_card_p2 = _factory(choice_p2);*/
+		m_card_p1 = _factory(MageTypeAbility::BoatRowOrColumn); 
+		m_card_p2 = _factory(MageTypeAbility::BoatRowOrColumn); 
 	}
 	
 	bool MageService::apply(Player& player) {
@@ -28,9 +25,13 @@ namespace base {
 		if (player.getColor() == color::ColorType::RED) {
 
 			if (m_card_p1) {
-				m_card_p1->apply(m_board, player);
-				m_card_p1.reset();
-				return true;
+				if (m_card_p1->apply(m_board, player)) {
+					m_card_p1.reset();
+					return true;
+				}
+				else {
+					return false;
+				}
 			}
 			else {
 				return false;
@@ -40,9 +41,13 @@ namespace base {
 		else {
 
 			if (m_card_p2) {
-				m_card_p2->apply(m_board, player);
-				m_card_p2.reset();
-				return true;
+				if (m_card_p2->apply(m_board, player)) {
+					m_card_p2.reset();
+					return true;
+				}
+				else {
+					return false;
+				}
 			}
 			else {
 				return false;
