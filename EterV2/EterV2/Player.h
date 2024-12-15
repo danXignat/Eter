@@ -28,6 +28,7 @@ namespace base {
         bool hasCards() const;
         bool hasCard(CombatCardType) const;
         bool hasUsedCard(CombatCardType) const;
+        bool hasUsedCards() const;
 
         CombatCard&& getCard(CombatCardType);
         CombatCard&& getUsedCard(CombatCardType);
@@ -35,8 +36,6 @@ namespace base {
         void addCard(CombatCard&&);
         void addUsedCard(CombatCard&&);
 
-        void setOpponent(Player* opponent);
-        Player* getOpponent() const;
         void renderCards() const;
 
     private:
@@ -50,7 +49,6 @@ namespace base {
         std::unordered_multimap<CombatCardType, CombatCard> m_cards;
         std::unordered_multimap<CombatCardType, CombatCard> m_used_cards;
 
-        Player* m_opponent = nullptr;
     };
 
     using PlayerRef = std::reference_wrapper<Player>;

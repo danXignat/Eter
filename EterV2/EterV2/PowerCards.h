@@ -9,6 +9,8 @@
 #include<memory>
 #include"typedefs.h"
 #include "logger.h"
+#include<ranges>
+#include <algorithm>
 
 namespace base {
 
@@ -31,6 +33,7 @@ namespace base {
 	public:
 		Flame();
 
+		void flipIllusion(Board& board, const Player& player);
 		void apply(Board& board, Player& player) override;
 
 	};
@@ -134,6 +137,7 @@ namespace base {
 		Wave();
 
 		void apply(Board& board, Player& player) override;
+		std::vector<Coord>validStacks(Board& board) const;
 
 	};
 
@@ -166,6 +170,7 @@ namespace base {
 		Support();
 
 		void apply(Board& board, Player& player) override;
+		std::vector<Coord>CoordCardType(Board& board, const Player& player) const;
 
 	};
 

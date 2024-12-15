@@ -19,6 +19,7 @@ namespace base {
 		void placeIllusion(const Coord&, CombatCard&& card);
 		bool hasIllusion(Player&);
 		bool isValidPlaceCard(const Coord&, const CombatCard&);
+		void getNewIllusion(CombatCard&& card);
 		static bool hasIllusionWon(CombatCard& illusion, const CombatCard& other);
 
 	private:

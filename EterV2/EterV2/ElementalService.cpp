@@ -22,7 +22,7 @@ namespace base {
 		/*type_p1 = static_cast<PowerCardType>(choices[0]);
 		type_p2 = static_cast<PowerCardType>(choices[1]);*/
 
-		type_card1 = PowerCardType::Gale;
+		type_card1 = PowerCardType::Wave;
 		type_card2 = PowerCardType::Gale;
 
 		card1 = _factory(type_card1);

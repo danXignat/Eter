@@ -70,4 +70,13 @@ namespace base {
 			Logger::log(Level::INFO, "Attacker defeats illusion");
 		}
 	}
+	void IllusionService::getNewIllusion(CombatCard&& card) {
+		if (card.getColor() == color::ColorType::RED) {
+			m_p1_has_illusion = true;
+		}
+		else {
+			m_p2_has_illusion = true;
+		}
+
+	}
 }
