@@ -17,7 +17,7 @@ namespace base {
 		MageType getType() const;
 		MageTypeAbility getMasterType() const;
 
-		virtual bool apply(Board& board, Player& player) = 0;
+		virtual void apply(Board& board, Player& player) = 0;
 		
 	protected:
 		MageType m_type;

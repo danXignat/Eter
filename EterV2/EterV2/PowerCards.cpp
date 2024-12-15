@@ -294,11 +294,11 @@ namespace base {
             char card_type;
             std::cin >> card_type;
             auto card = player.getCard(charToCombatCard(card_type));
-          //  if (board.isValidMove(coord, card)) {
+            if (board.isValidMove(coord, card)) {
                 card.flip();
                 board.appendMove(coord, std::move(card));
                 Logger::log(Level::INFO, "Mirrage power card was used");
-           // }
+            }
         }
     }
 
@@ -406,11 +406,11 @@ namespace base {
     }
     bool Mist::hasIllusion(Board& board, IllusionService& illusionService, Player& player) {
         auto playerColor = player.getColor();
-      //  if (illusionService.hasPlayerIllusion(playerColor)) {
-         //   Logger::log(Level::WARNING, "Player already has an illusion");
-         //   return false;
-      //  }
-     //   else {
+        if (illusionService.hasPlayerIllusion(playerColor)) {
+            Logger::log(Level::WARNING, "Player already has an illusion");
+            return false;
+        }
+        else {
             Logger::log(Level::INFO, "You can play your illusion");
 
             Coord coord;
@@ -421,7 +421,7 @@ namespace base {
             auto card = player.getCard(charToCombatCard(card_type));
 
             illusionService.placeIllusion(coord, std::move(card));
-      //  }
+        }
         return true;
     }
 

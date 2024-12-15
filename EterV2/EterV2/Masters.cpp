@@ -16,13 +16,8 @@ namespace base {
         m_ability = MageTypeAbility::Burn;
     }
 
-    bool MasterOfFireFront::apply(Board& board, Player& player) {
+    void MasterOfFireFront::apply(Board& board, Player& player) {
         auto choices = getChoices(board, player);
-        if (choices.empty())
-        {
-            Logger::log(Level::INFO, "You can't use this mage right now");
-            return false;
-        }
 
         std::cout << "Available choices:\n";
         for (auto [x, y] : choices) {
@@ -32,19 +27,14 @@ namespace base {
 
         Coord choice;
         std::cin >> choice.first >> choice.second;
-        if (std::find(choices.begin(),choices.end(),choice)==choices.end()){
-            Logger::log(Level::INFO, "Impossible choice");
-            return false;
-        }
-
 
         board.removeTopCardAt(choice);
         Logger::log(Level::INFO, "Mage fire ability remove top card used");
-        return true;
     }
 
     std::vector<Coord> MasterOfFireFront::getChoices(const Board& board, const Player& player) {
         std::vector<Coord> choices;
+
         for (const auto& [coord, stack] : board) {
             auto& [x, y] = coord;
 
@@ -70,13 +60,8 @@ namespace base {
         m_ability = MageTypeAbility::BurnRowOrColumn;
     }
 
-    bool MasterOfFireBack::apply(Board& board, Player& player) {
+    void MasterOfFireBack::apply(Board& board, Player& player) {
         auto choices = getChoices(board, player);
-        if (choices.first.empty()&&choices.second.empty())
-        {
-            Logger::log(Level::INFO, "You can't use this mage right now");
-            return false;
-        }
         std::cout << "Available choices:\n";
 
         std::cout << "Available rows: ";
@@ -94,32 +79,18 @@ namespace base {
         uint16_t choice;
         char row_or_col;
         std::cin >> choice >> row_or_col;
-        
+
         if (row_or_col == 'r') {
-            if (std::find(choices.first.begin(), choices.first.end(), choice) != choices.first.end()) {
-                board.removeRow(choice);
-            }
-            else { 
-                Logger::log(Level::INFO, "invalid input");
-                return false;
-            }
+            board.removeRow(choice);
         }
         else if (row_or_col == 'c') {
-            if (std::find(choices.second.begin(), choices.second.end(), choice) != choices.second.end()) {
-                board.removeColumn(choice);
-            }
-            else { 
-                Logger::log(Level::INFO, "invalid input");
-                return false;
-            }
+            board.removeColumn(choice);
         }
         else {
             Logger::log(Level::INFO, "invalid input");
-            return false;
         }
 
         Logger::log(Level::INFO, "Mage fire ability remove top card used");
-        return true;
     }
 
     std::pair<std::vector<uint16_t>, std::vector<uint16_t>> MasterOfFireBack::getChoices(const Board& board, const Player& player) {
@@ -186,14 +157,15 @@ namespace base {
         }
         return choices;
 
+
     }
 
-    bool MasterOfEarthFront::apply(Board& board, Player& player) {
+    void MasterOfEarthFront::apply(Board& board, Player& player) {
 
         auto choices = getChoices(board, player);
         if (choices.empty()) {
-            Logger::log(Level::INFO, "No valid position for using this Mage!");
-            return false;
+            std::cout << "No valid position for using this Mage!\n";
+            return;
         }
         std::cout << "Your available choices are: \n";
         for (const auto& [x, y] : choices) {
@@ -202,8 +174,8 @@ namespace base {
         Coord choice;
         std::cin >> choice.first >> choice.second;
         if (std::find(choices.begin(), choices.end(), choice) == choices.end()) {
-            Logger::log(Level::WARNING, "Invalid choice!");
-            return false;
+            Logger::log(Level::WARNING, "Invalid choice!\n");
+            return;
         }
         char card_type;
         std::cin >> card_type;
@@ -211,12 +183,11 @@ namespace base {
 
         if (card.getType() >= board[choice].back().getType()) {
             Logger::log(Level::WARNING, "Invalid card choice!\n");
-            return false;
+            return;
         }
-        auto& cards = board.getCombatCards();
-        cards[choice].emplace_back(std::move(card));
+
+        board.appendMove(choice, std::move(card));
         Logger::log(Level::INFO, "Mage Earth Bury ability card used");
-        return true;
     }
     ///---------Hole----------
 
@@ -225,7 +196,7 @@ namespace base {
         m_ability = MageTypeAbility::Hole;
     }
 
-    bool MasterOfEarthBack::apply(Board& board, Player& player) {
+    void MasterOfEarthBack::apply(Board& board, Player& player) {
         auto choices = board.availableSpaces();
         if (!choices.empty()) {
             std::cout << "Your choices are: ";
@@ -235,22 +206,15 @@ namespace base {
             std::cout << "\n Pick one: ";
             Coord input;
             std::cin >> input.first >> input.second;
-            if (std::find(choices.begin(), choices.end(), input) == choices.end()) {
-                Logger::log(Level::INFO, "You entered an invalid option for this mage");
-                return false;
-            }
             CombatCard card(CombatCardType::HOLE, player.getColor());
-
-            board.appendMove(input, std::move(card));
-            Logger::log(Level::INFO, "Mage Earth Hole ability card used");
-            return true;
-
+            if (board.isValidPlaceCard(input, card)) {
+                board.appendMove(input, std::move(card));
+                Logger::log(Level::INFO, "Mage Earth Hole ability card used");
+            }
         }
         else {
-            Logger::log(Level::INFO, "No available choices for this mage rn");
-            return false;
+            std::cout << "No available choices for this mage rn";
         }
-        
     }
 
 
@@ -261,12 +225,13 @@ namespace base {
         m_ability = MageTypeAbility::BlowAway;
     }
 
-    bool MasterOfAirFront::apply(Board& board, Player& player) {
+    void MasterOfAirFront::apply(Board& board, Player& player) {
 
         std::vector<Coord> choices = getChoices(board, player);
         if (choices.empty()) {
+            std::cout << "No options available for this mage!\n";
             Logger::log(Level::WARNING, "You can't use this mage right now!\n");
-            return false;
+            return;
         }
         std::cout << "Your choices are: \n";
         for (const auto& [x, y] : choices) {
@@ -281,17 +246,11 @@ namespace base {
 
         if (std::find(choices.begin(), choices.end(), coord_from) == choices.end()) {
             Logger::log(Level::WARNING, "Invalid choice!\n");
-            return false;
+            return;
         }
-        if (board.isValidMoveStack(coord_from, coord_to)) {
-            board.moveStack(coord_from, coord_to);
+        /*if (board.moveStack(coord_from, coord_to)) {// acuma nu mai e bool e void si e alta fucntie care verifica
             Logger::log(Level::INFO, "Mage Air BlowAway ability card used");
-        }
-        else {
-            Logger::log(Level::INFO, "Wrong choice");
-            return false;
-        }
-        return true;
+        }*/
     }
 
     std::vector<Coord> MasterOfAirFront::getChoices(Board& board, const Player& player) {
@@ -311,7 +270,7 @@ namespace base {
         m_ability = MageTypeAbility::BlowEter;
     }
 
-    bool MasterOfAirBack::apply(Board& board, Player& player) {
+    void MasterOfAirBack::apply(Board& board, Player& player) {
         auto choices = board.availableSpaces();
         if (!choices.empty()) {
             std::cout << "Your choices for additional Eter card are: \n";
@@ -321,19 +280,16 @@ namespace base {
             std::cout << std::endl;
             Coord input;
             std::cin >> input.first >> input.second;
-            if (std::find(choices.begin(), choices.end(), input) == choices.end()) {
-                Logger::log(Level::INFO, "Invalid option");
-                return false;
-            }
             CombatCard eter(CombatCardType::ETER, player.getColor());
-            board.appendMove(input, std::move(eter));
-            Logger::log(Level::INFO, "Mage Air BlowEter ability card used");
+            if (board.isValidPlaceCard(input, eter)) {
+                board.appendMove(input, std::move(eter));
+                Logger::log(Level::INFO, "Mage Air BlowEter ability card used");
+            }
         }
         else {
-            Logger::log(Level::INFO,"No available options for this mage rn" );
-            return false;
+            std::cout << "No available options for this mage rn";
         }
-        return true;
+
     }
 
     //----------------------------------------- MasterOfWater---------------------------------------
@@ -344,12 +300,38 @@ namespace base {
         m_ability = MageTypeAbility::Boat;
     }
 
-    bool MasterOfWaterFront::apply(Board& board, Player& player) {
+    bool MasterOfWaterFront::areAdjacentCards(const Coord& coord, Board& board) {
+        std::vector<Coord> directions = {
+            {coord.first - 1, coord.second},
+            {coord.first + 1, coord.second},
+            {coord.first, coord.second - 2},
+            {coord.first, coord.second + 2}
+        };
+
+        for (const auto& dir : directions) {
+            if (!board[dir].empty()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    bool MasterOfWaterFront::allCardsHaveNeighbors( Board&board) {
+        for (const auto& card : board) {
+            if (!areAdjacentCards(card.first,board)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    void MasterOfWaterFront::apply(Board& board, Player& player) {
         std::vector<Coord>choices = getChoices(board, player);
         if (choices.empty()) {
             std::cout << "No options available for this mage!\n";
             Logger::log(Level::WARNING, "Invalid choice!\n");
-            return false;
+            return;
         }
         std::cout << "Your choices are: \n";
         for (const auto& [x, y] : choices) {
@@ -364,27 +346,33 @@ namespace base {
 
         if (std::find(choices.begin(), choices.end(), coord_from) == choices.end()) {
             Logger::log(Level::WARNING, "Invalid choice!\n");
-            return false;
+            std::cout << "Invalid choice";
+            return;
         }
-      
-
-        if (board.isValidMoveStack(coord_from, coord_to)) {
-            board.moveStack(coord_from, coord_to);
+        /*if (board.moveStack(coord_from, coord_to)) {
             Logger::log(Level::INFO, "Mage Water Boat ability card used");
-      }
-        else {
-            Logger::log(Level::INFO,"Wrong choice");
-            return false;
+        }*/
 
-        }
-        return true;
+        std::cout << board.isValidMoveStack(coord_from, coord_to);
+        int n;
+        std::cin >> n;
     }
 
-    std::vector<Coord> MasterOfWaterFront::getChoices(Board& board, Player& player) {
+    std::vector<Coord> MasterOfWaterFront::getChoices(Board& board, Player& player)
+    {
         std::vector<Coord>choices;
         for (const auto& [coord, stack] : board) {
-            if (stack.back().getColor() != player.getColor()) {
-                choices.emplace_back(coord);
+            bool opponent_card = false;
+            if (!stack.empty()) {
+                for (const auto& combat_card : stack) {
+                    if (combat_card.getColor() != player.getColor()) {
+                        opponent_card = true;
+                        break;
+                    }
+                }
+                if (opponent_card) {
+                    choices.emplace_back(coord);
+                }
             }
         }
         return choices;
@@ -460,7 +448,11 @@ namespace base {
     }
 
     std::pair<uint16_t, char> MasterOfWaterBack::selectBorders(const std::optional<std::unordered_map<BorderType, std::vector<Coord>>>& borders, Board& board) const {
-       
+        if (!borders || borders->empty()) {
+            std::cout << "No borders found.\n";
+            Logger::log(Level::WARNING, "Can't use thid card rn");
+            return { -1, '\0' };
+        }
         int index = 0;
         for (const auto& [border, coords] : *borders) {
             std::cout << "Border number " << index++ << "->" << borderToString(border) << ", at coords: ";
@@ -508,12 +500,8 @@ namespace base {
         return { from_move,direction };
     }
 
-    bool MasterOfWaterBack::apply(Board& board, Player& player) {
+    void MasterOfWaterBack::apply(Board& board, Player& player) {
         auto borders = getBorders(board, player);
-        if (!borders || borders->empty()) {
-            Logger::log(Level::INFO, "There are no borders to move yet");
-            return false;
-        }
 
         auto result = selectBorders(borders, board);
         if (result.first != -1) {
@@ -530,10 +518,6 @@ namespace base {
 
             Logger::log(Level::INFO, "Mage Water BoatRowOrColumn ability card used");
         }
-        else {
-            Logger::log(Level::INFO, "Wrong choice");
-            return false;
-        }
-        return true;
+        return;
     }
 }
