@@ -1,4 +1,4 @@
-﻿#include "PowerCards.h"
+#include "PowerCards.h"
 
 using namespace logger;
 
@@ -16,14 +16,15 @@ namespace base {
     Destruction::Destruction() {
         m_ability = PowerCardType::Destruction;
     }
-
+  
     void Destruction::apply(Board& board, Player& player) {
         for (const auto& [coord, stack] : board) {
             auto top_card = board.getTopCard(coord);
-            const CombatCard& card = stack.back();
+           const CombatCard& card = top_card->get();
             if (card.getColor() != player.getColor()) {
                 Logger::log(Level::INFO, "Destruction power destroyed the last card");
-                board.popTopCardAt(coord);
+                board.removeTopCardAt(coord);
+                board.availableSpaces();
                 break;
             }
         }
@@ -34,37 +35,31 @@ namespace base {
     }
 
     void Flame::apply(Board& board, Player& player) {
-
-        flipIllusion(board, player);
-        Logger::log(Level::INFO, "It's your turn, place a card");
-
-        Coord new_coord;
-        std::cin >> new_coord.first >> new_coord.second;
-        char card_type;
-        std::cin >> card_type;
-
-        CombatCard selected_card = player.getCard(charToCombatCard(card_type));
-
-        if (board.isValidPlaceCard(new_coord, selected_card)) {
-            board.appendMove(new_coord, std::move(selected_card));
-            Logger::log(Level::INFO, "Flame power was used. Card placed at ({}, {})",
-                new_coord.first, new_coord.second);
-        }
-        else {
-            Logger::log(Level::WARNING, "Invalid move!");
-        }
-    }
-
-    void Flame::flipIllusion(Board& board, const Player& player) {
         for (const auto& [coord, stack] : board) {
-            const auto& top_card = board.getTopCard(coord);
+            auto top_card = board.getTopCard(coord);
             CombatCard& card = top_card->get();
             if (card.getColor() != player.getColor() && card.isIllusion()) {
                 card.flip();
                 Logger::log(Level::INFO, "The opponent's Illusion has been revealed");
             }
+          
+            Logger::log(Level::INFO, "It's your turn, place a card");
+            Coord new_coord;
+            std::cin >> new_coord.first >> new_coord.second;
+            char card_type;
+            std::cin >> card_type;
+
+
+            auto selected_card = player.getCard(charToCombatCard(card_type));
+            
+            if (board.isValidPlaceCard(new_coord, selected_card)) {
+                board.appendMove(new_coord, std::move(selected_card));
+                Logger::log(Level::INFO, "Flame power was used. Card placed at ({}, {})",
+                    new_coord.first, new_coord.second);
+                break;
+            }
             else {
-                Logger::log(Level::WARNING, "The card does not meet the conditions");
+                Logger::log(Level::WARNING, "Invalid move!");
             }
         }
     }
@@ -77,30 +72,31 @@ namespace base {
     }
 
     void Fire::apply(Board& board, Player& player) {
-        std::vector<Coord>duplicateCoord = getDuplicateCards(board, player);
-        if (duplicateCoord.size() > 1) {
-            for (const auto& coord : duplicateCoord) {
-                auto top_card = board.getTopCard(coord);
-                CombatCard& card = top_card->get();
-                player.addCard(std::move(card));
-                board.removeTopCardAt(coord);
+       std::vector<Coord>duplicateCoord = getDuplicateCards(board, player);
+       if (duplicateCoord.size() > 1) {
+           for (const auto& coord : duplicateCoord) {
+               auto top_card = board.getTopCard(coord);
+               CombatCard& card = top_card->get();
+               player.addCard(std::move(card));
+               board.removeTopCardAt(coord);
 
-                Logger::log(Level::INFO, "Fire power removed top cards and put then back in the player's hand");
-            }
+               Logger::log(Level::INFO, "Fire power removed top cards and put then back in the player's hand");
+           }
         }
-        else {
-            Logger::log(Level::WARNING, "No visible cards with the same value on the board");
-        }
+       else {
+           Logger::log(Level::WARNING, "No visible cards with the same value on the board");
+       }
     }
 
     std::vector<Coord>Fire::getDuplicateCards(Board& board, const Player& player) {
         std::vector<Coord>choices;
         for (const auto& [coord, stack] : board) {
-            const auto& [x, y] = coord;
-
-
+           const auto& [x, y] = coord;
+            if (stack.empty()) {
+                continue;
+            }
             bool is_player_card = stack[stack.size() - 1].getColor() == player.getColor();
-            if (is_player_card && !stack.back().isIllusion()) {
+            if(is_player_card && !stack.back().isIllusion()){
                 choices.emplace_back(x, y);
             }
         }
@@ -113,24 +109,6 @@ namespace base {
     }
 
     void Ash::apply(Board& board, Player& player) {
-        if (player.hasUsedCards()) {
-            char card_type;
-            std::cin >> card_type;
-            const CombatCardType& card_type_enum = charToCombatCard(card_type);
-            CombatCard card = player.getUsedCard(card_type_enum);
-            Coord coord;
-            std::cin >> coord.first >> coord.second;
-            if (board.isValidPlaceCard(coord, card)) {
-                board.appendMove(coord, std::move(card));
-                Logger::log(Level::INFO, "Ash power card was used");
-            }
-            else {
-                Logger::log(Level::WARNING, "Invalid place");
-            }
-        }
-        else {
-            Logger::log(Level::WARNING, "You don't have any removed cards");
-        }
     }
 
 
@@ -151,8 +129,8 @@ namespace base {
         for (auto& choice : choices) {
             const Coord& coord = choice.first;
             const CombatCardType& card = choice.second;
-            Logger::log(Level::INFO, "Card found at ({}, {})", coord.first, coord.second);
-            Logger::log(Level::INFO, "Card:{}", combatCardToChar(card));
+            Logger::log(Level::INFO, "Card found at ({}, {})", coord.first,coord.second);
+            Logger::log(Level::INFO, "Card:{}",combatCardToChar(card));
         }
         Logger::log(Level::INFO, "It's your turn");
         Coord coord_from;
@@ -162,14 +140,14 @@ namespace base {
         std::cout << "Move from coordinates:" << "\n";
         std::cin >> coord_from.first >> coord_from.second;
 
-        std::cout << "Covered card:" << "\n";
+        std::cout << "Covered card:"<<"\n";
         std::cin >> card_type_char;
 
-        std::cout << "To coordinates:" << "\n";
+        std::cout << "To coordinates:"<<"\n";
         std::cin >> new_coord.first >> new_coord.second;
 
 
-        CombatCardType card_type = charToCombatCard(card_type_char);
+        CombatCardType card_type = charToCombatCard(card_type_char); 
         CombatCard card(card_type, player.getColor());
 
         bool valid_card = false;
@@ -183,11 +161,11 @@ namespace base {
                 valid_card = true;
             }
         }
-        if (valid_card && valid_coord) {
+        if (valid_card&& valid_coord) {
             board.removeCardFromStackAt(coord_from, card);
             board.appendMove(new_coord, std::move(card));
         }
-        if (!valid_card) {
+        if(!valid_card) {
             Logger::log(Level::WARNING, "Invalid card selected.");
             return;
         }
@@ -215,7 +193,7 @@ namespace base {
         }
         return choices;
     }
-
+                
     ////------------------------------------------ Squall -------------------------------------------
     Squall::Squall() {
         m_ability = PowerCardType::Squall;
@@ -232,7 +210,7 @@ namespace base {
         for (auto& pair : visible_cards) {
             Coord available_coord = pair.first;
             CombatCard& card = pair.second;
-            if (available_coord != coord) {
+            if (available_coord!=coord) {
                 Logger::log(Level::WARNING, "No visible card at these coordinates");
             }
             else {
@@ -243,7 +221,7 @@ namespace base {
         }
     }
 
-    std::vector<std::pair<Coord, CombatCard>> Squall::opponentCards(Board& board, const Player& player) const {
+    std::vector<std::pair<Coord, CombatCard>> Squall::opponentCards( Board& board,const Player& player) const{
         std::vector<std::pair<Coord, CombatCard>> visible_cards;
         for (const auto& [coord, stack] : board) {
             const auto& top_card = board.getTopCard(coord);
@@ -262,8 +240,8 @@ namespace base {
     }
 
     void Gale::apply(Board& board, Player& player) {
-
-        for (auto& [coord, stack] : board) {
+      
+        for ( auto& [coord, stack] : board) {
             if (stack.size() > 1) {
                 for (int i = 0;i < stack.size() - 1;i++) {
                     const CombatCardType& card_type = stack[i].getType();
@@ -303,7 +281,7 @@ namespace base {
 
 
     ////------------------------------------------ Mirrage -------------------------------------------
-    Mirrage::Mirrage() {
+    Mirrage::Mirrage() {  
         m_ability = PowerCardType::Mirrage;
     }
 
@@ -316,9 +294,11 @@ namespace base {
             char card_type;
             std::cin >> card_type;
             auto card = player.getCard(charToCombatCard(card_type));
-            card.flip();
-            board.appendMove(coord, std::move(card));
-            Logger::log(Level::INFO, "Mirrage power card was used");
+          //  if (board.isValidMove(coord, card)) {
+                card.flip();
+                board.appendMove(coord, std::move(card));
+                Logger::log(Level::INFO, "Mirrage power card was used");
+           // }
         }
     }
 
@@ -327,7 +307,7 @@ namespace base {
         for (const auto& [coord, stack] : board) {
             auto top_card = board.getTopCard(coord);
             CombatCard& card = top_card->get();
-            if (card.isIllusion() && card.getColor() == player.getColor()) {
+            if (card.isIllusion() &&card.getColor()==player.getColor()) {
                 card.flip();
                 player.addCard(std::move(card));
                 CombatCard& card_value = card;
@@ -358,15 +338,11 @@ namespace base {
                 stacksToRemove.push_back(coord);
             }
         }
-        Coord new_coord;
-        std::cin >> new_coord.first >> new_coord.second;
 
-        if (std::find(stacksToRemove.begin(), stacksToRemove.end(), new_coord) == stacksToRemove.end()) {
-            Logger::log(Level::WARNING, "No stack at these coordinates");
-        }
-        else {
-            board.popStack(new_coord);
-            Logger::log(Level::INFO, "Storm power card remove the stack");
+        for (const auto& coord : stacksToRemove) {
+            board.removeStack(coord);
+            Logger::log(Level::INFO, "A stack with 2 or more cards has been removed from the board");
+            break;
         }
     }
 
@@ -400,7 +376,7 @@ namespace base {
             }
 
             board.swapStacks(coord_from, coord_to);
-        }
+      }
 
         Logger::log(Level::INFO, "Tide power card was used");
     }
@@ -420,62 +396,35 @@ namespace base {
 
 
     ////------------------------------------------ Mist -------------------------------------------
-    Mist::Mist() {
+    Mist::Mist() { //joaca inca o iluzie
         m_ability = PowerCardType::Mist;
 
     }
 
     void Mist::apply(Board& board, Player& player) {
-        WinManager win_manager(board);
-        IllusionService illusionService(board, win_manager);
-        for (const auto& [coord, stack] : board) {
-            if (stack.back().isIllusion()) {
-                Logger::log(Level::WARNING, "Player already has an illusion");
-            }
-            else {
-                Logger::log(Level::INFO, "You can play your new illusion");
-
-
-                Coord new_coord;
-                std::cin >> new_coord.first >> new_coord.second;
-
-                char card_type;
-                std::cin >> card_type;
-                CombatCard card = player.getCard(charToCombatCard(card_type));
-
-                illusionService.getNewIllusion(std::move(card));
-                if (illusionService.isValidPlaceCard(new_coord, std::move(card))) {
-                    illusionService.placeIllusion(coord, std::move(card));
-                }
-            }
-        }
+        
     }
     bool Mist::hasIllusion(Board& board, IllusionService& illusionService, Player& player) {
-        for (const auto& [coord, stack] : board) {
-            if (stack.back().isIllusion()) {
-                Logger::log(Level::WARNING, "Player already has an illusion");
-                return false;
-            }
-            else {
-                Logger::log(Level::INFO, "You can play your new illusion");
+        auto playerColor = player.getColor();
+       // if (illusionService.hasPlayerIllusion(playerColor)) {
+            Logger::log(Level::WARNING, "Player already has an illusion");
+      //      return false;
+      //  }
+     //   else {
+            Logger::log(Level::INFO, "You can play your illusion");
 
+            Coord coord;
+            std::cin >> coord.first >> coord.second;
 
-                Coord new_coord;
-                std::cin >> new_coord.first >> new_coord.second;
+            char card_type;
+            std::cin >> card_type;
+            auto card = player.getCard(charToCombatCard(card_type));
 
-                char card_type;
-                std::cin >> card_type;
-                CombatCard card = player.getCard(charToCombatCard(card_type));
-
-                illusionService.getNewIllusion(std::move(card));
-                if (illusionService.isValidPlaceCard(new_coord,std::move(card))) {
-                    illusionService.placeIllusion(coord, std::move(card));
-                }
-            }
-        }
+            illusionService.placeIllusion(coord, std::move(card));
+      //  }
         return true;
     }
-    
+
 
     ////------------------------------------------ Wave -------------------------------------------
     Wave::Wave() {
@@ -483,38 +432,6 @@ namespace base {
     }
 
     void Wave::apply(Board& board, Player& player) {
-        std::vector<Coord>coord_from = validStacks(board);
-
-
-        Coord old_coord;
-        std::cout << "The coordinates from where you want to move the stack:";
-        std::cin >> old_coord.first >> old_coord.second;
-        if (std::ranges::find(coord_from, old_coord) == coord_from.end()) {
-            Logger::log(Level::WARNING, "No stack at these coordinates");
-        }
-
-        Coord new_coord;
-        std::cout << "The coordinates where you want to move the stack:";
-        std::cin >> new_coord.first >> new_coord.second;
-
-            board.moveStack(old_coord, new_coord);
-            char card_type;
-            std::cout << "Play a card on the new empty position";
-             std::cin >> card_type;
-             CombatCard card = player.getCard(charToCombatCard(card_type));
-             if (board.isValidPlaceCard(old_coord, card)) {
-                 board.appendMove(old_coord, std::move(card));
-             }
-    }
-
-    std::vector<Coord>Wave::validStacks(Board& board) const {
-        std::vector<Coord> stackCoord;
-        for (const auto& [coord, stack] : board) {
-            if (board.isValidRemoveStack(coord)) {
-                stackCoord.push_back(coord);
-            }
-            return stackCoord;
-        }
     }
 
     ////------------------------------------------ Whirlpool -------------------------------------------
@@ -544,66 +461,12 @@ namespace base {
 
     ////------------------------------------------ Support -------------------------------------------
     Support::Support() {
-        m_ability = PowerCardType::Support;//to return
+        m_ability = PowerCardType::Support;
     }
 
     void Support::apply(Board& board, Player& player) {
-        std::vector<Coord>validCards = CoordCardType(board, player);
-
-        if (validCards.empty()) {
-            Logger::log(Level::WARNING, "No valid cards to apply the power card");
-            return;
-        }
-
-        Coord new_coord;
-        std::cout << "Enter the coordinates of the card:";
-        std::cin >> new_coord.first >> new_coord.second;
-
-        if (std::find(validCards.begin(), validCards.end(), new_coord) == validCards.end()) {
-            Logger::log(Level::WARNING, "No card at there coordinates");
-        }
-        auto top_card = board.getTopCard(new_coord);
-        CombatCard& card = top_card->get();
-        CombatCardType currentType = card.getType();
-
-        CombatCardType newType = currentType;
-        switch (currentType) {
-        case CombatCardType::ONE:
-            newType = CombatCardType::TWO;
-            break;
-        case CombatCardType::TWO:
-            newType = CombatCardType::THREE;
-            break;
-        case CombatCardType::THREE:
-            newType = CombatCardType::FOUR;
-            break;
-        default:
-            Logger::log(Level::WARNING, "Card cannot be incremented beyond FOUR");
-            return;
-        }
-        CombatCard new_card(newType, card.getColor());
-        board.popTopCardAt(new_coord);
-        board.appendMove(new_coord, std::move(new_card));
-
     }
-    std::vector<Coord> Support::CoordCardType(Board& board, const Player& player) const {
-        std::vector<Coord> coordCards;
 
-        for (const auto& [coord, stack] : board) {
-            if (stack.empty()) continue;
-            const CombatCard& card = stack.back();
-
-            if (!card.isIllusion() &&
-                card.getColor() == player.getColor() &&
-                (card.getType() == CombatCardType::ONE ||
-                    card.getType() == CombatCardType::TWO ||
-                    card.getType() == CombatCardType::THREE)) {
-                coordCards.emplace_back(coord);
-            }
-        }
-
-        return coordCards;
-    }
 
     ////------------------------------------------ Earthquake -------------------------------------------
     Earthquake::Earthquake() {
@@ -611,25 +474,21 @@ namespace base {
     }
 
     void Earthquake::apply(Board& board, Player& player) {
-        std::vector<Coord> coords_to_remove;
         for (const auto& [coord, stack] : board) {
-            const auto& top_card = board.getTopCard(coord);
+            if (!stack.empty()) {
+                auto top_card = board.getTopCard(coord);
                 const CombatCard& card = top_card->get();
+
                 if (card.getType() == CombatCardType::ONE) {
-                  
-                    coords_to_remove.emplace_back(coord);
+                    Logger::log(Level::INFO, "Earthquake power removed a visible card with number 1.");
+                    board.removeTopCardAt(coord);
+                    board.availableSpaces(); 
+                    break; 
+                }
+                else {
+                    Logger::log(Level::WARNING, "No visible cards with number 1");
+                }
             }
-        }
-
-        for (const auto& coord : coords_to_remove) {
-            board.popTopCardAt(coord);
-        }
-
-        if (coords_to_remove.empty()) {
-            Logger::log(Level::WARNING, "No visible cards with number 1");
-        }
-        else {
-            Logger::log(Level::INFO, "Earthquake power card removed all the visible '1' cards");
         }
     }
         

@@ -25,9 +25,12 @@ namespace base {
 		if (player.getColor() == color::ColorType::RED) {
 
 			if (m_card_p1) {
-				m_card_p1->apply(m_board, player);
-				m_card_p1.reset();
-				return true;
+				if (m_card_p1->apply(m_board, player)) {
+					m_card_p1.reset();
+					return true;
+				}
+				else
+					return false;
 			}
 			else {
 				return false;
@@ -37,9 +40,13 @@ namespace base {
 		else {
 
 			if (m_card_p2) {
-				m_card_p2->apply(m_board, player);
-				m_card_p2.reset();
-				return true;
+				if (m_card_p2->apply(m_board, player)) {
+					m_card_p2.reset();
+					return true;
+				}
+				else {
+					return false;
+				}
 			}
 			else {
 				return false;

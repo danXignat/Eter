@@ -339,6 +339,11 @@ namespace base {
 		return m_available_spaces;
 	}
 
+	std::unordered_map<Coord, std::vector<CombatCard>, CoordFunctor>& Board::getCombatCards()
+	{
+		return m_combat_cards;
+	}
+
 	//-----------------------------------------------------CHECKERS-----------------------------------------------------
 
 
