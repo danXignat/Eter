@@ -516,8 +516,154 @@ namespace base {
         m_ability = PowerCardType::Avalanche;
     }
 
-    void Avalanche::apply(Board& board, Player& player) {
+    static std::string_view ShiftToString(ShiftDirection direction) {
+        switch (direction) {
+        case ShiftDirection::Right:
+            return "Right";
+        case ShiftDirection::Left:
+            return "Left";
+        case ShiftDirection::Up:
+            return "Up";
+        case ShiftDirection::Down:
+            return "Down";
+        default:
+            return "Unknown";
+        }
     }
+    static ShiftDirection stringToShift(std::string_view direction_string) {
+        if (direction_string == "Right") {
+            return ShiftDirection::Right;
+        }
+        else if (direction_string == "Left") {
+            return ShiftDirection::Left;
+        }
+        else if (direction_string == "Up") {
+            return ShiftDirection::Up;
+        }
+        else if (direction_string == "Down") {
+            return ShiftDirection::Down;
+        }
+        else {
+            return ShiftDirection::Unknown; 
+        }
+    }
+    static std::string_view OrientationToString(Orientation type) {
+        switch (type) {
+        case Orientation::Column:
+            return "Column";
+        case Orientation::Row:
+            return "Row";
+        default:
+            return "Unknown";
+        }
+    }
+    
+    std::vector<std::pair<Orientation, std::pair<Coord, Coord>>> Avalanche::getPairs(Board& board) {
+        std::vector<std::pair<Orientation, std::pair<Coord, Coord>>> pairs;
+        const std::vector<std::pair<Coord, Orientation>> directions = {
+            {{2, 0}, Orientation::Row},
+            {{-2, 0}, Orientation::Row},
+            {{0, 1}, Orientation::Column},
+            {{0, -1}, Orientation::Column}
+        };
+
+        for (const auto& [coord, stack] : board) {
+            for (const auto& [delta, orientation] : directions) {
+                Coord neighbor = { coord.first + delta.first, coord.second + delta.second };
+                if (board.hasStack(neighbor)) {
+                    pairs.emplace_back(orientation, std::make_pair(coord, neighbor));
+                }
+            }
+        }
+        return pairs;
+    }
+
+
+    std::vector<std::pair<ShiftDirection, std::pair<Coord, Coord>>>Avalanche::checkShifting(
+        const std::vector<std::pair<Orientation, std::pair<Coord, Coord>>>& pack, Board& board) {
+
+        std::vector<std::pair<ShiftDirection, std::pair<Coord, Coord>>> choices;
+
+        const std::unordered_map<Orientation, std::vector<std::pair<Coord, ShiftDirection>>> directions = {
+            {Orientation::Row,    {{{2, 0}, ShiftDirection::Right}, {{-2, 0}, ShiftDirection::Left}}},
+            {Orientation::Column, {{{0, 1}, ShiftDirection::Up},    {{0, -1}, ShiftDirection::Down}}}
+        };
+
+        for (const auto& [type, pair] : pack) {
+            for (const auto& [delta, shift] : directions.at(type)) {
+                Coord newCoord = { pair.first.first + delta.first, pair.first.second + delta.second };
+                if (!board.hasStack(newCoord)) {
+                    choices.emplace_back(shift, std::make_pair(pair.first, pair.second));
+                }
+            }
+        }
+
+        return choices;
+    }
+
+    void Avalanche::apply(Board& board, Player& player) {
+        auto pairs = getPairs(board); 
+        if (pairs.empty()) {
+            Logger::log(Level::WARNING, "You can't use this card rn");
+            return;
+        }
+        auto choices = checkShifting(pairs, board);
+        std::cout << "Ur options are: ";
+        for (const auto& [type, pair] : choices) {
+            std::cout << ShiftToString(type) << " " << pair.first.first << " " << pair.first.second << " , "
+                << pair.second.first << " " << pair.second.second << " | ";
+        }
+
+        const std::unordered_map<ShiftDirection, Coord> directionDeltas = {
+       {ShiftDirection::Down, {0, 1}},
+       {ShiftDirection::Up, {0, -1}},
+       {ShiftDirection::Right, {2, 0}},
+       {ShiftDirection::Left, {-2, 0}}
+        };
+
+        std::cout << "Enter the direction you want to move the stacks (Left or Right for rows / Up or Down for columns) and the pair of coords\n";
+        std::string direction;
+        std::cin >> direction;
+        std::pair<Coord, Coord>pair;
+        std::cin >> pair.first.first >> pair.first.second >> pair.second.first >> pair.second.second;
+        auto choice = std::pair{ stringToShift(direction),pair }; 
+        auto it = std::find(choices.begin(), choices.end(), choice);
+        if (it != choices.end()) {
+            const auto& [type, selectedPair] = *it;
+            const auto& delta = directionDeltas.at(type);
+
+            Coord newCoord1, newCoord2;
+            if (type == ShiftDirection::Down || type == ShiftDirection::Up) {
+                newCoord1 = { selectedPair.second.first, selectedPair.second.second + delta.second };
+                newCoord2 = { selectedPair.first.first, selectedPair.first.second + delta.second };
+
+                if (board.canMoveTwoStacks(selectedPair.second, newCoord1, selectedPair.first, newCoord2)) {
+                    board.moveTwoStacks(selectedPair.second, newCoord1, selectedPair.first, newCoord2);
+                    Logger::log(Level::INFO, "Move applied");
+                }
+                else {
+                    Logger::log(Level::WARNING, "Invalid choice!"); 
+                }
+            }
+            else {
+                newCoord1 = { selectedPair.first.first + delta.first, selectedPair.first.second };
+                newCoord2 = { selectedPair.second.first + delta.first, selectedPair.second.second };
+
+                if (board.canMoveTwoStacks(selectedPair.first, newCoord1, selectedPair.second, newCoord2)) {
+                    board.moveTwoStacks(selectedPair.first, newCoord1, selectedPair.second, newCoord2);
+                    Logger::log(Level::INFO, "Move applied"); 
+                }
+                else {
+                    Logger::log(Level::WARNING, "Invalid choice!\n"); 
+                }
+            }
+        }
+        else {
+            Logger::log(Level::WARNING, "Invalid choice!\n");
+        }
+        Logger::log(Level::INFO, "Avalanche card used");
+    }
+
 
 
     ////------------------------------------------ Rock -------------------------------------------

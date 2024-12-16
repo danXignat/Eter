@@ -33,7 +33,7 @@ namespace base {
 		m_player1{ player1 }, m_player2{ player2 } {
 
 	}
-	
+
 
 	//----------------------------MODIFIERS--------------------------------
 
@@ -77,6 +77,24 @@ namespace base {
 			from_coord.first, from_coord.second, to_coord.first, to_coord.second);
 	}
 
+	
+
+	void Board::moveTwoStacks(const Coord& from1, const Coord& to1, const Coord& from2, const Coord& to2) {
+		if (!canMoveTwoStacks(from1, to1, from2, to2)) {
+			throw std::runtime_error("Invalid move");
+		}
+		m_combat_cards[to1] = std::move(m_combat_cards[from1]);
+		m_combat_cards.erase(from1);
+
+		m_combat_cards[to2] = std::move(m_combat_cards[from2]);
+		m_combat_cards.erase(from2);
+
+		_reinitialise();
+
+		Logger::log(Level::INFO, "Two stacks moved from ({}, {}) to ({}, {}) and from ({}, {}) to ({}, {})",
+			from1.first, from1.second, to1.first, to1.second,
+			from2.first, from2.second, to2.first, to2.second);
+	}
 
 	void Board::moveRow(uint16_t from_y, uint16_t to_y) {
 		if (from_y == to_y) {
@@ -107,6 +125,28 @@ namespace base {
 
 		Logger::log(Level::INFO, "Moved column {} to {}", from_y, to_y);
 	}
+	/*void Board::moveRow(uint16_t y, uint16_t newY) {
+		if (y == newY) {
+			Logger::log(Level::WARNING, "Source and destination rows are the same.");
+			return;
+		}
+		std::vector<std::pair<Coord, std::vector<CombatCard>>> rowData;
+		for (auto it = m_combat_cards.begin(); it != m_combat_cards.end();) {
+			if (it->first.second == y) {
+				rowData.emplace_back(it->first, std::move(it->second));
+				it = m_combat_cards.erase(it);
+			}
+			else {
+				++it;
+			}
+		}
+		for (auto& pair : rowData) {
+			Coord newCoord = { pair.first.first, newY };
+			m_combat_cards[newCoord] = std::move(pair.second);
+		}
+		_reinitialise();
+		Logger::log(Level::INFO, "Moved row {} to {}", y, newY);
+	}*/
 
 
 	void Board::moveColumn(uint16_t from_x, uint16_t to_x) {
@@ -437,6 +477,31 @@ namespace base {
 		}
 
 		return visited.size() == board_coords.size(); // conex
+	}
+
+	bool Board::canMoveTwoStacks(const Coord& from1, const Coord& to1, const Coord& from2, const Coord& to2) const {
+		if (!m_combat_cards.contains(from1) || !m_combat_cards.contains(from2)) {
+			Logger::log(Level::WARNING, "One or both stacks do not exist at the source coordinates.");
+			return false;
+		}
+		if (m_combat_cards.contains(to1)) {
+			Logger::log(Level::WARNING, "One or both destinations are not empty.");
+			return false;
+		}
+		if (!m_available_spaces.contains(to1)) {
+			Logger::log(Level::WARNING, "One or both destinations are invalid.");
+			return false;
+		}
+		std::unordered_set<Coord, CoordFunctor> new_config{
+			std::ranges::begin(m_combat_cards | std::views::keys),
+			std::ranges::end(m_combat_cards | std::views::keys)
+		};
+		new_config.erase(from1);
+		new_config.erase(from2);
+		new_config.insert(to1);
+		new_config.insert(to2);
+
+		return _isConex(new_config);
 	}
 
 	///------------------------------Setter Getter------------------------------------

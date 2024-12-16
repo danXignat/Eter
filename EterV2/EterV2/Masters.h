@@ -63,10 +63,8 @@ namespace base {
 	class MasterOfWaterFront : public MageCard {
 	public:
 		MasterOfWaterFront();
-		bool areAdjacentCards(const Coord& coord, Board& board);
 		bool apply(Board& board, Player& player) override;
 		std::vector<Coord> getChoices(Board& board, Player& player);
-		bool allCardsHaveNeighbors( Board&board);
 	};
 	enum class BorderType {
 		Top,

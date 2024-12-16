@@ -48,6 +48,7 @@ namespace base {
 		void moveColumn(uint16_t from_x, uint16_t to_x);
 		void moveStack(const Coord& from_coord, const Coord& to_coord);
 		void swapStacks(const Coord& from_coord, const Coord& to_coord);
+		void moveTwoStacks(const Coord& from1, const Coord& to1, const Coord& from2, const Coord& to2);
 
 		CombatCard&& popTopCardAt(const Coord& coord);
 		CombatCard&& popCardFromStackAt(const Coord& coord, const CombatCard& card_to_remove);
@@ -64,6 +65,7 @@ namespace base {
 		bool isValidPlaceCard(const Coord&, const CombatCard&);
 		bool isValidRemoveStack(const Coord&) const;
 		bool isValidMoveStack(const Coord&, const Coord&) const;
+		bool canMoveTwoStacks(const Coord& from1, const Coord& to1, const Coord& from2, const Coord& to2) const; 
 	
 		void render() const;
 		void sideViewRender();

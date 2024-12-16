@@ -197,12 +197,26 @@ namespace base {
 		void apply(Board& board, Player& player) override;
 
 	};
+	enum class ShiftDirection {
+		Right,
+		Left,
+		Up,
+		Down,
+		Unknown
+	};
+	enum class Orientation {
+		Row,
+		Column
+	};
 
 	class Avalanche :public PowerCard {
 	public:
 		Avalanche();
 
 		void apply(Board& board, Player& player) override;
+		std::vector<std::pair<ShiftDirection, std::pair<Coord, Coord>>> checkShifting(
+		const std::vector<std::pair<Orientation, std::pair<Coord, Coord>>>& pack, Board& board);
+		std::vector<std::pair<Orientation, std::pair<Coord, Coord>>> getPairs(Board& board);
 
 	};
 

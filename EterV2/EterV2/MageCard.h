@@ -23,12 +23,5 @@ namespace base {
 		MageType m_type;
 		MageTypeAbility m_ability;
 	};
-	
-	/*
-	inline std::ostream& operator<<(std::ostream& out, const MageCard& card) {
-		out << "Mage Type: " << card.getTypeName() << "\n"
-			<< "Front Ability: " << card.getFrontAbilityName() << "\n"
-			<< "Back Ability: " << card.getBackAbilityName() << "\n";
-		return out;
-	}*/
+
 }
