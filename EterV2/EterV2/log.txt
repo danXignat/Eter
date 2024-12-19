@@ -2,7 +2,10 @@
 [INFO] succesful action
 [INFO] card(2) appended at (12, 5)
 [INFO] succesful action
-[INFO] Two stacks moved from (10, 5) to (8, 5) and from (12, 5) to (10, 5)
+[INFO] card(3) appended at (14, 4)
+[INFO] succesful action
+[INFO] Stack moved from (12, 5) to (14, 5)
+[INFO] Stack moved from (10, 5) to (12, 5)
 [INFO] Move applied
 [INFO] Avalanche card used
 [INFO] succesful action

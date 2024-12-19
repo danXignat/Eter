@@ -4,6 +4,60 @@ using namespace logger;
 
 namespace base {
 
+    static std::string_view ShiftToString(ShiftDirection direction) {
+        switch (direction) {
+        case ShiftDirection::Right:
+            return "Right";
+        case ShiftDirection::Left:
+            return "Left";
+        case ShiftDirection::Up:
+            return "Up";
+        case ShiftDirection::Down:
+            return "Down";
+        default:
+            return "Unknown";
+        }
+    }
+    static ShiftDirection stringToShift(std::string_view direction_string) {
+        if (direction_string == "Right") {
+            return ShiftDirection::Right;
+        }
+        else if (direction_string == "Left") {
+            return ShiftDirection::Left;
+        }
+        else if (direction_string == "Up") {
+            return ShiftDirection::Up;
+        }
+        else if (direction_string == "Down") {
+            return ShiftDirection::Down;
+        }
+        else {
+            return ShiftDirection::Unknown;
+        }
+    }
+    static std::string_view OrientationToString(Orientation type) {
+        switch (type) {
+        case Orientation::Column:
+            return "Column";
+        case Orientation::Row:
+            return "Row";
+        default:
+            return "Unknown";
+        }
+    }
+
+    static Orientation stringToOrientation(std::string_view orientation) {
+        if (orientation == "Row") {
+            return Orientation::Row;
+        }
+        if (orientation == "Column") {
+            return Orientation::Column;
+        }
+        else {
+            return Orientation::Unknown;
+        }
+    }
+
     ////------------------------------------------ ControllerExplosion -------------------------------------------
     ControllerExplosion::ControllerExplosion() {
         m_ability = PowerCardType::ControllerExplosion;
@@ -267,9 +321,87 @@ namespace base {
         m_ability = PowerCardType::Hurricane;
     }
 
-    void Hurricane::apply(Board& board, Player& player) {
+    std::unordered_map<Orientation, std::vector<uint16_t>>Hurricane::getOptions(Board& board) {
+        std::unordered_map<Orientation, std::vector<uint16_t>>options;
+
+        if (board.fixedWidth()) {
+            auto rows = board.getFixedRows();
+            std::cout << "Row options: ";
+            for (const auto row : rows) {
+                std::cout << row << ", ";
+                options[Orientation::Row].push_back(row);
+            }
+
+        }
+        if (board.fixedHeight()) {
+            auto columns = board.getFixedColumns();
+            std::cout << "\nColumn options: ";
+            for (const auto column : columns) {
+                std::cout << column << ", ";
+                options[Orientation::Column].push_back(column);
+            }
+        }
+        return options;
     }
 
+    std::tuple<Orientation, uint16_t, ShiftDirection>  Hurricane::input(Board& board) {
+
+        auto options = getOptions(board);
+        if (options.empty()){
+            return { Orientation::Unknown,0,ShiftDirection::Unknown };
+        }
+        std::cout << "Enter Row/Column and the index you want to shift\n";
+        std::string orientation;
+        uint16_t index;
+        std::cin >> orientation >> index;
+        auto orient = stringToOrientation(orientation);
+        auto it = options.find(orient);
+        if (it == options.end() || std::find(it->second.begin(), it->second.end(), index) == it->second.end()) {
+            return { Orientation::Unknown,0,ShiftDirection::Unknown };
+        }
+
+        std::cout << "Enter the direction you want to shift (Right/Left for rows, Up/Down for cols)";
+        std::string shift_direction;
+        std::cin >> shift_direction;
+        auto shift_dir = stringToShift(shift_direction);
+
+        const std::unordered_map<Orientation, std::vector<ShiftDirection>> validDirections = {
+                    {Orientation::Row, {ShiftDirection::Left, ShiftDirection::Right}},
+                    {Orientation::Column, {ShiftDirection::Up, ShiftDirection::Down}}
+        };
+
+        auto dirIt = validDirections.find(orient);
+        if (std::find(dirIt->second.begin(), dirIt->second.end(), shift_dir) == dirIt->second.end()) {
+            return { Orientation::Unknown,0,ShiftDirection::Unknown };
+        }
+
+        return { orient,index,shift_dir };
+
+    }
+
+
+    void Hurricane::apply(Board& board, Player& player) {    //not finished 
+
+        auto choice = input(board);
+        auto orient = std::get<0>(choice);
+        if (orient == Orientation::Unknown) {
+            return;
+        }
+        auto index = std::get<1>(choice);
+        auto shift_dir = std::get<2>(choice);
+        if (orient == Orientation::Row) {
+            if (shift_dir == ShiftDirection::Right) {
+                Coord coord = board.getRightmostOnRow(index);
+                board.removeStack(coord);
+            }
+            else {
+                Coord coord = board.getLeftmostOnRow(index);
+                board.removeStack(coord);
+            }
+        }
+    }
+
+   
 
     ////------------------------------------------ Gust -------------------------------------------
     Gust::Gust() {
@@ -516,47 +648,6 @@ namespace base {
         m_ability = PowerCardType::Avalanche;
     }
 
-    static std::string_view ShiftToString(ShiftDirection direction) {
-        switch (direction) {
-        case ShiftDirection::Right:
-            return "Right";
-        case ShiftDirection::Left:
-            return "Left";
-        case ShiftDirection::Up:
-            return "Up";
-        case ShiftDirection::Down:
-            return "Down";
-        default:
-            return "Unknown";
-        }
-    }
-    static ShiftDirection stringToShift(std::string_view direction_string) {
-        if (direction_string == "Right") {
-            return ShiftDirection::Right;
-        }
-        else if (direction_string == "Left") {
-            return ShiftDirection::Left;
-        }
-        else if (direction_string == "Up") {
-            return ShiftDirection::Up;
-        }
-        else if (direction_string == "Down") {
-            return ShiftDirection::Down;
-        }
-        else {
-            return ShiftDirection::Unknown; 
-        }
-    }
-    static std::string_view OrientationToString(Orientation type) {
-        switch (type) {
-        case Orientation::Column:
-            return "Column";
-        case Orientation::Row:
-            return "Row";
-        default:
-            return "Unknown";
-        }
-    }
     
     std::vector<std::pair<Orientation, std::pair<Coord, Coord>>> Avalanche::getPairs(Board& board) {
         std::vector<std::pair<Orientation, std::pair<Coord, Coord>>> pairs;
@@ -602,7 +693,7 @@ namespace base {
     }
 
     void Avalanche::apply(Board& board, Player& player) {
-        auto pairs = getPairs(board); 
+        auto pairs = getPairs(board);
         if (pairs.empty()) {
             Logger::log(Level::WARNING, "You can't use this card rn");
             return;
@@ -622,39 +713,50 @@ namespace base {
         };
 
         std::cout << "Enter the direction you want to move the stacks (Left or Right for rows / Up or Down for columns) and the pair of coords\n";
+
         std::string direction;
         std::cin >> direction;
         std::pair<Coord, Coord>pair;
+
         std::cin >> pair.first.first >> pair.first.second >> pair.second.first >> pair.second.second;
-        auto choice = std::pair{ stringToShift(direction),pair }; 
+
+        auto choice = std::pair{ stringToShift(direction),pair };
         auto it = std::find(choices.begin(), choices.end(), choice);
+
         if (it != choices.end()) {
             const auto& [type, selectedPair] = *it;
             const auto& delta = directionDeltas.at(type);
-
+            std::vector<std::pair<Coord, Coord>>stacks;
             Coord newCoord1, newCoord2;
+
             if (type == ShiftDirection::Down || type == ShiftDirection::Up) {
                 newCoord1 = { selectedPair.second.first, selectedPair.second.second + delta.second };
                 newCoord2 = { selectedPair.first.first, selectedPair.first.second + delta.second };
 
-                if (board.canMoveTwoStacks(selectedPair.second, newCoord1, selectedPair.first, newCoord2)) {
-                    board.moveTwoStacks(selectedPair.second, newCoord1, selectedPair.first, newCoord2);
+                stacks.push_back({ selectedPair.second, newCoord1 });
+                stacks.push_back({ selectedPair.first, newCoord2 });
+
+                if (board.isValidMoveStacks(stacks)) {
+                    board.moveStacks(stacks);
                     Logger::log(Level::INFO, "Move applied");
                 }
                 else {
-                    Logger::log(Level::WARNING, "Invalid choice!"); 
+                    Logger::log(Level::WARNING, "Invalid choice!");
                 }
             }
             else {
                 newCoord1 = { selectedPair.first.first + delta.first, selectedPair.first.second };
                 newCoord2 = { selectedPair.second.first + delta.first, selectedPair.second.second };
 
-                if (board.canMoveTwoStacks(selectedPair.first, newCoord1, selectedPair.second, newCoord2)) {
-                    board.moveTwoStacks(selectedPair.first, newCoord1, selectedPair.second, newCoord2);
-                    Logger::log(Level::INFO, "Move applied"); 
+                stacks.push_back({ selectedPair.first, newCoord1 });
+                stacks.push_back({ selectedPair.second, newCoord2 });
+
+                if (board.isValidMoveStacks(stacks)) {
+                    board.moveStacks(stacks);
+                    Logger::log(Level::INFO, "Move applied");
                 }
                 else {
-                    Logger::log(Level::WARNING, "Invalid choice!\n"); 
+                    Logger::log(Level::WARNING, "Invalid choice!\n");
                 }
             }
         }
@@ -663,7 +765,7 @@ namespace base {
         }
         Logger::log(Level::INFO, "Avalanche card used");
     }
-
+   
 
 
     ////------------------------------------------ Rock -------------------------------------------
