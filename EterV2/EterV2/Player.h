@@ -37,6 +37,7 @@ namespace base {
         void addUsedCard(CombatCard&&);
 
         void renderCards() const;
+        void renderUsedCards() const;
 
     private:
         void _initializeCards(GameSizeType);

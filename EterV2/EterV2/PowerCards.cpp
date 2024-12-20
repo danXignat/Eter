@@ -109,6 +109,25 @@ namespace base {
     }
 
     void Ash::apply(Board& board, Player& player) {
+        if (player.hasUsedCards()) {
+            player.renderUsedCards();
+            std::cout << "Enter the coordinates and the card you want to play:";
+            Coord coord;
+            std::cin >> coord.first >> coord.second;
+
+            char card_type;
+            std::cin >> card_type;
+            auto card = player.getUsedCard(charToCombatCard(card_type));
+            if (board.isValidPlaceCard(coord, card)) {
+                board.appendMove(coord, std::move(card));
+            }
+            Logger::log(Level::INFO, "Ash power card was used");
+
+        }
+        else {
+            Logger::log(Level::WARNING, "You don't have any removed card");
+
+        }
     }
 
 
@@ -217,6 +236,7 @@ namespace base {
                 player.addCard(std::move(card));
                 board.removeTopCardAt(coord);
                 Logger::log(Level::INFO, "Squall ability: Returned a visible card to the opponent's hand.");
+                break;
             }
         }
     }
@@ -432,8 +452,25 @@ namespace base {
     }
 
     void Wave::apply(Board& board, Player& player) {
+        std::vector<Coord>coordStack = validStacks(board);
+        if (coordStack.empty()) {
+            Logger::log(Level::WARNING, "No stacks on the board");
+        }
+        else {
+            for (const auto& coord : coordStack) {
+            }
+            
+        }
     }
-
+        std::vector<Coord>Wave::validStacks(const Board & board) const {
+        std::vector<Coord>coordStack;
+        for (const auto& [coord, stack] : board) {
+            if (stack.size() > 1) {
+                coordStack.emplace_back(coord);
+            }
+        }
+        return coordStack;
+    }
     ////------------------------------------------ Whirlpool -------------------------------------------
     Whirlpool::Whirlpool() {
         m_ability = PowerCardType::Whirlpool;
@@ -499,6 +536,55 @@ namespace base {
     }
 
     void Crumble::apply(Board& board, Player& player) {
+        std::vector<Coord>validCards = CoordCardType(board, player);
+        if (validCards.empty()) {
+            Logger::log(Level::WARNING, "No valid cards to apply the power card");
+            return;
+        }
+        Coord new_coord;
+        std::cout << "Enter the coordinates of the card:";
+        std::cin >> new_coord.first >> new_coord.second;
+        if (std::find(validCards.begin(), validCards.end(), new_coord) == validCards.end()) {
+            Logger::log(Level::WARNING, "No card at there coordinates");
+        }
+        auto top_card = board.getTopCard(new_coord);
+        CombatCard& card = top_card->get();
+        CombatCardType currentType = card.getType();
+        CombatCardType newType = currentType;
+        switch (currentType) {
+        case CombatCardType::TWO:
+            newType = CombatCardType::ONE;
+            break;
+        case CombatCardType::THREE:
+            newType = CombatCardType::TWO;
+            break;
+        case CombatCardType::FOUR:
+            newType = CombatCardType::THREE;
+            break;
+        default:
+            Logger::log(Level::WARNING, "Card cannot be incremented beyond FOUR");
+            return;
+        }
+        CombatCard new_card(newType, card.getColor());
+        board.popTopCardAt(new_coord);
+        board.appendMove(new_coord, std::move(new_card));
+    }
+
+    std::vector<Coord> Crumble::CoordCardType(Board& board, const Player& player) const {
+        std::vector<Coord> coordCards;
+
+        for (const auto& [coord, stack] : board) {
+            if (stack.empty()) continue;
+            const CombatCard& card = stack.back();
+            if (!card.isIllusion() &&
+                card.getColor() == player.getColor() &&
+                (card.getType() == CombatCardType::TWO ||
+                    card.getType() == CombatCardType::THREE ||
+                    card.getType() == CombatCardType::FOUR)) {
+                coordCards.emplace_back(coord);
+            }
+        }
+        return coordCards;
     }
 
 

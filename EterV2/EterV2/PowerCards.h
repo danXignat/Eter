@@ -137,7 +137,7 @@ namespace base {
 		Wave();
 
 		void apply(Board& board, Player& player) override;
-		std::vector<Coord>validStacks(Board& board) const;
+		std::vector<Coord>validStacks(const Board& board) const;
 
 	};
 
@@ -187,6 +187,7 @@ namespace base {
 		Crumble();
 
 		void apply(Board& board, Player& player) override;
+		std::vector<Coord>CoordCardType(Board& board, const Player& player) const;
 
 	};
 

@@ -22,8 +22,8 @@ namespace base {
 		/*type_p1 = static_cast<PowerCardType>(choices[0]);
 		type_p2 = static_cast<PowerCardType>(choices[1]);*/
 
-		type_card1 = PowerCardType::Avalanche;
-		type_card2 = PowerCardType::Avalanche;
+		type_card1 = PowerCardType::Ash;
+		type_card2 = PowerCardType::Squall;
 
 		card1 = _factory(type_card1);
 		card2 = _factory(type_card2);

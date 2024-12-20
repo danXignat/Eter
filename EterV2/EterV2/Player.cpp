@@ -150,6 +150,27 @@ namespace base {
         }
     }
 
+    void Player::renderUsedCards() const {
+        if (m_color == color::ColorType::RED) {
+            utils::printAtCoordinate("Player RED used cards: ", 1, 18);
+
+            int i = 0;
+            for (const auto& [type, card] : m_used_cards) {
+                utils::printAtCoordinate(card, 1 + i, 19);
+                i += 2;
+            }
+        }
+        else {
+            utils::printAtCoordinate("Player BLUE used cards: ", 1, 20);
+
+            int i = 0;
+            for (const auto& [type, card] : m_used_cards) {
+                utils::printAtCoordinate(card, 1 + i, 21);
+                i += 2;
+            }
+        }
+    }
+
     const std::unordered_map<GameSizeType, std::unordered_map<CombatCardType, uint16_t>> Player::card_configs{
     {
         GameSizeType::SMALL, {
