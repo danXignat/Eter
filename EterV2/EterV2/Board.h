@@ -33,7 +33,9 @@ namespace base {
 		bool hasStack(const Coord&) const;
 		bool isFixed() const;
 		bool isCardOfColorAt(color::ColorType, const Coord&) const;
-
+		bool isFixedColumn(uint16_t x)const;
+		bool isFixedRow(uint16_t y)const;
+		
 		uint16_t getSize() const;
 		Coord getLeftCorner() const;
 		std::pair<Coord, Coord> getBoudingRect() const;
@@ -42,13 +44,19 @@ namespace base {
 		std::unordered_map<Coord, Stack, CoordFunctor>& getCombatCards();
 		std::optional<CombatCardRef> getTopCard(const Coord& coord);
 		const std::vector<CombatCard>& operator[](const Coord& coord);
-
+		std::unordered_set<uint16_t> getFixedRows() const;
+		std::unordered_set<uint16_t> getFixedColumns() const; 
+		Coord getRightmostOnRow(uint16_t y) const;
+		Coord getLeftmostOnRow(uint16_t y) const;
+		Coord getTopmostOnColumn(uint16_t x) const;
+		Coord getBottommostOnColumn(uint16_t x) const;
+		
 		void appendMove(const Coord&, CombatCard&&);
 		void moveRow(uint16_t from_y, uint16_t to_y);
 		void moveColumn(uint16_t from_x, uint16_t to_x);
 		void moveStack(const Coord& from_coord, const Coord& to_coord);
 		void swapStacks(const Coord& from_coord, const Coord& to_coord);
-		void moveTwoStacks(const Coord& from1, const Coord& to1, const Coord& from2, const Coord& to2);
+		void moveStacks(const std::vector<std::pair<Coord, Coord>>& moves);
 
 		CombatCard&& popTopCardAt(const Coord& coord);
 		CombatCard&& popCardFromStackAt(const Coord& coord, const CombatCard& card_to_remove);
@@ -65,8 +73,8 @@ namespace base {
 		bool isValidPlaceCard(const Coord&, const CombatCard&);
 		bool isValidRemoveStack(const Coord&) const;
 		bool isValidMoveStack(const Coord&, const Coord&) const;
-		bool canMoveTwoStacks(const Coord& from1, const Coord& to1, const Coord& from2, const Coord& to2) const; 
-	
+		bool isValidMoveStacks(const std::vector<std::pair<Coord, Coord>>& moves) const;
+		
 		void render() const;
 		void sideViewRender();
 

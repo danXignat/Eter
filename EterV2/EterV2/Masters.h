@@ -33,7 +33,7 @@ namespace base {
 
 		bool apply(Board& board, Player& player) override;
 		bool validPosition(const Coord& coord, Board& board, const Player& player)const;
-		std::vector<Coord> getChoices(Board& board, const Player& player);
+		std::vector<Coord> getChoices(Board& board, const Player& player) const;
 	};
 
 	class MasterOfEarthBack : public MageCard {

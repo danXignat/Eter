@@ -26,7 +26,7 @@ namespace base {
         }
 
         std::cout << "Available choices:\n";
-        for (auto [x, y] : choices) {
+        for (auto& [x, y] : choices) {
             std::cout << std::format("({}, {})", x, y);
         }
         std::cout << '\n';
@@ -176,7 +176,7 @@ namespace base {
         return false;
     }
 
-    std::vector<Coord> MasterOfEarthFront::getChoices(Board& board, const Player& player) {
+    std::vector<Coord> MasterOfEarthFront::getChoices(Board& board, const Player& player) const  {
 
         std::vector<Coord>choices;
         for (const auto& iterator : board) {
@@ -227,7 +227,7 @@ namespace base {
     }
 
     bool MasterOfEarthBack::apply(Board& board, Player& player) {
-        auto choices = board.availableSpaces();
+        auto& choices = board.availableSpaces();
         if (!choices.empty()) {
             std::cout << "Your choices are: ";
             for (const auto& choice : choices) {
@@ -311,7 +311,7 @@ namespace base {
     }
 
     bool MasterOfAirBack::apply(Board& board, Player& player) {
-        auto choices = board.availableSpaces();
+        auto& choices = board.availableSpaces();
         if (!choices.empty()) {
             std::cout << "Your choices for additional Eter card are: \n";
             for (const auto& choice : choices) {
@@ -437,7 +437,7 @@ namespace base {
         return borders.empty() ? std::nullopt : std::make_optional(borders);
     }
 
-    std::string_view borderToString(BorderType border) {
+   static std::string_view borderToString(BorderType border) {
 
         switch (border) {
         case BorderType::Top:
@@ -476,7 +476,7 @@ namespace base {
         if (selectedBorderIndex < 0 || selectedBorderIndex >= borders->size()) {
             std::cout << "Invalid index!";
             Logger::log(Level::WARNING, "Invalid index for border");
-            return { -1, '\0' };
+            return { 0, '/0' };
 
         }
         auto selectedBorderIt = std::next(borders->begin(), selectedBorderIndex);
@@ -484,10 +484,9 @@ namespace base {
 
         char direction = (selectedBorderIt->first == BorderType::Left || selectedBorderIt->first == BorderType::Right) ? 'c' : 'r';
         uint16_t from_move = (direction == 'r') ? selectedBorder.front().second : selectedBorder.front().first;
-        uint16_t to_move;
-
+        
         auto [corner1, corner2] = board.getBoudingRect();
-        std::cout << "Valid destinations for the " << (direction == 'r' ? "row" : "column") << " are:\n";
+        std::cout << "Valid moves for the " << (direction == 'r' ? "rowBorder" : "columnBorder") << " are:\n";
         if (direction == 'r') {
             if (selectedBorderIt->first == BorderType::Top) {
                 std::cout << "Move to the bottom border:" << corner2.second + 1 << "\n";
@@ -514,22 +513,30 @@ namespace base {
             return false;
         }
         auto result = selectBorders(borders, board);
-        if (result.first != -1) {
+        if (result.first != 0) {
             int to_move;
             std::cout << "Enter the destination: ";
             std::cin >> to_move;
-
+            auto [corner1, corner2] = board.getBoudingRect(); 
             if (result.second == 'r') {
-                board.moveRow(result.first, to_move);
+                if (to_move != corner2.second + 1 && to_move != corner1.second - 1) {
+                    Logger::log(Level::WARNING, "Invalid choice");
+                    return false;
+                }
+                board.moveRow(result.first, to_move); 
+                  
             }
-            else {
-                board.moveColumn(result.first, to_move);
+            else { 
+                if (to_move != corner2.first + 2 && to_move != corner1.first - 2) {
+                    Logger::log(Level::WARNING, "Invalid choice");  
+                    return false;
+                }
+                board.moveColumn(result.first, to_move); 
             }
-
             Logger::log(Level::INFO, "Mage Water BoatRowOrColumn ability card used");
         }
         else {
-            Logger::log(Level::INFO, "Wrong choice");
+            Logger::log(Level::WARNING, "Wrong choice");
             return false;
         }
         return true;

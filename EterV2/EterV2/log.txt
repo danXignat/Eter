@@ -1,10 +1,12 @@
 [INFO] card(1) appended at (10, 5)
 [INFO] succesful action
-[INFO] card(1) appended at (10, 6)
+[INFO] card(2) appended at (12, 5)
 [INFO] succesful action
-[INFO] card(2) appended at (10, 6)
+[INFO] card(3) appended at (14, 4)
 [INFO] succesful action
-[WARNING] No visible card at these coordinates
-[INFO] Squall ability: Returned a visible card to the opponent's hand.
+[INFO] Stack moved from (12, 5) to (14, 5)
+[INFO] Stack moved from (10, 5) to (12, 5)
+[INFO] Move applied
+[INFO] Avalanche card used
 [INFO] succesful action
 [ERROR] No arguments

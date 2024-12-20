@@ -77,26 +77,24 @@ namespace base {
 			from_coord.first, from_coord.second, to_coord.first, to_coord.second);
 	}
 
-	
-
-	void Board::moveTwoStacks(const Coord& from1, const Coord& to1, const Coord& from2, const Coord& to2) {
-		if (!canMoveTwoStacks(from1, to1, from2, to2)) {
+	void Board::moveStacks(const std::vector<std::pair<Coord, Coord>>& moves) {
+		if (!isValidMoveStacks(moves)) {
 			throw std::runtime_error("Invalid move");
 		}
-		m_combat_cards[to1] = std::move(m_combat_cards[from1]);
-		m_combat_cards.erase(from1);
-
-		m_combat_cards[to2] = std::move(m_combat_cards[from2]);
-		m_combat_cards.erase(from2);
+		for (const auto& [from, to] : moves) {
+			m_combat_cards[to] = std::move(m_combat_cards[from]);
+			m_combat_cards.erase(from);
+		}
 
 		_reinitialise();
 
-		Logger::log(Level::INFO, "Two stacks moved from ({}, {}) to ({}, {}) and from ({}, {}) to ({}, {})",
-			from1.first, from1.second, to1.first, to1.second,
-			from2.first, from2.second, to2.first, to2.second);
+		for (const auto& [from, to] : moves) {
+			Logger::log(Level::INFO, "Stack moved from ({}, {}) to ({}, {})",
+				from.first, from.second, to.first, to.second);
+		}
 	}
 
-	void Board::moveRow(uint16_t from_y, uint16_t to_y) {
+	/*void Board::moveRow(uint16_t from_y, uint16_t to_y) {
 		if (from_y == to_y) {
 			throw std::runtime_error("from and to are the same");
 		}
@@ -124,8 +122,9 @@ namespace base {
 		_reinitialise();
 
 		Logger::log(Level::INFO, "Moved column {} to {}", from_y, to_y);
-	}
-	/*void Board::moveRow(uint16_t y, uint16_t newY) {
+	}*/
+
+	void Board::moveRow(uint16_t y, uint16_t newY) {
 		if (y == newY) {
 			Logger::log(Level::WARNING, "Source and destination rows are the same.");
 			return;
@@ -146,10 +145,32 @@ namespace base {
 		}
 		_reinitialise();
 		Logger::log(Level::INFO, "Moved row {} to {}", y, newY);
-	}*/
+	}
 
+	void Board::moveColumn(uint16_t x, uint16_t newX) {
+		if (x == newX) {
+			Logger::log(Level::WARNING, "Source and destination columns are the same.");
+			return;
+		}
+		std::vector<std::pair<Coord, std::vector<CombatCard>>> columnData;
+		for (auto it = m_combat_cards.begin(); it != m_combat_cards.end(); ) {
+			if (it->first.first == x) {
+				columnData.emplace_back(it->first, std::move(it->second));
+				it = m_combat_cards.erase(it);
+			}
+			else {
+				++it;
+			}
+		}
+		for (auto& pair : columnData) {
+			Coord newCoord = { newX, pair.first.second };
+			m_combat_cards[newCoord] = std::move(pair.second);
+		}
+		_reinitialise();
+		Logger::log(Level::INFO, "Moved column {} to {}", x, newX);
+	}
 
-	void Board::moveColumn(uint16_t from_x, uint16_t to_x) {
+	/*void Board::moveColumn(uint16_t from_x, uint16_t to_x) {
 		if (from_x == to_x) {
 			throw std::runtime_error("froma nd to are the same");
 		}
@@ -177,10 +198,7 @@ namespace base {
 		_reinitialise();
 
 		Logger::log(Level::INFO, "Moved column {} to {}", from_x, to_x);
-	}
-
-
-
+	}*/
 
 	void Board::swapStacks(const Coord& from_coord, const Coord& to_coord) {
 		auto from_it = m_combat_cards.find(from_coord);
@@ -340,8 +358,8 @@ namespace base {
 			_addUsedCard(std::move(stack.back()));
 		}
 	}
-
-	void Board::removeTopCardAt(const Coord& coord) {
+	
+	void Board::removeTopCardAt(const Coord& coord) {	
 		CombatCard card = this->popTopCardAt(coord);
 
 		_addUsedCard(std::move(card));
@@ -479,30 +497,34 @@ namespace base {
 		return visited.size() == board_coords.size(); // conex
 	}
 
-	bool Board::canMoveTwoStacks(const Coord& from1, const Coord& to1, const Coord& from2, const Coord& to2) const {
-		if (!m_combat_cards.contains(from1) || !m_combat_cards.contains(from2)) {
-			Logger::log(Level::WARNING, "One or both stacks do not exist at the source coordinates.");
-			return false;
-		}
-		if (m_combat_cards.contains(to1)) {
-			Logger::log(Level::WARNING, "One or both destinations are not empty.");
-			return false;
-		}
-		if (!m_available_spaces.contains(to1)) {
-			Logger::log(Level::WARNING, "One or both destinations are invalid.");
-			return false;
-		}
+	bool Board::isValidMoveStacks(const std::vector<std::pair<Coord, Coord>>& moves) const {
+
 		std::unordered_set<Coord, CoordFunctor> new_config{
 			std::ranges::begin(m_combat_cards | std::views::keys),
 			std::ranges::end(m_combat_cards | std::views::keys)
 		};
-		new_config.erase(from1);
-		new_config.erase(from2);
-		new_config.insert(to1);
-		new_config.insert(to2);
 
+		bool is_first_stack = true;
+		for (const auto& [from, to] : moves) {
+			if (!new_config.contains(from)) {
+				Logger::log(Level::WARNING, "Stack does not exist at source coordinate ({}, {}).", from.first, from.second);
+				return false;
+			}
+			if (new_config.contains(to)) {
+				Logger::log(Level::WARNING, "Destination coordinate ({}, {}) is not empty.", to.first, to.second);
+				return false;
+			}
+			if (is_first_stack && !m_available_spaces.contains(to)) {
+				Logger::log(Level::WARNING, "Destination coordinate ({}, {}) is invalid.", to.first, to.second);
+				return false;
+			}
+			new_config.erase(from);
+			new_config.insert(to);
+			is_first_stack = false;
+		}
 		return _isConex(new_config);
 	}
+
 
 	///------------------------------Setter Getter------------------------------------
 
@@ -539,6 +561,113 @@ namespace base {
 
 		return false;
 	}
+
+	bool Board::isFixedColumn(uint16_t x) const
+	{
+		
+		uint16_t count_elements = 0;
+		for (const auto& [coord, stack] : m_combat_cards) {
+			if (coord.first == x) {
+				count_elements++;
+			}
+			
+		}
+		return count_elements==m_size;
+	}
+
+	bool Board::isFixedRow(uint16_t y) const
+	{
+	
+		uint16_t count_elements = 0;
+		for (const auto& [coord, stack] : m_combat_cards) {
+			if (coord.second == y) {
+				count_elements++;
+			}
+		}
+		return count_elements == m_size;
+	}
+
+	std::unordered_set<uint16_t> Board::getFixedRows()const {
+
+		std::unordered_set<uint16_t> fixed_rows;
+		std::unordered_set<uint16_t> rows; 
+
+		for (const auto& [coord, stack] : m_combat_cards) {
+			rows.insert(coord.second); 
+		}
+		for (const auto& y : rows) {
+			if (isFixedRow(y)) {
+				fixed_rows.insert(y);
+			}
+		}
+		return fixed_rows;
+
+	 }
+
+
+	std::unordered_set<uint16_t> Board::getFixedColumns() const {
+
+		std::unordered_set<uint16_t> fixed_columns;
+		std::unordered_set<uint16_t> columns; 
+
+		for (const auto& [coord, stack] : m_combat_cards) {
+			columns.insert(coord.first); 
+		}
+		for (const auto& x : columns) {
+			if (isFixedColumn(x)) {
+				fixed_columns.insert(x);
+			}
+		}
+		return  fixed_columns;
+	}
+
+	Coord Board::getRightmostOnRow(uint16_t y) const {
+		Coord rightmost = { 0, y };
+
+		for (const auto& [coord, stack] : m_combat_cards) {
+			if (coord.second == y && coord.first > rightmost.first) {
+				rightmost = coord;
+			}
+		}
+
+		return rightmost;
+	}
+	Coord Board::getLeftmostOnRow(uint16_t y) const {
+		Coord leftmost = { std::numeric_limits<uint16_t>::max(), y };
+
+		for (const auto& [coord, stack] : m_combat_cards) {
+			if (coord.second == y && coord.first < leftmost.first) {
+				leftmost = coord;
+			}
+		}
+
+		return leftmost;
+	}
+	Coord Board::getTopmostOnColumn(uint16_t x) const {
+		Coord topmost = { x, std::numeric_limits<uint16_t>::max() };
+
+		for (const auto& [coord, stack] : m_combat_cards) {
+			if (coord.first == x && coord.second < topmost.second) {
+				topmost = coord;
+			}
+		}
+
+		return topmost;
+	}
+	Coord Board::getBottommostOnColumn(uint16_t x) const {
+		Coord bottommost = { x, 0 };
+
+		for (const auto& [coord, stack] : m_combat_cards) {
+			if (coord.first == x && coord.second > bottommost.second) {
+				bottommost = coord;
+			}
+		}
+
+		return bottommost;
+	}
+
+
+
 
 	uint16_t Board::getSize() const {
 		return m_size;

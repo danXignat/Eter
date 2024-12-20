@@ -11,8 +11,21 @@
 #include "logger.h"
 #include<ranges>
 #include <algorithm>
+#include<map>
 
 namespace base {
+	enum class ShiftDirection {
+		Right,
+		Left,
+		Up,
+		Down,
+		Unknown
+	};
+	enum class Orientation {
+		Row,
+		Column,
+		Unknown
+	};
 
 	class ControllerExplosion :public PowerCard {
 	public:
@@ -84,8 +97,11 @@ namespace base {
 	class Hurricane :public PowerCard {
 	public:
 		Hurricane();
+		
 
 		void apply(Board& board, Player& player) override;
+		std::unordered_map<Orientation, std::vector<uint16_t>> getOptions(Board& board);  
+		std::tuple<Orientation, uint16_t, ShiftDirection>  input(Board&board);
 
 	};
 
@@ -198,17 +214,7 @@ namespace base {
 		void apply(Board& board, Player& player) override;
 
 	};
-	enum class ShiftDirection {
-		Right,
-		Left,
-		Up,
-		Down,
-		Unknown
-	};
-	enum class Orientation {
-		Row,
-		Column
-	};
+	
 
 	class Avalanche :public PowerCard {
 	public:
