@@ -4,6 +4,20 @@
 #include<unordered_map>
 #include<string_view>
 namespace base {
+
+	enum class ShiftDirection {
+		Right,
+		Left,
+		Up,
+		Down,
+		Unknown
+	};
+	enum class Orientation {
+		Row,
+		Column,
+		Unknown
+	};
+
 	 enum class PowerCardType : uint8_t {
 		ControllerExplosion,
 		Destruction,
@@ -92,5 +106,59 @@ namespace base {
 
  inline std::string_view abilityToString(PowerCardType ability) {
 	 return mapPowerTypeAbilities.at(ability);
+ }
+
+ static std::string_view ShiftToString(ShiftDirection direction) {
+	 switch (direction) {
+	 case ShiftDirection::Right:
+		 return "Right";
+	 case ShiftDirection::Left:
+		 return "Left";
+	 case ShiftDirection::Up:
+		 return "Up";
+	 case ShiftDirection::Down:
+		 return "Down";
+	 default:
+		 return "Unknown";
+	 }
+ }
+ static ShiftDirection stringToShift(std::string_view direction_string) {
+	 if (direction_string == "Right") {
+		 return ShiftDirection::Right;
+	 }
+	 else if (direction_string == "Left") {
+		 return ShiftDirection::Left;
+	 }
+	 else if (direction_string == "Up") {
+		 return ShiftDirection::Up;
+	 }
+	 else if (direction_string == "Down") {
+		 return ShiftDirection::Down;
+	 }
+	 else {
+		 return ShiftDirection::Unknown;
+	 }
+ }
+ static std::string_view OrientationToString(Orientation type) {
+	 switch (type) {
+	 case Orientation::Column:
+		 return "Column";
+	 case Orientation::Row:
+		 return "Row";
+	 default:
+		 return "Unknown";
+	 }
+ }
+
+ static Orientation stringToOrientation(std::string_view orientation) {
+	 if (orientation == "Row") {
+		 return Orientation::Row;
+	 }
+	 if (orientation == "Column") {
+		 return Orientation::Column;
+	 }
+	 else {
+		 return Orientation::Unknown;
+	 }
  }
 }

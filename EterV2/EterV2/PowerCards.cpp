@@ -4,60 +4,6 @@ using namespace logger;
 
 namespace base {
 
-    static std::string_view ShiftToString(ShiftDirection direction) {
-        switch (direction) {
-        case ShiftDirection::Right:
-            return "Right";
-        case ShiftDirection::Left:
-            return "Left";
-        case ShiftDirection::Up:
-            return "Up";
-        case ShiftDirection::Down:
-            return "Down";
-        default:
-            return "Unknown";
-        }
-    }
-    static ShiftDirection stringToShift(std::string_view direction_string) {
-        if (direction_string == "Right") {
-            return ShiftDirection::Right;
-        }
-        else if (direction_string == "Left") {
-            return ShiftDirection::Left;
-        }
-        else if (direction_string == "Up") {
-            return ShiftDirection::Up;
-        }
-        else if (direction_string == "Down") {
-            return ShiftDirection::Down;
-        }
-        else {
-            return ShiftDirection::Unknown;
-        }
-    }
-    static std::string_view OrientationToString(Orientation type) {
-        switch (type) {
-        case Orientation::Column:
-            return "Column";
-        case Orientation::Row:
-            return "Row";
-        default:
-            return "Unknown";
-        }
-    }
-
-    static Orientation stringToOrientation(std::string_view orientation) {
-        if (orientation == "Row") {
-            return Orientation::Row;
-        }
-        if (orientation == "Column") {
-            return Orientation::Column;
-        }
-        else {
-            return Orientation::Unknown;
-        }
-    }
-
     ////------------------------------------------ ControllerExplosion -------------------------------------------
     ControllerExplosion::ControllerExplosion() {
         m_ability = PowerCardType::ControllerExplosion;
@@ -368,6 +314,7 @@ namespace base {
 
         auto options = getOptions(board);
         if (options.empty()){
+            Logger::log(Level::WARNING, "You can't use this mage right now"); 
             return { Orientation::Unknown,0,ShiftDirection::Unknown };
         }
         std::cout << "Enter Row/Column and the index you want to shift\n";
@@ -377,6 +324,7 @@ namespace base {
         auto orient = stringToOrientation(orientation);
         auto it = options.find(orient);
         if (it == options.end() || std::find(it->second.begin(), it->second.end(), index) == it->second.end()) {
+            Logger::log(Level::WARNING, "Wrong choice");
             return { Orientation::Unknown,0,ShiftDirection::Unknown };
         }
 
@@ -392,6 +340,7 @@ namespace base {
 
         auto dirIt = validDirections.find(orient);
         if (std::find(dirIt->second.begin(), dirIt->second.end(), shift_dir) == dirIt->second.end()) {
+            Logger::log(Level::WARNING, "Wrong choice");
             return { Orientation::Unknown,0,ShiftDirection::Unknown };
         }
 
@@ -400,7 +349,7 @@ namespace base {
     }
 
 
-    void Hurricane::apply(Board& board, Player& player) {    //not finished 
+    void Hurricane::apply(Board& board, Player& player) {  
 
         auto choice = input(board);
         auto orient = std::get<0>(choice);
@@ -409,14 +358,35 @@ namespace base {
         }
         auto index = std::get<1>(choice);
         auto shift_dir = std::get<2>(choice);
+        std::vector<std::pair<Coord, Coord>>to_shift;
         if (orient == Orientation::Row) {
+           
             if (shift_dir == ShiftDirection::Right) {
-                Coord coord = board.getRightmostOnRow(index);
+                Coord coord = board.getRightMostOnRow(index);
                 board.removeStack(coord);
+                auto vect_coords = board.getCoordsOnRow(index);
+                board.shiftRowToRight(vect_coords);
             }
             else {
-                Coord coord = board.getLeftmostOnRow(index);
+                Coord coord = board.getLeftMostOnRow(index);
                 board.removeStack(coord);
+                auto vect_coords = board.getCoordsOnRow(index);
+                board.shiftRowToLeft(vect_coords);
+            }
+        }
+        if (orient == Orientation::Column) {
+           
+            if (shift_dir == ShiftDirection::Up) {
+                Coord coord = board.getTopMostOnColumn(index);
+                board.removeStack(coord);
+                auto vect_coord = board.getCoordsOnColumn(index);
+                board.shiftColumnUp(vect_coord);
+            }
+            else {
+                Coord coord = board.getBottomMostOnColumn(index);
+                board.removeStack(coord);
+                auto vect_coord = board.getCoordsOnColumn(index);
+                board.shiftColumnDown(vect_coord);
             }
         }
     }

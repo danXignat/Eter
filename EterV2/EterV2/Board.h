@@ -33,8 +33,8 @@ namespace base {
 		bool hasStack(const Coord&) const;
 		bool isFixed() const;
 		bool isCardOfColorAt(color::ColorType, const Coord&) const;
-		bool isFixedColumn(uint16_t x)const;
-		bool isFixedRow(uint16_t y)const;
+		bool isFixedColumn(int16_t x)const;
+		bool isFixedRow(int16_t y)const;
 		
 		uint16_t getSize() const;
 		Coord getLeftCorner() const;
@@ -44,12 +44,14 @@ namespace base {
 		std::unordered_map<Coord, Stack, CoordFunctor>& getCombatCards();
 		std::optional<CombatCardRef> getTopCard(const Coord& coord);
 		const std::vector<CombatCard>& operator[](const Coord& coord);
-		std::unordered_set<uint16_t> getFixedRows() const;
-		std::unordered_set<uint16_t> getFixedColumns() const; 
-		Coord getRightmostOnRow(uint16_t y) const;
-		Coord getLeftmostOnRow(uint16_t y) const;
-		Coord getTopmostOnColumn(uint16_t x) const;
-		Coord getBottommostOnColumn(uint16_t x) const;
+		std::unordered_set<int16_t> getFixedRows() const;
+		std::unordered_set<int16_t> getFixedColumns() const; 
+		Coord getRightMostOnRow(int16_t y) const;
+		Coord getLeftMostOnRow(int16_t y) const;
+		Coord getTopMostOnColumn(int16_t x) const;
+		Coord getBottomMostOnColumn(int16_t x) const;
+		std::vector<Coord> getCoordsOnRow(int16_t row_index) const;
+		std::vector<Coord> getCoordsOnColumn(int16_t col_index) const;
 		
 		void appendMove(const Coord&, CombatCard&&);
 		void moveRow(uint16_t from_y, uint16_t to_y);
@@ -57,10 +59,14 @@ namespace base {
 		void moveStack(const Coord& from_coord, const Coord& to_coord);
 		void swapStacks(const Coord& from_coord, const Coord& to_coord);
 		void moveStacks(const std::vector<std::pair<Coord, Coord>>& moves);
-
+		void shiftRowToRight(const std::vector<Coord>& row_coords);
+		void shiftRowToLeft(const std::vector<Coord>& row_coords);
+		void shiftColumnDown(const std::vector<Coord>& col_coords);
+		void shiftColumnUp(const std::vector<Coord>& col_coords);
+		 
 		CombatCard&& popTopCardAt(const Coord& coord);
 		CombatCard&& popCardFromStackAt(const Coord& coord, const CombatCard& card_to_remove);
-		Stack&& popStack(const Coord& coord);
+		Stack popStack(const Coord& coord);
 		std::vector<Stack> popRow(uint16_t y);
 		std::vector<Stack> popColumn(uint16_t x);
 

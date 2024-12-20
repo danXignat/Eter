@@ -14,18 +14,6 @@
 #include<map>
 
 namespace base {
-	enum class ShiftDirection {
-		Right,
-		Left,
-		Up,
-		Down,
-		Unknown
-	};
-	enum class Orientation {
-		Row,
-		Column,
-		Unknown
-	};
 
 	class ControllerExplosion :public PowerCard {
 	public:

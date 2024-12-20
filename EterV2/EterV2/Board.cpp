@@ -93,6 +93,50 @@ namespace base {
 				from.first, from.second, to.first, to.second);
 		}
 	}
+	void Board::shiftRowToRight(const std::vector<Coord>& row_coords) {
+		std::vector<std::pair<Coord, Coord>> moves;
+
+		for (auto it = row_coords.rbegin(); it != row_coords.rend(); ++it) {
+			Coord from = *it;
+			Coord to = { from.first+2, from.second };
+			moves.emplace_back(from, to);
+		}
+
+		moveStacks(moves);
+	}
+	void Board::shiftRowToLeft(const std::vector<Coord>& row_coords) {
+		std::vector<std::pair<Coord, Coord>> moves;
+
+		for (auto it = row_coords.begin(); it != row_coords.end(); ++it) {
+			Coord from = *it;
+			Coord to = { from.first - 2, from.second };
+			moves.emplace_back(from, to);
+		}
+		moveStacks(moves);
+	}
+	void Board::shiftColumnDown(const std::vector<Coord>& col_coords) {
+		std::vector<std::pair<Coord, Coord>> moves;
+
+		for (auto it = col_coords.rbegin(); it != col_coords.rend(); ++it) {
+			Coord from = *it;
+			Coord to = { from.first , from.second+1 };
+			moves.emplace_back(from, to);
+		}
+		moveStacks(moves);
+	}
+	void Board::shiftColumnUp(const std::vector<Coord>& col_coords) {
+		std::vector<std::pair<Coord, Coord>> moves;
+
+		for (auto it = col_coords.begin(); it != col_coords.end(); ++it) {
+			Coord from = *it;
+			Coord to = { from.first, from.second-1 };
+			moves.emplace_back(from, to);
+		}
+		moveStacks(moves);
+	}
+
+
+
 
 	/*void Board::moveRow(uint16_t from_y, uint16_t to_y) {
 		if (from_y == to_y) {
@@ -278,12 +322,31 @@ namespace base {
 		return std::move(card);
 	}
 
-	Board::Stack&& Board::popStack(const Coord& coord) {
-		if (m_combat_cards.contains(coord) == false) {
+	//Board::Stack&& Board::popStack(const Coord& coord) {
+	//	if (m_combat_cards.contains(coord) == false) {
+	//		throw std::runtime_error("not a valid pos");
+	//	}
+
+	//	if (this->isValidRemoveStack(coord) == false) {
+	//		throw std::runtime_error("not conex anymore");
+	//	}
+
+	//	Stack stack = std::move(m_combat_cards[coord]);
+	//	m_combat_cards.erase(coord);
+
+	//	_reinitialise();
+
+	//	Logger::log(Level::INFO, "stack removed at ({}, {})", coord.first, coord.second);
+
+	//	return std::move(stack);
+	//}
+
+	Board::Stack Board::popStack(const Coord& coord) {
+		if (!m_combat_cards.contains(coord)) {
 			throw std::runtime_error("not a valid pos");
 		}
 
-		if (this->isValidRemoveStack(coord) == false) {
+		if (!this->isValidRemoveStack(coord)) {
 			throw std::runtime_error("not conex anymore");
 		}
 
@@ -294,7 +357,7 @@ namespace base {
 
 		Logger::log(Level::INFO, "stack removed at ({}, {})", coord.first, coord.second);
 
-		return std::move(stack);
+		return stack;
 	}
 
 	std::vector<Board::Stack> Board::popRow(uint16_t y) {
@@ -562,10 +625,10 @@ namespace base {
 		return false;
 	}
 
-	bool Board::isFixedColumn(uint16_t x) const
+	bool Board::isFixedColumn(int16_t x) const
 	{
 		
-		uint16_t count_elements = 0;
+		int16_t count_elements = 0;
 		for (const auto& [coord, stack] : m_combat_cards) {
 			if (coord.first == x) {
 				count_elements++;
@@ -575,10 +638,10 @@ namespace base {
 		return count_elements==m_size;
 	}
 
-	bool Board::isFixedRow(uint16_t y) const
+	bool Board::isFixedRow(int16_t y) const
 	{
 	
-		uint16_t count_elements = 0;
+		int16_t count_elements = 0;
 		for (const auto& [coord, stack] : m_combat_cards) {
 			if (coord.second == y) {
 				count_elements++;
@@ -587,10 +650,10 @@ namespace base {
 		return count_elements == m_size;
 	}
 
-	std::unordered_set<uint16_t> Board::getFixedRows()const {
+	std::unordered_set<int16_t> Board::getFixedRows()const {
 
-		std::unordered_set<uint16_t> fixed_rows;
-		std::unordered_set<uint16_t> rows; 
+		std::unordered_set<int16_t> fixed_rows;
+		std::unordered_set<int16_t> rows; 
 
 		for (const auto& [coord, stack] : m_combat_cards) {
 			rows.insert(coord.second); 
@@ -605,10 +668,10 @@ namespace base {
 	 }
 
 
-	std::unordered_set<uint16_t> Board::getFixedColumns() const {
+	std::unordered_set<int16_t> Board::getFixedColumns() const {
 
-		std::unordered_set<uint16_t> fixed_columns;
-		std::unordered_set<uint16_t> columns; 
+		std::unordered_set<int16_t> fixed_columns;
+		std::unordered_set<int16_t> columns; 
 
 		for (const auto& [coord, stack] : m_combat_cards) {
 			columns.insert(coord.first); 
@@ -621,7 +684,7 @@ namespace base {
 		return  fixed_columns;
 	}
 
-	Coord Board::getRightmostOnRow(uint16_t y) const {
+	Coord Board::getRightMostOnRow(int16_t y) const {
 		Coord rightmost = { 0, y };
 
 		for (const auto& [coord, stack] : m_combat_cards) {
@@ -632,8 +695,8 @@ namespace base {
 
 		return rightmost;
 	}
-	Coord Board::getLeftmostOnRow(uint16_t y) const {
-		Coord leftmost = { std::numeric_limits<uint16_t>::max(), y };
+	Coord Board::getLeftMostOnRow(int16_t y) const {
+		Coord leftmost = { std::numeric_limits<int16_t>::max(), y };
 
 		for (const auto& [coord, stack] : m_combat_cards) {
 			if (coord.second == y && coord.first < leftmost.first) {
@@ -643,8 +706,8 @@ namespace base {
 
 		return leftmost;
 	}
-	Coord Board::getTopmostOnColumn(uint16_t x) const {
-		Coord topmost = { x, std::numeric_limits<uint16_t>::max() };
+	Coord Board::getTopMostOnColumn(int16_t x) const {	
+		Coord topmost = { x, std::numeric_limits<int16_t>::max() };
 
 		for (const auto& [coord, stack] : m_combat_cards) {
 			if (coord.first == x && coord.second < topmost.second) {
@@ -654,7 +717,7 @@ namespace base {
 
 		return topmost;
 	}
-	Coord Board::getBottommostOnColumn(uint16_t x) const {
+	Coord Board::getBottomMostOnColumn(int16_t x) const {
 		Coord bottommost = { x, 0 };
 
 		for (const auto& [coord, stack] : m_combat_cards) {
@@ -666,7 +729,31 @@ namespace base {
 		return bottommost;
 	}
 
+	std::vector<Coord> Board::getCoordsOnRow(int16_t row_index) const {
+		std::vector<Coord> coords;
+		for (const auto& [coord, stack] : m_combat_cards) {
+			if (coord.second == row_index) {
+				coords.push_back(coord);
+			}
+		}
+		std::sort(coords.begin(), coords.end(), [](const Coord& a, const Coord& b) { ///
+			return a.first < b.first; 
+			});
+		return coords;
+	}
 
+	std::vector<Coord> Board::getCoordsOnColumn(int16_t col_index) const {
+		std::vector<Coord> coords;
+		for (const auto& [coord, stack] : m_combat_cards) {
+			if (coord.first == col_index) {
+				coords.push_back(coord);
+			}
+		}
+		std::sort(coords.begin(), coords.end(), [](const Coord& a, const Coord& b) { /// 
+			return a.second < b.second; 
+			});
+		return coords;
+	}
 
 
 	uint16_t Board::getSize() const {

@@ -125,7 +125,7 @@ namespace base {
     void Player::addUsedCard(CombatCard&& card) {
         m_used_cards.emplace(card.getType(), std::move(card));
     }
-
+  
 
     //---------------------------------------------------------------------
 
