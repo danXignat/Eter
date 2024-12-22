@@ -151,6 +151,7 @@ namespace base {
 		Whirlpool();
 
 		void apply(Board& board, Player& player) override;
+		std::vector<std::pair<Coord, Coord>>getPairs(Board& board);
 
 	};
 

@@ -654,7 +654,72 @@ namespace base {
     }
 
     void Whirlpool::apply(Board& board, Player& player) {
+        auto coord_pairs = getPairs(board);
+        if (coord_pairs.empty()) {
+            Logger::log(Level::WARNING, "No valid row to use power card");
+        }
+
+        std::cout << "Options:";
+        for (const auto& pair : coord_pairs) {
+            std::cout << " Pair: (" << pair.first.first << ", " << pair.second.second << ") and (" << pair.second.first << ", " << pair.second.second << ")" << std::endl;
+            }
+        std::cout << "Choose the coodinate pairs for which you want to use the power card " << std::endl;
+        Coord first_coord, second_coord;
+        std::cout << "First coord:";
+        std::cin >> first_coord.first >> first_coord.second;
+        std::cout << "Second coord:";
+        std::cin >> second_coord.first >> second_coord.second;
+
+        std::pair<Coord, Coord>input_coords{first_coord, second_coord};
+        if (std::find(coord_pairs.begin(), coord_pairs.end(), input_coords) != coord_pairs.end()) {
+           CombatCard& firstCard = board.getCombatCards()[first_coord].back();
+           CombatCard& secondCard = board.getCombatCards()[second_coord].back();
+
+           if (firstCard.getType() < secondCard.getType()) {
+               board.appendMove({ first_coord.first + 2,first_coord.second }, std::move(firstCard));
+               board.appendMove({ second_coord.first - 2,second_coord.second }, std::move(secondCard));
+           }
+           else if (firstCard.getType() == secondCard.getType()) {
+               std::cout << "Choose the coordinates of the card you want to place on top:";
+               Coord equal_card_cood;
+               std::cin >> equal_card_cood.first>>equal_card_cood.second;
+               if (equal_card_cood != first_coord || equal_card_cood != second_coord) {
+                   Logger::log(Level::WARNING, "Invalid coordinates");
+               }
+               if (equal_card_cood == first_coord) {
+                   board.appendAnyCard({ second_coord.first - 2,second_coord.second }, std::move(secondCard));
+                   board.appendAnyCard({ first_coord.first + 2,first_coord.second }, std::move(firstCard));
+               }
+               else {
+                   board.appendAnyCard({ first_coord.first + 2,first_coord.second }, std::move(firstCard));
+                   board.appendAnyCard({ second_coord.first - 2,second_coord.second }, std::move(secondCard));
+               }
+           }
+           else {
+               board.appendMove({ second_coord.first - 2,second_coord.second }, std::move(secondCard));
+               board.appendMove({ first_coord.first + 2,first_coord.second }, std::move(firstCard));
+           }
+           board.popTopCardAt(first_coord);
+           board.popTopCardAt(second_coord);
+           Logger::log(Level::INFO, "Whirlpool power card was played");
+        }
+        else {
+            Logger::log(Level::WARNING, "Invalid coords");
+        }
+
     }
+
+    std::vector< std::pair<Coord, Coord>>Whirlpool::getPairs(Board& board) {
+        std::vector< std::pair<Coord, Coord>> row_pairs;
+
+        for (const auto& [coord, stack] : board) {
+            if (board.hasStack({ coord.first + 4, coord.second }) && !board.hasStack({ coord.first + 2, coord.second })) {
+                row_pairs.emplace_back(std::make_pair(coord, Coord{ coord.first + 4, coord.second }));
+            }
+        }
+        return row_pairs;
+    }
+
 
     ////------------------------------------------ Blizzard -------------------------------------------
     Blizzard::Blizzard() {

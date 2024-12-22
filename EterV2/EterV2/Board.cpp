@@ -54,6 +54,20 @@ namespace base {
 			combatCardToChar(m_combat_cards[coord].back().getType()), coord.first, coord.second
 		);
 	}
+	
+	void Board::appendAnyCard(const Coord& coord, CombatCard&& card) {
+		m_bounding_rect.add(coord);
+
+		m_combat_cards[coord].emplace_back(std::move(card));
+
+		_updateAvailableSpaces(coord);
+
+		Logger::log(
+			Level::INFO,
+			"card({}) appended at ({}, {})",
+			combatCardToChar(m_combat_cards[coord].back().getType()), coord.first, coord.second
+		);
+	}
 
 	void Board::moveStack(const Coord& from_coord, const Coord& to_coord) {
 		if (m_combat_cards.contains(to_coord)) {

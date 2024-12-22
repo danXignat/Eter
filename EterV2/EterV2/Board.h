@@ -54,6 +54,7 @@ namespace base {
 		std::vector<Coord> getCoordsOnColumn(int16_t col_index) const;
 		
 		void appendMove(const Coord&, CombatCard&&);
+		void appendAnyCard(const Coord&, CombatCard&&);
 		void moveRow(uint16_t from_y, uint16_t to_y);
 		void moveColumn(uint16_t from_x, uint16_t to_x);
 		void moveStack(const Coord& from_coord, const Coord& to_coord);
