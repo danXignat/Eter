@@ -95,8 +95,7 @@ namespace base {
             if (stack.empty()) {
                 continue;
             }
-            bool is_player_card = stack[stack.size() - 1].getColor() == player.getColor();
-            if (is_player_card && !stack.back().isIllusion()) {
+            if (!stack.back().isIllusion()) {
                 choices.emplace_back(x, y);
             }
         }
@@ -395,6 +394,67 @@ namespace base {
     }
 
     void Gust::apply(Board& board, Player& player) {
+        std::vector<Coord>cardsCoord = getCardsCoord(board);
+        std::cout << "Choose the card to move:" << std::endl;
+        std::for_each(cardsCoord.begin(), cardsCoord.end(),
+            [](const Coord& coord) {
+                std::cout << "Card at " << coord.first << ", " << coord.second << std::endl;
+            });
+        std::cout << "Enter the coodinates of the card you want to move:";
+        Coord cardCoord;
+        std::cin >> cardCoord.first >> cardCoord.second;
+
+        if (std::find(cardsCoord.begin(), cardsCoord.end(), cardCoord) == cardsCoord.end()) {
+            Logger::log(Level::WARNING, "Invalid card coordinates");
+            return;
+        }
+        CombatCard& card = board.getCombatCards()[cardCoord].back();
+        std::vector<Coord>validMoves;
+        std::vector<Coord> neighbors{
+       {cardCoord.first - 2, cardCoord.second},
+       {cardCoord.first + 2, cardCoord.second},
+       {cardCoord.first, cardCoord.second - 1},
+       {cardCoord.first, cardCoord.second + 1}
+        };
+        for (const auto& neighbor : neighbors) {
+            if (board.getCombatCards().contains(neighbor) && !board.getCombatCards()[neighbor].back().isIllusion()) {
+                CombatCard& neighborCard = board.getCombatCards()[neighbor].back();
+                if (neighborCard.getType() < card.getType()) {
+                    validMoves.push_back(neighbor);
+                }
+            }
+        }
+
+        if (!validMoves.empty()) {
+            for (const auto& move : validMoves) {
+                std::cout << "Valid moves:" << move.first << ", " << move.second << std::endl;
+            }
+            std::cout << "Enter the coodinates where you want to move the card:";
+            Coord new_coord;
+            std::cin >> new_coord.first >> new_coord.second;
+            if (std::find(validMoves.begin(), validMoves.end(), new_coord) == validMoves.end()) {
+                Logger::log(Level::WARNING, "Invalid coordinates to move the card");
+                return;
+            }
+            if (board.isValidPlaceCard(new_coord, card)) {
+                board.appendMove(new_coord, std::move(card));
+                board.removeTopCardAt(cardCoord);
+                Logger::log(Level::INFO, "Gust power card was used");
+            }
+        }
+        else {
+            Logger::log(Level::WARNING, "No valid coordinates to move the card");
+        }
+    }
+
+    std::vector<Coord> Gust::getCardsCoord(const Board& board)const {
+        std::vector<Coord>coords;
+        for (const auto& [coord, stack] : board) {
+            if (!stack.empty() && !stack.back().isIllusion()) {
+                coords.emplace_back(coord);
+            }
+        }
+        return coords;
     }
 
 
@@ -550,16 +610,33 @@ namespace base {
     }
 
     void Wave::apply(Board& board, Player& player) {
+        if (board.availableSpaces().empty()) {
+            Logger::log(Level::WARNING, "No empty spaces to move the stack");
+        }
         std::vector<Coord>coordStack = validStacks(board);
         if (coordStack.empty()) {
             Logger::log(Level::WARNING, "No stacks on the board");
         }
         else {
             for (const auto& coord : coordStack) {
+                Coord new_coord;
+                std::cout << "Enter the coordinates where you want to move the stack:" << std::endl;
+                std::cin >> new_coord.first >> new_coord.second;
+                if (board.isValidMoveStack(coord, new_coord)) {
+                    board.moveStack(coord, new_coord);
+                }
+                char card_type;
+                std::cout << "Enter the card you want to play on the new empty space" << std::endl;
+                std::cin >> card_type;
+                auto card = player.getCard(charToCombatCard(card_type));
+                if (board.isValidPlaceCard(coord, card)) {
+                    board.appendMove(coord, std::move(card));
+                }
             }
-
         }
+        Logger::log(Level::INFO, "Wave power card was used");
     }
+
     std::vector<Coord>Wave::validStacks(const Board& board) const {
         std::vector<Coord>coordStack;
         for (const auto& [coord, stack] : board) {
@@ -569,6 +646,8 @@ namespace base {
         }
         return coordStack;
     }
+
+
     ////------------------------------------------ Whirlpool -------------------------------------------
     Whirlpool::Whirlpool() {
         m_ability = PowerCardType::Whirlpool;
@@ -590,11 +669,11 @@ namespace base {
         m_ability = PowerCardType::Waterfall;
     }
 
-    std::unordered_map<Orientation, std::vector<int16_t>> Waterfall::getOptions(Board& board) { 
+    std::unordered_map<Orientation, std::vector<int16_t>> Waterfall::getOptions(Board& board) {
         int16_t size = static_cast<int16_t>(board.getSize() - 1);
         std::unordered_map<Orientation, std::vector<int16_t>> choices;
-        std::unordered_set<int16_t> processedRows;  
-        std::unordered_set<int16_t> processedCols;  
+        std::unordered_set<int16_t> processedRows;
+        std::unordered_set<int16_t> processedCols;
 
         std::cout << "Your options are: ";
 
@@ -604,7 +683,7 @@ namespace base {
                 if (countRowElements.size() >= size) {
                     std::cout << "index row: " << coord.second << " ";
                     choices[Orientation::Row].emplace_back(coord.second);
-                    processedRows.insert(coord.second); 
+                    processedRows.insert(coord.second);
                 }
             }
 
@@ -613,7 +692,7 @@ namespace base {
                 if (countColElements.size() >= size) {
                     std::cout << "index column: " << coord.first << " ";
                     choices[Orientation::Column].emplace_back(coord.first);
-                    processedCols.insert(coord.first);  
+                    processedCols.insert(coord.first);
                 }
             }
         }
@@ -646,16 +725,16 @@ namespace base {
             return { Orientation::Unknown,0,MoveDirection::Unknown };
         }
 
-        auto dirIt = validDirections.find(orient); 
-        if (std::find(dirIt->second.begin(), dirIt->second.end(), move_dir) == dirIt->second.end()) { 
-            Logger::log(Level::WARNING, "Wrong choice"); 
-            return { Orientation::Unknown,0,MoveDirection::Unknown }; 
-        } 
+        auto dirIt = validDirections.find(orient);
+        if (std::find(dirIt->second.begin(), dirIt->second.end(), move_dir) == dirIt->second.end()) {
+            Logger::log(Level::WARNING, "Wrong choice");
+            return { Orientation::Unknown,0,MoveDirection::Unknown };
+        }
         Logger::log(Level::INFO, "Valid choice");
         return { orient,index,move_dir };
     }
- 
-    
+
+
     void Waterfall::apply(Board& board, Player& player) {
         auto choice = input(board);
         auto orient = std::get<0>(choice);
@@ -679,10 +758,10 @@ namespace base {
                 board.mergeStacks(vect, destination);
             }
             else {
-                auto destination = board.getBottomMostOnColumn(index); 
+                auto destination = board.getBottomMostOnColumn(index);
                 board.mergeStacks(vect, destination);
             }
-        }    
+        }
     }
 
 
@@ -692,6 +771,53 @@ namespace base {
     }
 
     void Support::apply(Board& board, Player& player) {
+        std::vector<Coord>validCards = CoordCardType(board, player);
+        if (validCards.empty()) {
+            Logger::log(Level::WARNING, "No valid cards to apply the power card");
+            return;
+        }
+        Coord new_coord;
+        std::cout << "Enter the coordinates of the card:";
+        std::cin >> new_coord.first >> new_coord.second;
+        if (std::find(validCards.begin(), validCards.end(), new_coord) == validCards.end()) {
+            Logger::log(Level::WARNING, "No card at there coordinates");
+        }
+        auto top_card = board.getTopCard(new_coord);
+        CombatCard& card = top_card->get();
+        CombatCardType currentType = card.getType();
+        CombatCardType newType = currentType;
+        switch (currentType) {
+        case CombatCardType::ONE:
+            newType = CombatCardType::TWO;
+            break;
+        case CombatCardType::TWO:
+            newType = CombatCardType::THREE;
+            break;
+        case CombatCardType::THREE:
+            newType = CombatCardType::FOUR;
+            break;
+        default:
+            Logger::log(Level::WARNING, "Card cannot be incremented beyond FOUR");
+            return;
+        }
+        CombatCard new_card(newType, card.getColor());
+        board.popTopCardAt(new_coord);
+        board.appendMove(new_coord, std::move(new_card));
+    }
+    std::vector<Coord> Support::CoordCardType(Board& board, const Player& player) const {
+        std::vector<Coord> coordCards;
+        for (const auto& [coord, stack] : board) {
+            if (stack.empty()) continue;
+            const CombatCard& card = stack.back();
+            if (!card.isIllusion() &&
+                card.getColor() == player.getColor() &&
+                (card.getType() == CombatCardType::TWO ||
+                    card.getType() == CombatCardType::THREE ||
+                    card.getType() == CombatCardType::FOUR)) {
+                coordCards.emplace_back(coord);
+            }
+        }
+        return coordCards;
     }
 
 
@@ -709,16 +835,16 @@ namespace base {
                 if (card.getType() == CombatCardType::ONE) {
                     Logger::log(Level::INFO, "Earthquake power removed a visible card with number 1.");
                     board.removeTopCardAt(coord);
-                    board.availableSpaces(); 
-                    break; 
+                    board.availableSpaces();
+                    break;
                 }
                 else {
                     Logger::log(Level::WARNING, "No visible cards with number 1");
                 }
             }
-        } 
+        }
     }
-        
+
 
     ////------------------------------------------ Crumble -------------------------------------------
     Crumble::Crumble() {
@@ -792,7 +918,7 @@ namespace base {
         m_ability = PowerCardType::Avalanche;
     }
 
-    
+
     std::vector<std::pair<Orientation, std::pair<Coord, Coord>>> Avalanche::getPairs(Board& board) {
         std::vector<std::pair<Orientation, std::pair<Coord, Coord>>> pairs;
         const std::vector<std::pair<Coord, Orientation>> directions = {
@@ -909,7 +1035,7 @@ namespace base {
         }
         Logger::log(Level::INFO, "Avalanche card used");
     }
-   
+
 
 
     ////------------------------------------------ Rock -------------------------------------------
@@ -919,7 +1045,7 @@ namespace base {
 
     void Rock::apply(Board& board, Player& player) {
         std::vector<Coord>illusionCoord = getIllusionCoords(board);
-        if (!illusionCoord.empty()&& player.hasCards()) {
+        if (!illusionCoord.empty() && player.hasCards()) {
 
             std::cout << "Illusion coordinates: " << std::endl;
 
@@ -955,4 +1081,3 @@ namespace base {
     }
 
 }
-////////////

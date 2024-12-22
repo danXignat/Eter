@@ -98,6 +98,7 @@ namespace base {
 		Gust();
 
 		void apply(Board& board, Player& player) override;
+		std::vector<Coord>getCardsCoord(const Board& board)const;
 
 	};
 
