@@ -44,11 +44,12 @@ namespace base {
 
     std::vector<Coord> MasterOfFireFront::getChoices(const Board& board, const Player& player) {
         std::vector<Coord> choices;
+        bool minimumSize = 2;
 
         for (const auto& [coord, stack] : board) {
             auto& [x, y] = coord;
 
-            if (stack.size() < 2) {
+            if (stack.size() < minimumSize) {                   
                 continue;
             }
 
@@ -90,13 +91,17 @@ namespace base {
             std::cout << col << " ";
         }
         std::cout << '\n';
-
+        std::cout << "Enter your choice index and 'r' for row or 'c' for column\n";
         uint16_t choice;
         char row_or_col;
         std::cin >> choice >> row_or_col;
 
         if (row_or_col == 'r') {
             if (std::find(choices.first.begin(), choices.first.end(), choice) != choices.first.end()) {
+                if (!board.isValidRemoveRow(choice)) {
+                    Logger::log(Level::ERROR, "You can't remove that row");
+                    return false;
+                }
                 board.removeRow(choice);
             }
             else {
@@ -106,6 +111,10 @@ namespace base {
         }
         else if (row_or_col == 'c') {
             if (std::find(choices.second.begin(), choices.second.end(), choice) != choices.second.end()) {
+                if (!board.isValidRemoveColumn(choice)) {  
+                    Logger::log(Level::ERROR, "You can't remove that column"); 
+                    return false;
+                }
                 board.removeColumn(choice);
             }
             else {
@@ -142,12 +151,12 @@ namespace base {
         }
 
         for (const auto& [pos, val] : rows) {
-            if (val.first >= 3 && val.second) {
+            if (val.first >= board.getSize()-1 && val.second) {  // 
                 line_choices.push_back(pos);
             }
         }
         for (const auto& [pos, val] : cols) {
-            if (val.first >= 3 && val.second) {
+            if (val.first >= board.getSize()-1 && val.second) {  //
                 column_choices.push_back(pos);
             }
         }
@@ -422,17 +431,16 @@ namespace base {
                 right_border.push_back({ corner2.first, y });
             }
         }
-
-        auto addBorder = [&borders](std::vector<Coord>& border, BorderType type) {
-            if (border.size() >= 3) {
+        auto addBorder = [&borders](std::vector<Coord>& border, BorderType type,uint16_t size) {
+            if (border.size() >= size) {                                       
                 borders[type] = std::move(border);
             }
             };
-
-        addBorder(top_border, BorderType::Top);
-        addBorder(bottom_border, BorderType::Bottom);
-        addBorder(left_border, BorderType::Left);
-        addBorder(right_border, BorderType::Right);
+        uint16_t size = board.getSize()-1; 
+        addBorder(top_border, BorderType::Top,size);
+        addBorder(bottom_border, BorderType::Bottom,size);
+        addBorder(left_border, BorderType::Left,size);
+        addBorder(right_border, BorderType::Right,size);
 
         return borders.empty() ? std::nullopt : std::make_optional(borders);
     }

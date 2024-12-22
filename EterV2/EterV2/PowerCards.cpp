@@ -16,11 +16,11 @@ namespace base {
     Destruction::Destruction() {
         m_ability = PowerCardType::Destruction;
     }
-  
+
     void Destruction::apply(Board& board, Player& player) {
         for (const auto& [coord, stack] : board) {
             auto top_card = board.getTopCard(coord);
-           const CombatCard& card = top_card->get();
+            const CombatCard& card = top_card->get();
             if (card.getColor() != player.getColor()) {
                 Logger::log(Level::INFO, "Destruction power destroyed the last card");
                 board.removeTopCardAt(coord);
@@ -42,7 +42,7 @@ namespace base {
                 card.flip();
                 Logger::log(Level::INFO, "The opponent's Illusion has been revealed");
             }
-          
+
             Logger::log(Level::INFO, "It's your turn, place a card");
             Coord new_coord;
             std::cin >> new_coord.first >> new_coord.second;
@@ -51,7 +51,7 @@ namespace base {
 
 
             auto selected_card = player.getCard(charToCombatCard(card_type));
-            
+
             if (board.isValidPlaceCard(new_coord, selected_card)) {
                 board.appendMove(new_coord, std::move(selected_card));
                 Logger::log(Level::INFO, "Flame power was used. Card placed at ({}, {})",
@@ -72,31 +72,31 @@ namespace base {
     }
 
     void Fire::apply(Board& board, Player& player) {
-       std::vector<Coord>duplicateCoord = getDuplicateCards(board, player);
-       if (duplicateCoord.size() > 1) {
-           for (const auto& coord : duplicateCoord) {
-               auto top_card = board.getTopCard(coord);
-               CombatCard& card = top_card->get();
-               player.addCard(std::move(card));
-               board.removeTopCardAt(coord);
+        std::vector<Coord>duplicateCoord = getDuplicateCards(board, player);
+        if (duplicateCoord.size() > 1) {
+            for (const auto& coord : duplicateCoord) {
+                auto top_card = board.getTopCard(coord);
+                CombatCard& card = top_card->get();
+                player.addCard(std::move(card));
+                board.removeTopCardAt(coord);
 
-               Logger::log(Level::INFO, "Fire power removed top cards and put then back in the player's hand");
-           }
+                Logger::log(Level::INFO, "Fire power removed top cards and put then back in the player's hand");
+            }
         }
-       else {
-           Logger::log(Level::WARNING, "No visible cards with the same value on the board");
-       }
+        else {
+            Logger::log(Level::WARNING, "No visible cards with the same value on the board");
+        }
     }
 
     std::vector<Coord>Fire::getDuplicateCards(Board& board, const Player& player) {
         std::vector<Coord>choices;
         for (const auto& [coord, stack] : board) {
-           const auto& [x, y] = coord;
+            const auto& [x, y] = coord;
             if (stack.empty()) {
                 continue;
             }
             bool is_player_card = stack[stack.size() - 1].getColor() == player.getColor();
-            if(is_player_card && !stack.back().isIllusion()){
+            if (is_player_card && !stack.back().isIllusion()) {
                 choices.emplace_back(x, y);
             }
         }
@@ -148,8 +148,8 @@ namespace base {
         for (auto& choice : choices) {
             const Coord& coord = choice.first;
             const CombatCardType& card = choice.second;
-            Logger::log(Level::INFO, "Card found at ({}, {})", coord.first,coord.second);
-            Logger::log(Level::INFO, "Card:{}",combatCardToChar(card));
+            Logger::log(Level::INFO, "Card found at ({}, {})", coord.first, coord.second);
+            Logger::log(Level::INFO, "Card:{}", combatCardToChar(card));
         }
         Logger::log(Level::INFO, "It's your turn");
         Coord coord_from;
@@ -159,14 +159,14 @@ namespace base {
         std::cout << "Move from coordinates:" << "\n";
         std::cin >> coord_from.first >> coord_from.second;
 
-        std::cout << "Covered card:"<<"\n";
+        std::cout << "Covered card:" << "\n";
         std::cin >> card_type_char;
 
-        std::cout << "To coordinates:"<<"\n";
+        std::cout << "To coordinates:" << "\n";
         std::cin >> new_coord.first >> new_coord.second;
 
 
-        CombatCardType card_type = charToCombatCard(card_type_char); 
+        CombatCardType card_type = charToCombatCard(card_type_char);
         CombatCard card(card_type, player.getColor());
 
         bool valid_card = false;
@@ -180,11 +180,11 @@ namespace base {
                 valid_card = true;
             }
         }
-        if (valid_card&& valid_coord) {
+        if (valid_card && valid_coord) {
             board.removeCardFromStackAt(coord_from, card);
             board.appendMove(new_coord, std::move(card));
         }
-        if(!valid_card) {
+        if (!valid_card) {
             Logger::log(Level::WARNING, "Invalid card selected.");
             return;
         }
@@ -212,7 +212,7 @@ namespace base {
         }
         return choices;
     }
-                
+
     ////------------------------------------------ Squall -------------------------------------------
     Squall::Squall() {
         m_ability = PowerCardType::Squall;
@@ -229,7 +229,7 @@ namespace base {
         for (auto& pair : visible_cards) {
             Coord available_coord = pair.first;
             CombatCard& card = pair.second;
-            if (available_coord!=coord) {
+            if (available_coord != coord) {
                 Logger::log(Level::WARNING, "No visible card at these coordinates");
             }
             else {
@@ -241,7 +241,7 @@ namespace base {
         }
     }
 
-    std::vector<std::pair<Coord, CombatCard>> Squall::opponentCards( Board& board,const Player& player) const{
+    std::vector<std::pair<Coord, CombatCard>> Squall::opponentCards(Board& board, const Player& player) const {
         std::vector<std::pair<Coord, CombatCard>> visible_cards;
         for (const auto& [coord, stack] : board) {
             const auto& top_card = board.getTopCard(coord);
@@ -260,10 +260,10 @@ namespace base {
     }
 
     void Gale::apply(Board& board, Player& player) {
-      
-        for ( auto& [coord, stack] : board) {
+
+        for (auto& [coord, stack] : board) {
             if (stack.size() > 1) {
-                for (int i = 0;i < stack.size() - 1;i++) {
+                for (int i = 0; i < stack.size() - 1; i++) {
                     const CombatCardType& card_type = stack[i].getType();
                     auto card = player.getCard(card_type);
                     if (player.getColor() == card.getColor()) {
@@ -310,12 +310,12 @@ namespace base {
         return options;
     }
 
-    std::tuple<Orientation, uint16_t, ShiftDirection>  Hurricane::input(Board& board) {
+    std::tuple<Orientation, uint16_t, MoveDirection>  Hurricane::input(Board& board) {
 
         auto options = getOptions(board);
-        if (options.empty()){
-            Logger::log(Level::WARNING, "You can't use this mage right now"); 
-            return { Orientation::Unknown,0,ShiftDirection::Unknown };
+        if (options.empty()) {
+            Logger::log(Level::WARNING, "You can't use this mage right now");
+            return { Orientation::Unknown,0,MoveDirection::Unknown };
         }
         std::cout << "Enter Row/Column and the index you want to shift\n";
         std::string orientation;
@@ -323,25 +323,21 @@ namespace base {
         std::cin >> orientation >> index;
         auto orient = stringToOrientation(orientation);
         auto it = options.find(orient);
+
         if (it == options.end() || std::find(it->second.begin(), it->second.end(), index) == it->second.end()) {
             Logger::log(Level::WARNING, "Wrong choice");
-            return { Orientation::Unknown,0,ShiftDirection::Unknown };
+            return { Orientation::Unknown,0,MoveDirection::Unknown };
         }
 
         std::cout << "Enter the direction you want to shift (Right/Left for rows, Up/Down for cols)";
         std::string shift_direction;
         std::cin >> shift_direction;
-        auto shift_dir = stringToShift(shift_direction);
-
-        const std::unordered_map<Orientation, std::vector<ShiftDirection>> validDirections = {
-                    {Orientation::Row, {ShiftDirection::Left, ShiftDirection::Right}},
-                    {Orientation::Column, {ShiftDirection::Up, ShiftDirection::Down}}
-        };
-
+        auto shift_dir = stringToMoveDir(shift_direction);
         auto dirIt = validDirections.find(orient);
+
         if (std::find(dirIt->second.begin(), dirIt->second.end(), shift_dir) == dirIt->second.end()) {
             Logger::log(Level::WARNING, "Wrong choice");
-            return { Orientation::Unknown,0,ShiftDirection::Unknown };
+            return { Orientation::Unknown,0,MoveDirection::Unknown };
         }
 
         return { orient,index,shift_dir };
@@ -349,7 +345,7 @@ namespace base {
     }
 
 
-    void Hurricane::apply(Board& board, Player& player) {  
+    void Hurricane::apply(Board& board, Player& player) {
 
         auto choice = input(board);
         auto orient = std::get<0>(choice);
@@ -360,8 +356,8 @@ namespace base {
         auto shift_dir = std::get<2>(choice);
         std::vector<std::pair<Coord, Coord>>to_shift;
         if (orient == Orientation::Row) {
-           
-            if (shift_dir == ShiftDirection::Right) {
+
+            if (shift_dir == MoveDirection::Right) {
                 Coord coord = board.getRightMostOnRow(index);
                 board.removeStack(coord);
                 auto vect_coords = board.getCoordsOnRow(index);
@@ -374,9 +370,9 @@ namespace base {
                 board.shiftRowToLeft(vect_coords);
             }
         }
-        if (orient == Orientation::Column) {
-           
-            if (shift_dir == ShiftDirection::Up) {
+        else {
+
+            if (shift_dir == MoveDirection::Up) {
                 Coord coord = board.getTopMostOnColumn(index);
                 board.removeStack(coord);
                 auto vect_coord = board.getCoordsOnColumn(index);
@@ -391,7 +387,7 @@ namespace base {
         }
     }
 
-   
+
 
     ////------------------------------------------ Gust -------------------------------------------
     Gust::Gust() {
@@ -403,7 +399,7 @@ namespace base {
 
 
     ////------------------------------------------ Mirrage -------------------------------------------
-    Mirrage::Mirrage() {  
+    Mirrage::Mirrage() {
         m_ability = PowerCardType::Mirrage;
     }
 
@@ -416,11 +412,11 @@ namespace base {
             char card_type;
             std::cin >> card_type;
             auto card = player.getCard(charToCombatCard(card_type));
-          //  if (board.isValidMove(coord, card)) {
-                card.flip();
-                board.appendMove(coord, std::move(card));
-                Logger::log(Level::INFO, "Mirrage power card was used");
-           // }
+            //  if (board.isValidMove(coord, card)) {
+            card.flip();
+            board.appendMove(coord, std::move(card));
+            Logger::log(Level::INFO, "Mirrage power card was used");
+            // }
         }
     }
 
@@ -429,7 +425,7 @@ namespace base {
         for (const auto& [coord, stack] : board) {
             auto top_card = board.getTopCard(coord);
             CombatCard& card = top_card->get();
-            if (card.isIllusion() &&card.getColor()==player.getColor()) {
+            if (card.isIllusion() && card.getColor() == player.getColor()) {
                 card.flip();
                 player.addCard(std::move(card));
                 CombatCard& card_value = card;
@@ -498,7 +494,7 @@ namespace base {
             }
 
             board.swapStacks(coord_from, coord_to);
-      }
+        }
 
         Logger::log(Level::INFO, "Tide power card was used");
     }
@@ -524,26 +520,26 @@ namespace base {
     }
 
     void Mist::apply(Board& board, Player& player) {
-        
+
     }
     bool Mist::hasIllusion(Board& board, IllusionService& illusionService, Player& player) {
         auto playerColor = player.getColor();
-       // if (illusionService.hasPlayerIllusion(playerColor)) {
-            Logger::log(Level::WARNING, "Player already has an illusion");
-      //      return false;
-      //  }
-     //   else {
-            Logger::log(Level::INFO, "You can play your illusion");
+        // if (illusionService.hasPlayerIllusion(playerColor)) {
+        Logger::log(Level::WARNING, "Player already has an illusion");
+        //      return false;
+        //  }
+       //   else {
+        Logger::log(Level::INFO, "You can play your illusion");
 
-            Coord coord;
-            std::cin >> coord.first >> coord.second;
+        Coord coord;
+        std::cin >> coord.first >> coord.second;
 
-            char card_type;
-            std::cin >> card_type;
-            auto card = player.getCard(charToCombatCard(card_type));
+        char card_type;
+        std::cin >> card_type;
+        auto card = player.getCard(charToCombatCard(card_type));
 
-            illusionService.placeIllusion(coord, std::move(card));
-      //  }
+        illusionService.placeIllusion(coord, std::move(card));
+        //  }
         return true;
     }
 
@@ -561,10 +557,10 @@ namespace base {
         else {
             for (const auto& coord : coordStack) {
             }
-            
+
         }
     }
-        std::vector<Coord>Wave::validStacks(const Board & board) const {
+    std::vector<Coord>Wave::validStacks(const Board& board) const {
         std::vector<Coord>coordStack;
         for (const auto& [coord, stack] : board) {
             if (stack.size() > 1) {
@@ -594,7 +590,99 @@ namespace base {
         m_ability = PowerCardType::Waterfall;
     }
 
+    std::unordered_map<Orientation, std::vector<int16_t>> Waterfall::getOptions(Board& board) { 
+        int16_t size = static_cast<int16_t>(board.getSize() - 1);
+        std::unordered_map<Orientation, std::vector<int16_t>> choices;
+        std::unordered_set<int16_t> processedRows;  
+        std::unordered_set<int16_t> processedCols;  
+
+        std::cout << "Your options are: ";
+
+        for (const auto& [coord, _] : board) {
+            if (processedRows.find(coord.second) == processedRows.end()) {
+                auto countRowElements = board.getCoordsOnRow(coord.second);
+                if (countRowElements.size() >= size) {
+                    std::cout << "index row: " << coord.second << " ";
+                    choices[Orientation::Row].emplace_back(coord.second);
+                    processedRows.insert(coord.second); 
+                }
+            }
+
+            if (processedCols.find(coord.first) == processedCols.end()) {
+                auto countColElements = board.getCoordsOnColumn(coord.first);
+                if (countColElements.size() >= size) {
+                    std::cout << "index column: " << coord.first << " ";
+                    choices[Orientation::Column].emplace_back(coord.first);
+                    processedCols.insert(coord.first);  
+                }
+            }
+        }
+        std::cout << std::endl;
+        return choices;
+    }
+
+
+    std::tuple< Orientation, int16_t, MoveDirection> Waterfall::input(Board& board) {
+        auto options = getOptions(board);
+
+        if (options.empty()) {
+            Logger::log(Level::WARNING, "You can't use this mage right now");
+            return { Orientation::Unknown,0,MoveDirection::Unknown };
+        }
+
+        std::cout << "Enter 'Row/Column', the index and the direction you want to move the cards\n";
+
+        int16_t index;
+        std::string orientation, move_direction;
+
+        std::cin >> orientation >> index >> move_direction;
+
+        auto orient = stringToOrientation(orientation);
+        auto move_dir = stringToMoveDir(move_direction);
+        auto it = options.find(orient);
+
+        if (it == options.end() || std::find(it->second.begin(), it->second.end(), index) == it->second.end()) {
+            Logger::log(Level::WARNING, "Wrong choice");
+            return { Orientation::Unknown,0,MoveDirection::Unknown };
+        }
+
+        auto dirIt = validDirections.find(orient); 
+        if (std::find(dirIt->second.begin(), dirIt->second.end(), move_dir) == dirIt->second.end()) { 
+            Logger::log(Level::WARNING, "Wrong choice"); 
+            return { Orientation::Unknown,0,MoveDirection::Unknown }; 
+        } 
+        Logger::log(Level::INFO, "Valid choice");
+        return { orient,index,move_dir };
+    }
+ 
+    
     void Waterfall::apply(Board& board, Player& player) {
+        auto choice = input(board);
+        auto orient = std::get<0>(choice);
+        auto index = std::get<1>(choice);
+        auto dir = std::get<2>(choice);
+        if (orient == Orientation::Row) {
+            auto vect = board.getCoordsOnRow(index);
+            if (dir == MoveDirection::Right) {
+                auto destination = board.getRightMostOnRow(index);
+                board.mergeStacks(vect, destination);
+            }
+            else {
+                auto destination = board.getLeftMostOnRow(index);
+                board.mergeStacks(vect, destination);
+            }
+        }
+        else {
+            auto vect = board.getCoordsOnColumn(index);
+            if (dir == MoveDirection::Up) {
+                auto destination = board.getTopMostOnColumn(index);
+                board.mergeStacks(vect, destination);
+            }
+            else {
+                auto destination = board.getBottomMostOnColumn(index); 
+                board.mergeStacks(vect, destination);
+            }
+        }    
     }
 
 
@@ -628,7 +716,7 @@ namespace base {
                     Logger::log(Level::WARNING, "No visible cards with number 1");
                 }
             }
-        }
+        } 
     }
         
 
@@ -726,14 +814,14 @@ namespace base {
     }
 
 
-    std::vector<std::pair<ShiftDirection, std::pair<Coord, Coord>>>Avalanche::checkShifting(
+    std::vector<std::pair<MoveDirection, std::pair<Coord, Coord>>>Avalanche::checkShifting(
         const std::vector<std::pair<Orientation, std::pair<Coord, Coord>>>& pack, Board& board) {
 
-        std::vector<std::pair<ShiftDirection, std::pair<Coord, Coord>>> choices;
+        std::vector<std::pair<MoveDirection, std::pair<Coord, Coord>>> choices;
 
-        const std::unordered_map<Orientation, std::vector<std::pair<Coord, ShiftDirection>>> directions = {
-            {Orientation::Row,    {{{2, 0}, ShiftDirection::Right}, {{-2, 0}, ShiftDirection::Left}}},
-            {Orientation::Column, {{{0, 1}, ShiftDirection::Up},    {{0, -1}, ShiftDirection::Down}}}
+        const std::unordered_map<Orientation, std::vector<std::pair<Coord, MoveDirection>>> directions = {
+            {Orientation::Row,    {{{2, 0}, MoveDirection::Right}, {{-2, 0}, MoveDirection::Left}}},
+            {Orientation::Column, {{{0, 1}, MoveDirection::Up},    {{0, -1}, MoveDirection::Down}}}
         };
 
         for (const auto& [type, pair] : pack) {
@@ -757,15 +845,15 @@ namespace base {
         auto choices = checkShifting(pairs, board);
         std::cout << "Ur options are: ";
         for (const auto& [type, pair] : choices) {
-            std::cout << ShiftToString(type) << " " << pair.first.first << " " << pair.first.second << " , "
+            std::cout << MoveDirToString(type) << " " << pair.first.first << " " << pair.first.second << " , "
                 << pair.second.first << " " << pair.second.second << " | ";
         }
 
-        const std::unordered_map<ShiftDirection, Coord> directionDeltas = {
-       {ShiftDirection::Down, {0, 1}},
-       {ShiftDirection::Up, {0, -1}},
-       {ShiftDirection::Right, {2, 0}},
-       {ShiftDirection::Left, {-2, 0}}
+        const std::unordered_map<MoveDirection, Coord> directionDeltas = {
+       {MoveDirection::Down, {0, 1}},
+       {MoveDirection::Up, {0, -1}},
+       {MoveDirection::Right, {2, 0}},
+       {MoveDirection::Left, {-2, 0}}
         };
 
         std::cout << "Enter the direction you want to move the stacks (Left or Right for rows / Up or Down for columns) and the pair of coords\n";
@@ -776,7 +864,7 @@ namespace base {
 
         std::cin >> pair.first.first >> pair.first.second >> pair.second.first >> pair.second.second;
 
-        auto choice = std::pair{ stringToShift(direction),pair };
+        auto choice = std::pair{ stringToMoveDir(direction),pair };
         auto it = std::find(choices.begin(), choices.end(), choice);
 
         if (it != choices.end()) {
@@ -785,7 +873,7 @@ namespace base {
             std::vector<std::pair<Coord, Coord>>stacks;
             Coord newCoord1, newCoord2;
 
-            if (type == ShiftDirection::Down || type == ShiftDirection::Up) {
+            if (type == MoveDirection::Down || type == MoveDirection::Up) {
                 newCoord1 = { selectedPair.second.first, selectedPair.second.second + delta.second };
                 newCoord2 = { selectedPair.first.first, selectedPair.first.second + delta.second };
 

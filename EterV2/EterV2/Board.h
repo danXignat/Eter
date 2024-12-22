@@ -63,6 +63,7 @@ namespace base {
 		void shiftRowToLeft(const std::vector<Coord>& row_coords);
 		void shiftColumnDown(const std::vector<Coord>& col_coords);
 		void shiftColumnUp(const std::vector<Coord>& col_coords);
+		void mergeStacks(const std::vector<Coord>& coords, const Coord& final_coord);
 		 
 		CombatCard&& popTopCardAt(const Coord& coord);
 		CombatCard&& popCardFromStackAt(const Coord& coord, const CombatCard& card_to_remove);
@@ -78,8 +79,11 @@ namespace base {
 
 		bool isValidPlaceCard(const Coord&, const CombatCard&);
 		bool isValidRemoveStack(const Coord&) const;
+		bool isValidRemoveRow(const uint16_t row_index)const;
+		bool isValidRemoveColumn(const uint16_t col_index)const;
 		bool isValidMoveStack(const Coord&, const Coord&) const;
 		bool isValidMoveStacks(const std::vector<std::pair<Coord, Coord>>& moves) const;
+		bool isValidMergeStacks(const std::vector<Coord>& coords, const Coord& final_coord)const;
 		
 		void render() const;
 		void sideViewRender();

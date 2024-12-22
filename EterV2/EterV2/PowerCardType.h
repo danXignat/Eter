@@ -5,7 +5,7 @@
 #include<string_view>
 namespace base {
 
-	enum class ShiftDirection {
+	enum class MoveDirection { 
 		Right,
 		Left,
 		Up,
@@ -99,6 +99,11 @@ namespace base {
 
  };
 
+ const std::unordered_map<Orientation, std::vector<MoveDirection>> validDirections = {
+			 {Orientation::Row, {MoveDirection::Left, MoveDirection::Right}},
+			 {Orientation::Column, {MoveDirection::Up, MoveDirection::Down}}
+ }; 
+
  inline std::string_view typeToStrings(PowerCardType type) {
 	 return mapPowers.at(type);
  }
@@ -108,35 +113,35 @@ namespace base {
 	 return mapPowerTypeAbilities.at(ability);
  }
 
- static std::string_view ShiftToString(ShiftDirection direction) {
+ static std::string_view MoveDirToString(MoveDirection direction) {
 	 switch (direction) {
-	 case ShiftDirection::Right:
+	 case MoveDirection::Right:
 		 return "Right";
-	 case ShiftDirection::Left:
+	 case MoveDirection::Left:
 		 return "Left";
-	 case ShiftDirection::Up:
+	 case MoveDirection::Up:
 		 return "Up";
-	 case ShiftDirection::Down:
+	 case MoveDirection::Down:
 		 return "Down";
 	 default:
 		 return "Unknown";
 	 }
  }
- static ShiftDirection stringToShift(std::string_view direction_string) {
+ static MoveDirection stringToMoveDir(std::string_view direction_string) {
 	 if (direction_string == "Right") {
-		 return ShiftDirection::Right;
+		 return MoveDirection::Right;
 	 }
 	 else if (direction_string == "Left") {
-		 return ShiftDirection::Left;
+		 return MoveDirection::Left;
 	 }
 	 else if (direction_string == "Up") {
-		 return ShiftDirection::Up;
+		 return MoveDirection::Up;
 	 }
 	 else if (direction_string == "Down") {
-		 return ShiftDirection::Down;
+		 return MoveDirection::Down;
 	 }
 	 else {
-		 return ShiftDirection::Unknown;
+		 return MoveDirection::Unknown;
 	 }
  }
  static std::string_view OrientationToString(Orientation type) {

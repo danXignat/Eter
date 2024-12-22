@@ -89,7 +89,7 @@ namespace base {
 
 		void apply(Board& board, Player& player) override;
 		std::unordered_map<Orientation, std::vector<uint16_t>> getOptions(Board& board);  
-		std::tuple<Orientation, uint16_t, ShiftDirection>  input(Board&board);
+		std::tuple<Orientation, uint16_t, MoveDirection>  input(Board&board);
 
 	};
 
@@ -164,8 +164,10 @@ namespace base {
 	class Waterfall :public PowerCard {
 	public:
 		Waterfall();
-
+		std::unordered_map < Orientation, std::vector<int16_t>>getOptions(Board& board); 
+		std::tuple< Orientation, int16_t, MoveDirection>input(Board&board);
 		void apply(Board& board, Player& player) override;
+
 
 	};
 
@@ -209,7 +211,7 @@ namespace base {
 		Avalanche();
 
 		void apply(Board& board, Player& player) override;
-		std::vector<std::pair<ShiftDirection, std::pair<Coord, Coord>>> checkShifting(
+		std::vector<std::pair<MoveDirection, std::pair<Coord, Coord>>> checkShifting(
 		const std::vector<std::pair<Orientation, std::pair<Coord, Coord>>>& pack, Board& board);
 		std::vector<std::pair<Orientation, std::pair<Coord, Coord>>> getPairs(Board& board);
 

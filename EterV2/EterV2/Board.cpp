@@ -135,7 +135,40 @@ namespace base {
 		moveStacks(moves);
 	}
 
+	void Board::mergeStacks(const std::vector<Coord>& coords, const Coord& final_coord) {
+		if (!isValidMergeStacks(coords, final_coord)) {
+			Logger::log(Level::WARNING, "Merge stacks validation failed.");
+			return;
+		}
+		bool forward = (final_coord == coords.back());
+		auto merge = [&](const Coord& src, const Coord& dest) {
+			if (!m_combat_cards.contains(src) || !m_combat_cards.contains(dest)) {
+				Logger::log(Level::WARNING, "Invalid merge: Missing stack at ({}, {}) or ({}, {}).", src.first, src.second, dest.first, dest.second);
+				return;
+			}
+			auto& src_stack = m_combat_cards[src];
+			auto& dest_stack = m_combat_cards[dest];
 
+			dest_stack.insert(dest_stack.end(),
+				std::make_move_iterator(src_stack.begin()),
+				std::make_move_iterator(src_stack.end()));
+			src_stack.clear();
+			m_combat_cards.erase(src);
+
+			Logger::log(Level::INFO, "Merged stack from ({}, {}) to ({}, {}).", src.first, src.second, dest.first, dest.second);
+			};
+		if (forward) {
+			for (size_t i = 0; i < coords.size() - 1; ++i) {
+				merge(coords[i], coords[i + 1]);
+			}
+		}
+		else {
+			for (size_t i = coords.size() - 1; i > 0; --i) {
+				merge(coords[i], coords[i - 1]);
+			}
+		}
+		_reinitialise();
+	}
 
 
 	/*void Board::moveRow(uint16_t from_y, uint16_t to_y) {
@@ -441,6 +474,10 @@ namespace base {
 	}
 
 	void Board::removeRow(uint16_t y) {
+		if (!isValidRemoveRow(y)) {
+			Logger::log(Level::ERROR, "You can't remove that row");
+			return;
+		}
 		std::vector<Stack> row_stacks = std::move(popRow(y));
 
 		for (;  row_stacks.empty() == false; row_stacks.pop_back()) {
@@ -449,6 +486,10 @@ namespace base {
 	}
 
 	void Board::removeColumn(uint16_t x) {
+		if (!isValidRemoveColumn(x)) {
+			Logger::log(Level::ERROR, "You can't remove that column");
+			return;
+		}
 		std::vector<Stack> col_stacks = std::move(popColumn(x));
 
 		for (; col_stacks.empty() == false; col_stacks.pop_back()) {
@@ -504,6 +545,52 @@ namespace base {
 
 		return _isConex(new_config);
 	}
+
+	bool Board::isValidRemoveRow(const uint16_t row_index) const
+	{
+		if (row_index < m_bounding_rect.corner1.second || row_index > m_bounding_rect.corner2.second) {
+			Logger::log(Level::WARNING, "Row {} is out of bounds.", row_index); 
+			return false;
+		}
+
+		std::unordered_set<Coord, CoordFunctor> simulated_config{
+			std::ranges::begin(m_combat_cards | std::views::keys),
+			std::ranges::end(m_combat_cards | std::views::keys)
+		};
+
+		for (auto it = simulated_config.begin(); it != simulated_config.end(); ) {
+			if (it->second == row_index) {
+				it = simulated_config.erase(it);
+			}
+			else {
+				++it;
+			}
+		}
+		return _isConex(simulated_config);
+
+	}
+
+	bool Board::isValidRemoveColumn(const uint16_t col_index) const {
+
+		if (col_index < m_bounding_rect.corner1.first || col_index > m_bounding_rect.corner2.first) {
+			Logger::log(Level::WARNING, "Column {} is out of bounds.", col_index);
+			return false;
+		}
+		std::unordered_set<Coord, CoordFunctor> simulated_config{
+			std::ranges::begin(m_combat_cards | std::views::keys),
+			std::ranges::end(m_combat_cards | std::views::keys)
+		};
+		for (auto it = simulated_config.begin(); it != simulated_config.end(); ) {
+			if (it->first == col_index) {
+				it = simulated_config.erase(it);
+			}
+			else {
+				++it;
+			}
+		}
+		return _isConex(simulated_config);
+	}
+
 
 	bool Board::isValidMoveStack(const Coord& from_coord, const Coord& to_coord) const {
 		if (m_combat_cards.contains(from_coord) == false) {
@@ -586,6 +673,35 @@ namespace base {
 			is_first_stack = false;
 		}
 		return _isConex(new_config);
+	}
+
+	bool Board::isValidMergeStacks(const std::vector<Coord>& coords, const Coord& final_coord) const {
+		if (coords.empty()) {
+			Logger::log(Level::WARNING, "No source stacks provided for merge.");
+			return false;
+		}
+		if (std::find(coords.begin(), coords.end(), final_coord) == coords.end()) {
+			Logger::log(Level::WARNING, "Final destination ({}, {}) is not in the source coordinates.", final_coord.first, final_coord.second);
+			return false;
+		}
+		if (!m_combat_cards.contains(final_coord)) {
+			Logger::log(Level::WARNING, "Final destination ({}, {}) is not valid.", final_coord.first, final_coord.second);
+			return false;
+		}
+		std::unordered_set<Coord, CoordFunctor> simulated_config{
+			std::ranges::begin(m_combat_cards | std::views::keys),
+			std::ranges::end(m_combat_cards | std::views::keys)
+		};
+		for (const auto& coord : coords) {
+			if (coord != final_coord) {
+				if (!simulated_config.contains(coord)) {
+					Logger::log(Level::WARNING, "Stack does not exist at ({}, {}).", coord.first, coord.second);
+					return false;
+				}
+				simulated_config.erase(coord);
+			}
+		}
+		return _isConex(simulated_config);
 	}
 
 
