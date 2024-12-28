@@ -17,12 +17,14 @@ private:
 protected:
     void mousePressEvent(QMouseEvent* event) override;
 public:
-    GameGUI(base::Board& board, QWidget *parent = nullptr);
+    GameGUI(base::Board& board, base::Player& redPlayer, base::Player& bluePlayer, QWidget* parent = nullptr);
     ~GameGUI();
 
     void drawSquareAt(QGraphicsScene* scene, int row, int col);
     void drawAvailablePositions();
-   // void drawImageAt(QGraphicsScene* scene, int row, int col, const QString& imagePath);
+    void drawImageAt(QGraphicsScene* scene, int row, int col, const QString& imagePath);
+    void drawPlayerCards(const base::Player& player, int xStart, int yStart);
+
    
 };
 

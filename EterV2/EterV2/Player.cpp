@@ -94,7 +94,9 @@ namespace base {
 
         return std::move(card);
     }
-
+    const std::unordered_multimap<CombatCardType, CombatCard>& Player::getCards() const{
+        return m_cards;
+    }
     CombatCard&& Player::getUsedCard(CombatCardType type) {
         if (this->hasUsedCard(type) == false) {
             throw std::runtime_error("player does not have this card");
