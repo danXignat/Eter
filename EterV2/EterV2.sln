@@ -5,6 +5,8 @@ VisualStudioVersion = 17.11.35312.102
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "EterV2", "EterV2\EterV2.vcxproj", "{CAE92530-402A-4F9D-BB76-8F6F30190FB5}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GameGUI", "GameGUI\GameGUI.vcxproj", "{33277FE1-EBA2-4F1B-B623-D6FE11EE9909}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -21,6 +23,14 @@ Global
 		{CAE92530-402A-4F9D-BB76-8F6F30190FB5}.Release|x64.Build.0 = Release|x64
 		{CAE92530-402A-4F9D-BB76-8F6F30190FB5}.Release|x86.ActiveCfg = Release|Win32
 		{CAE92530-402A-4F9D-BB76-8F6F30190FB5}.Release|x86.Build.0 = Release|Win32
+		{33277FE1-EBA2-4F1B-B623-D6FE11EE9909}.Debug|x64.ActiveCfg = Debug|x64
+		{33277FE1-EBA2-4F1B-B623-D6FE11EE9909}.Debug|x64.Build.0 = Debug|x64
+		{33277FE1-EBA2-4F1B-B623-D6FE11EE9909}.Debug|x86.ActiveCfg = Debug|x64
+		{33277FE1-EBA2-4F1B-B623-D6FE11EE9909}.Debug|x86.Build.0 = Debug|x64
+		{33277FE1-EBA2-4F1B-B623-D6FE11EE9909}.Release|x64.ActiveCfg = Release|x64
+		{33277FE1-EBA2-4F1B-B623-D6FE11EE9909}.Release|x64.Build.0 = Release|x64
+		{33277FE1-EBA2-4F1B-B623-D6FE11EE9909}.Release|x86.ActiveCfg = Release|x64
+		{33277FE1-EBA2-4F1B-B623-D6FE11EE9909}.Release|x86.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
