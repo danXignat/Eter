@@ -15,11 +15,9 @@ namespace base {
 		ElementalMode(const std::vector<ServiceType>&, const std::pair<std::string, std::string>&);
 		void run() override;
 		void render();
-		bool _handleSpecialEvent(const InputHandler&) override;
+		bool usePower() override;
 
 	private:
-		std::optional<IllusionService> m_illusion_service;
-		std::optional<ExplosionService> m_explosion_service;
 		ElementalService m_elemental_service;
 	};
 }

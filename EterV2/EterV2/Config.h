@@ -19,10 +19,12 @@ namespace base {
         Coord getStartPoint(const Coord&);
         uint16_t getCardWidth(uint16_t);
         uint16_t getCardHeight(uint16_t);
-
+    
+    public:
         Config(const Config&) = delete;
         Config& operator=(const Config&) = delete;
         ~Config() = default;
+
     private:
         Config() = default;
 

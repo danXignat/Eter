@@ -7,11 +7,14 @@
 namespace base {
 	class ExplosionService {
 	public:
+		static constexpr const uint16_t VALID_COMPLETED_LINES = 2;
+
 		ExplosionService(Board&, Player&, Player&);
 
 		void apply();
 		void setting();
 		void renderExplosion();
+		bool checkAvailability();
 
 	private:
 		Board& m_board;

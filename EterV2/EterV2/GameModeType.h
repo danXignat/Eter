@@ -16,9 +16,13 @@ namespace base {
 		BIG = 4
 	};
 
-	enum class GameEventType : uint16_t {
+	enum class EventType : uint16_t {
 		NONE, 
-		BoardCard,
-		SpecialCard
+		PlaceCombatCard,
+		PlaceIllusion,
+		SettingExplosion,
+		DetonateExplosion,
+		UseMage,
+		UsePower
 	};
 }

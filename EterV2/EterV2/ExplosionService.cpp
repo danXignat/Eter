@@ -1,5 +1,6 @@
 #include "ExplosionService.h"
 
+#include <ranges>
 #include "conio.h"
 
 namespace base {
@@ -8,6 +9,22 @@ namespace base {
 		m_player1{ player1 }, m_player2{ player2 },
 		m_card{board, player1, player2} {
 		
+	}
+
+	bool ExplosionService::checkAvailability() {
+		std::unordered_map<uint16_t, uint16_t> x_field_counter;
+		std::unordered_map<uint16_t, uint16_t> y_field_counter;
+
+		for (const Coord& coord : m_board | std::views::keys) {
+			x_field_counter[coord.first]++;
+			y_field_counter[coord.second]++;
+		}
+
+		auto validCount = [&](const Coord& pair) { return pair.second == m_board.size(); };
+		uint16_t valid_x_count = std::count_if(x_field_counter.begin(), x_field_counter.end(), validCount);
+		uint16_t valid_y_count = std::count_if(y_field_counter.begin(), y_field_counter.end(), validCount);
+
+		return valid_x_count + valid_y_count >= VALID_COMPLETED_LINES;
 	}
 
 	void ExplosionService::apply() {
@@ -82,4 +99,5 @@ namespace base {
 	void ExplosionService::renderExplosion() {
 		m_card.render();
 	}
+
 }

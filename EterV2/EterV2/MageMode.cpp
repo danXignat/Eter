@@ -10,24 +10,9 @@ using namespace logger;
 namespace base {
 	//---------------------------------------Constructor-------------------------------------
 	MageMode::MageMode(const std::vector<ServiceType>& services, const std::pair<std::string, std::string>& player_names) :
-		BaseGameMode{GameSizeType::BIG, player_names},
+		BaseGameMode{GameSizeType::BIG, player_names, services},
 		m_mage_service{ m_board }
-	{
-
-		for (ServiceType service : services) {
-			switch (service) {
-				using enum ServiceType;
-			case ILLUSION:
-				m_illusion_service.emplace(m_board, m_win_manager);
-				break;
-			case EXPLOSION:
-				m_explosion_service.emplace(m_board, m_player_red, m_player_blue);
-				break;
-			default:
-				break;
-			}
-		}
-	}
+	{}
 
 	//---------------------------------------Events----------------------------------------------
 
@@ -46,15 +31,36 @@ namespace base {
 				continue;
 			}
 
-			if (_handleEvent(input)) {
-				Logger::log(Level::INFO, "succesful action");
-				_switchPlayer();
-			}
-			else {
-				Logger::log(Level::INFO, "failed action");
+			bool action_succed;
+			switch (input.event_type) {
+				using enum EventType;
+
+			case PlaceCombatCard:
+				action_succed = placeCombatCard(input);
+				break;
+
+			case PlaceIllusion:
+				action_succed = placeIllusion(input);
+				break;
+
+			case UseMage:
+				action_succed = useMage();
+				break;
+
+			default:
+				break;
 			}
 
-			this->render();
+			if (isExplosionAvailable()) {
+				this->render();
+				setExplosion();
+				detonateExplosion();
+			}
+
+			if (action_succed) {
+				switchPlayer();
+				this->render();
+			}
 		}
 
 		if (m_curr_player.get().getColor() == color::ColorType::BLUE) {
@@ -67,55 +73,8 @@ namespace base {
 		std::cin.get();
 	}
 
-	bool MageMode::_handleSpecialEvent(const InputHandler& input) {
-
-		switch (input.service_type) {
-			using enum ServiceType;
-
-		case ILLUSION: {
-			if (m_illusion_service) {
-				Coord coord = input.coord;
-				CombatCardType card_type = input.card_type;
-
-				CombatCard card = m_curr_player.get().getCard(card_type);
-				card.flip();
-
-				bool has_illusion = m_illusion_service->hasIllusion(m_curr_player.get());
-				bool valid_move = m_illusion_service->isValidPlaceCard(coord, card);
-
-				if (has_illusion && valid_move) {
-					m_illusion_service->placeIllusion(coord, std::move(card));
-
-					return true;
-				}
-				else {
-					card.flip();
-
-					m_curr_player.get().addCard(std::move(card));
-				}
-			}
-			break;
-		}
-
-		case EXPLOSION: {
-			if (m_explosion_service) {
-				m_explosion_service->setting();
-				m_explosion_service->apply();
-
-				return true;
-			}
-			break;
-		}
-		
-		case MAGE: {
-			return m_mage_service.apply(m_curr_player);
-		}
-
-		default:
-			break;
-		}
-
-		return false;
+	bool MageMode::useMage() {
+		return m_mage_service.apply(m_curr_player.get());
 	}
 
 	////------------------------------------------------Methods-------------------------------------------------

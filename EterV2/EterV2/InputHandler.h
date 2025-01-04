@@ -13,7 +13,7 @@ namespace base {
 		std::pair<uint16_t, uint16_t> coord;
 		CombatCardType card_type;
 		ServiceType service_type;
-		GameEventType event_type;
+		EventType event_type;
 	};
 	
 }

@@ -38,30 +38,33 @@ void testExplosion() {
 }
 
 void testConfig() {
-	base::Config::getInstance()		//builder design pattern
-		.setStartPoint({ 10, 5 })
-		.setCardWidth(2)
-		.setCardHeight(1);
+	using namespace base;
 
-	for (auto& [label, value] : base::Config::getInstance().getConfig()) {
+	Config& config = Config::getInstance();		//builder design pattern
+
+	config.setStartPoint({ 10, 5 })
+		  .setCardWidth(2)
+		  .setCardHeight(1);
+
+	for (auto& [label, value] : config.getConfig()) {
 		if (std::holds_alternative<uint16_t>(value)) {
 			std::cout << label << ": " << std::get<uint16_t>(value) << std::endl;
 		}
-		else if (std::holds_alternative<base::Coord>(value)) {
+		else if (std::holds_alternative<Coord>(value)) {
 			std::cout << label << ": " <<
-				std::get<base::Coord>(value).first << ", " <<
-				std::get<base::Coord>(value).second << std::endl;
+				std::get<Coord>(value).first << ", " <<
+				std::get<Coord>(value).second << std::endl;
 		}
 	}
 }
 
 int main() {
-	/*system("start powershell -Command \"Get-Content -Path 'log.txt' -Wait\"");
+	system("start powershell -Command \"Get-Content -Path 'log.txt' -Wait\"");
 
 	base::GameModePtr game_mode{ base::GameModeFactory::get("212", { "titi", "gigi" }) };
-	game_mode->run();*/
+	game_mode->run();
 
-	testConfig();
+	//testConfig();
 
 	//testExplosion();
 }

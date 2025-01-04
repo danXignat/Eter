@@ -13,17 +13,25 @@
 namespace base {
 	class BaseGameMode : public IGameMode {
 	public:
-		BaseGameMode(GameSizeType, const std::pair<std::string, std::string>&);
+		BaseGameMode(GameSizeType, const std::pair<std::string, std::string>&, const std::vector<ServiceType>&);
 		virtual ~BaseGameMode() = default;
 
 		virtual void run() = 0;
 
-	protected:
-		bool _handleEvent(const InputHandler&);
-		bool _handleBoardEvent(const InputHandler&);
-		virtual bool _handleSpecialEvent(const InputHandler&) = 0;
+	public:
+		bool placeCombatCard(const InputHandler&);
 
-		void _switchPlayer();
+		virtual bool placeIllusion(const InputHandler&);
+
+		virtual bool isExplosionAvailable();
+		virtual void setExplosion();
+		virtual void detonateExplosion();
+
+		virtual bool useMage();
+
+		virtual bool usePower();
+
+		void switchPlayer();
 
 	protected:
 		Player m_player_red;
@@ -32,5 +40,8 @@ namespace base {
 
 		Board m_board;
 		WinManager m_win_manager;
+
+		std::optional<IllusionService> m_illusion_service;
+		std::optional<ExplosionService> m_explosion_service;
 	};
 }

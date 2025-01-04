@@ -140,7 +140,10 @@ namespace base {
 	Coord Explosion::_mapExplosionToBoard(const Coord& effect_coord) {
 		Logger::log(Level::INFO, "board {} {} explosion card {} {}", m_board_corner.value().first, m_board_corner.value().second, effect_coord.first, effect_coord.second);
 
-		return { m_board_corner.value().first + 2 * effect_coord.first, m_board_corner.value().second + effect_coord.second };
+		return { 
+			m_board_corner.value().first + 2 * (effect_coord.first - m_effect_corner1.first),
+			m_board_corner.value().second + effect_coord.second - m_effect_corner1.second
+		};
 	}
 
 	void Explosion::setEffectForWidth(Board& board) {

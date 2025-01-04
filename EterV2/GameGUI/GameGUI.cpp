@@ -71,7 +71,7 @@ void GameGUI::drawPlayerCards(const base::Player& player, int xStart, int yStart
     }
 
     for (const auto& [type, card] : cards) {
-        QString imagePath = QString("C:/Eter/EterV2/eterCards/%1_%2.png")
+        QString imagePath = QString("../eterCards/%1_%2.png")
             .arg(player.getColor() == color::ColorType::RED ? "red" : "blue")
             .arg(combatCardToChar(type));
 
@@ -101,7 +101,7 @@ void GameGUI::mousePressEvent(QMouseEvent* event) {
     const auto& availableSpaces = gameBoard.availableSpaces();
     for (const auto& coord : availableSpaces) {
         if (coords.first == coord.first && coords.second == coord.second) {
-            drawImageAt(scene, coords.first / 2, coords.second, "C:/Eter/EterV2/eterCards/1_blue.png");
+            drawImageAt(scene, coords.first / 2, coords.second, "../eterCards/%1_%2.png");
             gameBoard.appendAnyCard(coords, std::move(card));
             drawAvailablePositions();
             break;

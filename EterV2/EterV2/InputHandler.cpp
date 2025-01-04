@@ -10,7 +10,7 @@ namespace base {
 		coord{0, 0},
 		card_type{ CombatCardType::NONE },
 		service_type{ ServiceType::NONE },
-		event_type{ GameEventType::NONE } {
+		event_type{ EventType::NONE } {
 
 	}
 
@@ -30,17 +30,17 @@ namespace base {
 			throw std::runtime_error("No arguments");
 		}
 		else if (tokens.size() == 1) {
-			std::string special_card{ tokens.front() };
-			std::regex pattern{ R"(^[emp]$)" };
-
-			if (special_card.size() == 1 && std::regex_match(special_card, pattern)) {
-				service_type = charToService(special_card.front());
+			switch (tokens.front().front())
+			{
+			case 'm':
+				event_type = EventType::UseMage;
+				break;
+			case 'p':
+				event_type = EventType::UsePower;
+				break;
+			default:
+				break;
 			}
-			else {
-				throw std::runtime_error("Invalid special card");
-			}
-
-			event_type = GameEventType::SpecialCard;
 		}
 		else if (tokens.size() > 1 && tokens.size() <= 3) {
 			std::regex coord_pattern{ R"(^\d{0,2}$)" };
@@ -64,7 +64,7 @@ namespace base {
 			}
 			card_type = charToCombatCard(card_type_str.front());
 
-			event_type = GameEventType::BoardCard;
+			event_type = EventType::PlaceCombatCard;
 		}
 		else if (tokens.size() > 1 && tokens.size() <= 4) {
 			std::regex coord_pattern{ R"(^\d{0,2}$)" };
@@ -95,7 +95,7 @@ namespace base {
 				service_type = charToService(tokens[3].front());
 			}
 
-			event_type = GameEventType::SpecialCard;
+			event_type = EventType::PlaceIllusion;
 		}
 		else {
 			throw std::runtime_error("Invalid argument number");
