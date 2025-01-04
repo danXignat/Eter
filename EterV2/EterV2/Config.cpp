@@ -1,14 +1,17 @@
 #include "Config.h"
 
 namespace base {
-    std::unique_ptr<Config> Config::m_instance = nullptr;
+    std::unique_ptr<Config> Config::m_instance{new Config()};
+
+    Config::Config() :
+        m_mapped_offsets{DIRECTON_OFFSETS},
+        m_start_point{0, 0},
+        m_card_space_x{ 0 },
+        m_card_space_y{ 0 } {
+
+    }
 
 	Config& Config::getInstance() {
-        if (!m_instance) {
-            m_instance = std::unique_ptr<Config>(
-                new Config()
-            );
-        }
         return *m_instance;
     }
 
@@ -18,35 +21,47 @@ namespace base {
         return *m_instance;
     }
 
-    Config& Config::setCardWidth(uint16_t width) {
-        m_instance->m_card_width = width;
+    Config& Config::setCardSpacingX(uint16_t spacing) {
+        m_instance->m_card_space_x = spacing;
+
+        std::transform(m_mapped_offsets.begin(), m_mapped_offsets.end(), m_mapped_offsets.begin(),
+            [spacing](auto& p) -> Coord { return { spacing * p.first, p.second }; }
+        );
 
         return *m_instance;
     }
 
-    Config& Config::setCardHeight(uint16_t height) {
-        m_instance->m_card_height = height;
+    Config& Config::setCardSpacingY(uint16_t spacing) {
+        m_instance->m_card_space_y = spacing;
+
+        std::transform(m_mapped_offsets.begin(), m_mapped_offsets.end(), m_mapped_offsets.begin(),
+            [spacing](auto& p) -> Coord { return {p.first, spacing * p.second}; }
+        );
 
         return *m_instance;
     }
 
-    Coord Config::getStartPoint(const Coord&) {
+    Coord Config::getStartPoint() {
         return m_start_point;
     }
 
-    uint16_t Config::getCardWidth(uint16_t) {
-        return m_card_width;
+    uint16_t Config::getCardSpacingX() {
+        return m_card_space_x;
     }
 
-    uint16_t Config::getCardHeight(uint16_t) {
-        return m_card_height;
+    uint16_t Config::getCardSpacingY() {
+        return m_card_space_y;
+    }
+
+    const std::array<Coord, 8>& Config::getOffsets() {
+        return m_mapped_offsets;
     }
 
     std::unordered_map<std::string, std::variant<uint16_t, Coord>> Config::getConfig() const {
         return {
             {"StartPoint", {m_start_point}},
-            {"CardWidth", {m_card_width} },
-            {"CardHeight", {m_card_height} }
+            {"CardSpaceX", {m_card_space_x} },
+            {"CardSpaceY", {m_card_space_y} }
         };
     }
 }

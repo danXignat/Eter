@@ -13,6 +13,7 @@
 #include "colors.h"
 #include "GameModeType.h"
 #include "typedefs.h"
+#include "Config.h"
 
 using namespace utils;
 
@@ -20,11 +21,6 @@ namespace base {
 	class Board {
 	public:
 		using Stack = std::vector<CombatCard>;
-		static constexpr const std::pair<uint16_t, uint16_t> START_POS{10, 5};
-		static constexpr const std::array<Coord, 8> ADJACENCY_OFFSETS{
-			Coord{2, 0}, Coord{2, -1}, Coord{0, -1}, Coord{-2, -1},
-			Coord{-2, 0}, Coord{-2, 1}, Coord{0, 1}, Coord{2, 1}
-		};
 
 		Board(uint16_t, Player&, Player&);
 		Board(GameSizeType, Player&, Player&);

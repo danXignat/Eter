@@ -13,7 +13,7 @@
 namespace base {
     class MageService {
     public:
-        static constexpr const uint16_t mage_number = 8;
+        static constexpr const uint16_t MAGE_NUMBER = 8;
 
         MageService(Board& board);
         bool apply(Player& player);

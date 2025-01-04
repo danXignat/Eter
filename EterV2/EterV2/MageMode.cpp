@@ -50,7 +50,7 @@ namespace base {
 			default:
 				break;
 			}
-
+			
 			if (isExplosionAvailable()) {
 				this->render();
 				setExplosion();

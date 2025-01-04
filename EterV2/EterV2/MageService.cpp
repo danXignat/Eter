@@ -9,7 +9,7 @@ namespace base {
 		std::random_device rd;
 		std::mt19937 gen(rd());
 
-		std::array<uint16_t, MageService::mage_number> choices;
+		std::array<uint16_t, MAGE_NUMBER> choices;
 		std::iota(choices.begin(), choices.end(), 0);
 		std::shuffle(choices.begin(), choices.end(), gen);
 
@@ -73,6 +73,7 @@ namespace base {
 	std::unique_ptr<MageCard> MageService::_factory(MageTypeAbility ability_type) {
 		switch (ability_type) {
 			using enum MageTypeAbility;
+			
 		case Burn:
 			return std::make_unique<MasterOfFireFront>();
 			

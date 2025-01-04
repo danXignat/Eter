@@ -13,7 +13,7 @@ namespace base {
 	Board::Board(uint16_t size, Player& player1, Player& player2) :
 		m_size{ size },
 		m_bounding_rect{ size },
-		m_available_spaces{ Coord{10, 5} },
+		m_available_spaces{ Config::getInstance().getStartPoint() },
 		m_player1{ player1 }, m_player2{ player2 } {
 
 	}
@@ -21,7 +21,7 @@ namespace base {
 	Board::Board(GameSizeType size_type, Player& player1, Player& player2) :
 		m_size{ static_cast<uint16_t>(size_type) },
 		m_bounding_rect{ static_cast<uint16_t>(size_type) },
-		m_available_spaces{Board::START_POS},
+		m_available_spaces{ Config::getInstance().getStartPoint() },
 		m_player1{ player1 }, m_player2{ player2 } {
 
 	}
@@ -655,7 +655,7 @@ namespace base {
 		for (; queue.empty() == false; queue.pop()) {
 			Coord curr = queue.front();
 
-			for (const auto& [x, y] : ADJACENCY_OFFSETS) {
+			for (const auto& [x, y] : Config::getInstance().getOffsets()) {
 				Coord adjacent_coord{ curr.first + x, curr.second + y };
 
 				bool not_visited = visited.contains(adjacent_coord) == false;
@@ -932,7 +932,7 @@ namespace base {
 	void Board::_updateAvailableSpaces(const Coord& coord) {
 		m_available_spaces.erase(coord);
 
-		for (const auto& offset : ADJACENCY_OFFSETS) {
+		for (const auto& offset : Config::getInstance().getOffsets()) {
 			Coord new_point{ coord.first + offset.first, coord.second + offset.second };
 
 			if (!m_combat_cards.contains(new_point)) {
@@ -1034,7 +1034,7 @@ namespace base {
 
 	Board::BoundingRect::BoundingRect(uint16_t size) :
 		size{ size },
-		corner1{ 10, 5 }, corner2{ 10, 5 },
+		corner1{ Config::getInstance().getStartPoint() }, corner2{ Config::getInstance().getStartPoint() },
 		fixed_width{ false }, fixed_height{ false } {
 
 	}
@@ -1057,8 +1057,11 @@ namespace base {
 			corner2.second = std::max(corner2.second, coord.second);
 		}
 
-		fixed_width = ((corner2.first - corner1.first) / 2 + 1 == size) ? true : false;
-		fixed_height = (corner2.second - corner1.second + 1 == size) ? true : false;
+		uint16_t offset_x = Config::getInstance().getCardSpacingX();
+		uint16_t offset_y = Config::getInstance().getCardSpacingY();
+
+		fixed_width  = ((corner2.first - corner1.first) / offset_x + 1 == size) ? true : false;
+		fixed_height = ((corner2.second - corner1.second) / offset_y + 1 == size) ? true : false;
 	}
 
 	void Board::BoundingRect::remove(const Coord& coord) {

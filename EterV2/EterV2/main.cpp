@@ -43,8 +43,8 @@ void testConfig() {
 	Config& config = Config::getInstance();		//builder design pattern
 
 	config.setStartPoint({ 10, 5 })
-		  .setCardWidth(2)
-		  .setCardHeight(1);
+		  .setCardSpacingX(100)
+		  .setCardSpacingY(200);
 
 	for (auto& [label, value] : config.getConfig()) {
 		if (std::holds_alternative<uint16_t>(value)) {
@@ -56,10 +56,19 @@ void testConfig() {
 				std::get<Coord>(value).second << std::endl;
 		}
 	}
+
+	for (const auto& [x, y] : config.getOffsets()) {
+		std::cout << x << " " << y << std::endl;
+	}
 }
 
 int main() {
 	system("start powershell -Command \"Get-Content -Path 'log.txt' -Wait\"");
+
+	base::Config::getInstance()
+		.setStartPoint({ 10, 5 })
+		.setCardSpacingX(4)
+		.setCardSpacingY(2);
 
 	base::GameModePtr game_mode{ base::GameModeFactory::get("212", { "titi", "gigi" }) };
 	game_mode->run();

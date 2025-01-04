@@ -2,6 +2,7 @@
 
 #include <ranges>
 
+#include "Config.h"
 #include "logger.h"
 #include "utils.h"
 
@@ -70,8 +71,8 @@ namespace base {
 	void Explosion::_handleRecursiveRemoval(const Coord& effect_coord) {
 		auto [curr_x, curr_y] { effect_coord };
 
-		for (auto [x_offset, y_offset] : m_board.ADJACENCY_OFFSETS) {
-			Coord neighbor_effect_coord{ curr_x + x_offset/2, curr_y + y_offset };
+		for (auto [x_offset, y_offset] : Config::DIRECTON_OFFSETS) {
+			Coord neighbor_effect_coord{ curr_x + x_offset, curr_y + y_offset };
 			Coord neighbor_board_coord{ _mapExplosionToBoard(neighbor_effect_coord) };
 
 			auto [effect_x, effect_y] { neighbor_effect_coord };
@@ -140,9 +141,12 @@ namespace base {
 	Coord Explosion::_mapExplosionToBoard(const Coord& effect_coord) {
 		Logger::log(Level::INFO, "board {} {} explosion card {} {}", m_board_corner.value().first, m_board_corner.value().second, effect_coord.first, effect_coord.second);
 
+		uint16_t offset_x = Config::getInstance().getCardSpacingX();
+		uint16_t offset_y = Config::getInstance().getCardSpacingY();
+
 		return { 
-			m_board_corner.value().first + 2 * (effect_coord.first - m_effect_corner1.first),
-			m_board_corner.value().second + effect_coord.second - m_effect_corner1.second
+			m_board_corner.value().first  + offset_x * (effect_coord.first - m_effect_corner1.first),
+			m_board_corner.value().second + offset_y * (effect_coord.second - m_effect_corner1.second)
 		};
 	}
 
