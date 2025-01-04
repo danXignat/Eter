@@ -11,7 +11,7 @@ namespace base {
 
 		void apply();
 		void setting();
-		void render_explosion();
+		void renderExplosion();
 
 	private:
 		Board& m_board;

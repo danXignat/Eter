@@ -21,6 +21,10 @@ namespace base {
 	public:
 		using Stack = std::vector<CombatCard>;
 		static constexpr const std::pair<uint16_t, uint16_t> START_POS{10, 5};
+		static constexpr const std::array<Coord, 8> ADJACENCY_OFFSETS{
+			Coord{2, 0}, Coord{2, -1}, Coord{0, -1}, Coord{-2, -1},
+			Coord{-2, 0}, Coord{-2, 1}, Coord{0, 1}, Coord{2, 1}
+		};
 
 		Board(uint16_t, Player&, Player&);
 		Board(GameSizeType, Player&, Player&);
@@ -33,15 +37,15 @@ namespace base {
 		bool hasStack(const Coord&) const;
 		bool isFixed() const;
 		bool isCardOfColorAt(color::ColorType, const Coord&) const;
-		bool isFixedColumn(int16_t x)const;
-		bool isFixedRow(int16_t y)const;
+		bool isFixedColumn(int16_t x) const;
+		bool isFixedRow(int16_t y) const;
 		
 		uint16_t getSize() const;
 		Coord getLeftCorner() const;
 		std::pair<Coord, Coord> getBoudingRect() const;
 		std::pair<uint16_t, uint16_t> getBoundingRectSize() const;
 		const std::unordered_set<Coord, CoordFunctor>& availableSpaces() const;
-		std::unordered_map<Coord, Stack, CoordFunctor>& getCombatCards();
+		const std::unordered_map<Coord, Stack, CoordFunctor>& getCombatCards() const;
 		std::optional<CombatCardRef> getTopCard(const Coord& coord);
 		const std::vector<CombatCard>& operator[](const Coord& coord);
 		std::unordered_set<int16_t> getFixedRows() const;
@@ -53,6 +57,7 @@ namespace base {
 		std::vector<Coord> getCoordsOnRow(int16_t row_index) const;
 		std::vector<Coord> getCoordsOnColumn(int16_t col_index) const;
 		
+		void createHole(const Coord&);
 		void appendMove(const Coord&, CombatCard&&);
 		void appendAnyCard(const Coord&, CombatCard&&);
 		void moveRow(uint16_t from_y, uint16_t to_y);
@@ -119,7 +124,6 @@ namespace base {
 		BoundingRect m_bounding_rect;
 		Player& m_player1, & m_player2;
 
-		std::array<Coord, 8> m_adjacency_offsets;
 		std::unordered_map<Coord, Stack, CoordFunctor> m_combat_cards;
 		std::unordered_set<Coord, CoordFunctor> m_available_spaces;
 

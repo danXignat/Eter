@@ -408,7 +408,7 @@ namespace base {
             Logger::log(Level::WARNING, "Invalid card coordinates");
             return;
         }
-        CombatCard& card = board.getCombatCards()[cardCoord].back();
+        /*CombatCard& card = board.getCombatCards()[cardCoord].back(); //n ai voie sa modifici asa boardul trebuie sa folosesti metode existente musai am facut getCombatCards const ca sa nu mai poti face asta
         std::vector<Coord>validMoves;
         std::vector<Coord> neighbors{
        {cardCoord.first - 2, cardCoord.second},
@@ -423,9 +423,9 @@ namespace base {
                     validMoves.push_back(neighbor);
                 }
             }
-        }
+        }*/
 
-        if (!validMoves.empty()) {
+        /*if (!validMoves.empty()) {
             for (const auto& move : validMoves) {
                 std::cout << "Valid moves:" << move.first << ", " << move.second << std::endl;
             }
@@ -444,7 +444,7 @@ namespace base {
         }
         else {
             Logger::log(Level::WARNING, "No valid coordinates to move the card");
-        }
+        }*/
     }
 
     std::vector<Coord> Gust::getCardsCoord(const Board& board)const {
@@ -672,10 +672,10 @@ namespace base {
 
         std::pair<Coord, Coord>input_coords{first_coord, second_coord};
         if (std::find(coord_pairs.begin(), coord_pairs.end(), input_coords) != coord_pairs.end()) {
-           CombatCard& firstCard = board.getCombatCards()[first_coord].back();
-           CombatCard& secondCard = board.getCombatCards()[second_coord].back();
+          /* CombatCard& firstCard = board.getCombatCards()[first_coord].back();
+           CombatCard& secondCard = board.getCombatCards()[second_coord].back();*/
 
-           if (firstCard.getType() < secondCard.getType()) {
+           /*if (firstCard.getType() < secondCard.getType()) { //aceeasi problema ca mai sus
                board.appendMove({ first_coord.first + 2,first_coord.second }, std::move(firstCard));
                board.appendMove({ second_coord.first - 2,second_coord.second }, std::move(secondCard));
            }
@@ -699,6 +699,7 @@ namespace base {
                board.appendMove({ second_coord.first - 2,second_coord.second }, std::move(secondCard));
                board.appendMove({ first_coord.first + 2,first_coord.second }, std::move(firstCard));
            }
+           */
            board.popTopCardAt(first_coord);
            board.popTopCardAt(second_coord);
            Logger::log(Level::INFO, "Whirlpool power card was played");

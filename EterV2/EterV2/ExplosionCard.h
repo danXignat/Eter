@@ -27,6 +27,8 @@ namespace base {
 
 		Explosion(Board&, Player&, Player&);
 
+		std::vector<Coord> getAffectedFields() const;
+
 		void apply();
 		void render();
 		void setEffectForWidth(Board&);
@@ -47,16 +49,20 @@ namespace base {
 		std::vector<Coord> _generateEffectPos (std::mt19937&);
 		std::vector<Effect> _generateEffectType(std::mt19937&);
 
-		void _handleBackToHand(const Coord&);
-		void _handleRemove(const Coord&);
-		void _handleHole(const Coord&);
-		Coord _getMappedCoord(const Coord& explosion_coord);
+		void _handleBackToHand(const Coord&, const Coord&);
+		void _handleRemove(const Coord&, const Coord&);
+		void _handleHole(const Coord&, const Coord&);
+		void _handleRecursiveRemoval(const Coord&);
+		Coord _mapExplosionToBoard(const Coord&);
+		Coord _mapBoardToExplosion(const Coord&);
 
 	private:
 		Board& m_board;
 		Player& m_player1, & m_player2;
 
 		uint16_t m_effect_count;
+		std::optional<Coord> m_board_corner;
+		std::unordered_set<Coord, CoordFunctor> m_visited_effects;
 		std::vector<std::vector<std::optional<Effect>>> m_effects;
 		Coord m_effect_corner1, m_effect_corner2;
 	};

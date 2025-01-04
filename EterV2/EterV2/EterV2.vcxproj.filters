@@ -65,6 +65,9 @@
     <ClCompile Include="BaseGameMode.cpp">
       <Filter>GameMode</Filter>
     </ClCompile>
+    <ClCompile Include="Config.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="GameMode">
@@ -188,6 +191,9 @@
     </ClInclude>
     <ClInclude Include="BaseGameMode.h">
       <Filter>GameMode</Filter>
+    </ClInclude>
+    <ClInclude Include="Config.h">
+      <Filter>Utils</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

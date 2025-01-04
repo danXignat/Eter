@@ -91,6 +91,9 @@ namespace base {
 			case FOUR:
 				out << "4";
 				break;
+			case HOLE:
+				out << "H";
+				break;
 			default:
 				break;
 			}

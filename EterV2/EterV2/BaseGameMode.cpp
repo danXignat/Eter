@@ -25,7 +25,7 @@ namespace base {
 		if (input.event_type == GameEventType::BoardCard) {
 			return _handleBoardEvent(input);
 		}
-		else if (input.event_type == GameEventType::SpecialCard) {
+		else {
 			return _handleSpecialEvent(input);
 		}
 	}
@@ -54,9 +54,4 @@ namespace base {
 
 		return false;
 	}
-
-	
-
-
-
 }

@@ -44,7 +44,7 @@ namespace base {
 
     std::vector<Coord> MasterOfFireFront::getChoices(const Board& board, const Player& player) {
         std::vector<Coord> choices;
-        bool minimumSize = 2;
+        int minimumSize = 2;
 
         for (const auto& [coord, stack] : board) {
             auto& [x, y] = coord;
@@ -223,9 +223,9 @@ namespace base {
             Logger::log(Level::WARNING, "Invalid card choice!\n");
             return false;
         }
-        auto& cards = board.getCombatCards();
+        /*const auto& cards = board.getCombatCards();  ai voie sa modifici asa boardu am facut metoda aia sa fie const ref 
         cards[choice].emplace_back(std::move(card)); 
-        Logger::log(Level::INFO, "Mage Earth Bury ability card used");
+        Logger::log(Level::INFO, "Mage Earth Bury ability card used");*/
         return true;
     }
     ///---------Hole----------

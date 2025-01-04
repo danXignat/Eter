@@ -14,10 +14,6 @@ namespace base {
 		m_size{ size },
 		m_bounding_rect{ size },
 		m_available_spaces{ Coord{10, 5} },
-		m_adjacency_offsets{ {
-			{2, 0}, {2, -1}, {0, -1}, {-2, -1},
-			{-2, 0}, {-2, 1}, {0, 1}, {2, 1}
-		} },
 		m_player1{ player1 }, m_player2{ player2 } {
 
 	}
@@ -26,16 +22,22 @@ namespace base {
 		m_size{ static_cast<uint16_t>(size_type) },
 		m_bounding_rect{ static_cast<uint16_t>(size_type) },
 		m_available_spaces{Board::START_POS},
-		m_adjacency_offsets{ {
-			{2, 0}, {2, -1}, {0, -1}, {-2, -1},
-			{-2, 0}, {-2, 1}, {0, 1}, {2, 1}
-		} },
 		m_player1{ player1 }, m_player2{ player2 } {
 
 	}
 
 
 	//----------------------------MODIFIERS--------------------------------
+
+	void Board::createHole(const Coord& coord) {
+		m_combat_cards[coord].clear();
+
+		m_combat_cards[coord].push_back(
+			CombatCard{ CombatCardType::HOLE, color::ColorType::DEFAULT }
+		);
+
+		Logger::log(Level::INFO, "Hole created at {} {}", coord.first, coord.second);
+	}
 
 	void Board::appendMove(const Coord& coord, CombatCard&& card) {
 		if (this->isValidPlaceCard(coord, card) == false) {
@@ -319,11 +321,11 @@ namespace base {
 
 	CombatCard&& Board::popTopCardAt(const Coord& coord) {
 		if (m_combat_cards.contains(coord) == false) {
-			throw std::runtime_error("not a valid pos");
+			throw std::runtime_error("card does not exist");
 		}
 
 		if (m_combat_cards[coord].size() == 1 && this->isValidRemoveStack(coord) == false) {
-			throw std::runtime_error("not a valid pos");
+			throw std::runtime_error("breaks adjacency");
 		}
 
 		CombatCard card = std::move(m_combat_cards[coord].back());
@@ -334,6 +336,8 @@ namespace base {
 
 			_reinitialise();
 		}
+
+		Logger::log(Level::INFO, "popped card at ({}, {})", coord.first, coord.second);
 
 		return std::move(card);
 	}
@@ -515,8 +519,7 @@ namespace base {
 		return m_available_spaces;
 	}
 
-	std::unordered_map<Coord, std::vector<CombatCard>, CoordFunctor>& Board::getCombatCards()
-	{
+	const std::unordered_map<Coord, std::vector<CombatCard>, CoordFunctor>& Board::getCombatCards() const {
 		return m_combat_cards;
 	}
 
@@ -634,6 +637,13 @@ namespace base {
 	}
 
 	bool Board::_isConex(const std::unordered_set<Coord, CoordFunctor>& board_coords) const { // bfs 
+		if (board_coords.size() == 0 ||
+			board_coords.size() == 1 ||
+			board_coords.size() == 2
+			) {
+			return true;
+		}
+
 		std::unordered_set<Coord, CoordFunctor> visited;
 		std::queue<Coord> queue;
 
@@ -645,7 +655,7 @@ namespace base {
 		for (; queue.empty() == false; queue.pop()) {
 			Coord curr = queue.front();
 
-			for (const auto& [x, y] : m_adjacency_offsets) {
+			for (const auto& [x, y] : ADJACENCY_OFFSETS) {
 				Coord adjacent_coord{ curr.first + x, curr.second + y };
 
 				bool not_visited = visited.contains(adjacent_coord) == false;
@@ -922,7 +932,7 @@ namespace base {
 	void Board::_updateAvailableSpaces(const Coord& coord) {
 		m_available_spaces.erase(coord);
 
-		for (const auto& offset : m_adjacency_offsets) {
+		for (const auto& offset : ADJACENCY_OFFSETS) {
 			Coord new_point{ coord.first + offset.first, coord.second + offset.second };
 
 			if (!m_combat_cards.contains(new_point)) {

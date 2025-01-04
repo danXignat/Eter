@@ -21,6 +21,9 @@ namespace base {
 		std::vector<Coord> positions{ _generateEffectPos(gen) };
 		std::vector<Effect> effects{ _generateEffectType(gen) };
 
+		/*std::vector<Coord> positions{ {0, 1}, {0, 2}, {0, 3} };
+		std::vector<Effect> effects{ Effect::HAND, Effect::REMOVE, Effect::REMOVE };*/
+
 		for (const auto&[coord, effect] : std::views::zip(positions, effects)) {
 			auto& [row, col] = coord;
 			m_effects[row][col] = effect;
@@ -34,23 +37,27 @@ namespace base {
 	}
 
 	void Explosion::apply() {
+		m_board_corner.emplace(m_board.getBoudingRect().first);
+
 		for (uint16_t i = m_effect_corner1.second; i <= m_effect_corner2.second; i++) {
 			for (uint16_t j = m_effect_corner1.first; j <= m_effect_corner2.first; j++) {
-				if (m_effects[i][j].has_value() == false) {
+				if (m_effects[i][j].has_value() == false || m_visited_effects.contains({j, i})) {
 					continue;
 				}
 				
+				Coord board_coord{ _mapExplosionToBoard({j, i}) };
+
 				switch (m_effects[i][j].value()) {
 				case Effect::HAND:
-					_handleBackToHand({i, j});
+					_handleBackToHand({ j, i }, board_coord);
 					break;
 
 				case Effect::REMOVE:
-					_handleRemove({ i, j });
+					_handleRemove({ j, i }, board_coord);
 					break;
 
 				case Effect::HOLE:
-					_handleHole({ i, j });
+					_handleHole({ j, i }, board_coord);
 					break;
 
 				default:
@@ -60,39 +67,80 @@ namespace base {
 		}
 	}
 
-	void Explosion::_handleBackToHand(const Coord& coord) {
-		Coord board_coord{ _getMappedCoord(coord) };
+	void Explosion::_handleRecursiveRemoval(const Coord& effect_coord) {
+		auto [curr_x, curr_y] { effect_coord };
 
-		CombatCard card = std::move(m_board.popTopCardAt(board_coord));
+		for (auto [x_offset, y_offset] : m_board.ADJACENCY_OFFSETS) {
+			Coord neighbor_effect_coord{ curr_x + x_offset/2, curr_y + y_offset };
+			Coord neighbor_board_coord{ _mapExplosionToBoard(neighbor_effect_coord) };
 
-		if (card.getColor() == color::ColorType::RED) {
-			m_player1.addCard(std::move(card));
-		}
-		else {
-			m_player2.addCard(std::move(card));
+			auto [effect_x, effect_y] { neighbor_effect_coord };
+
+			if (m_board.hasStack(neighbor_board_coord) &&
+				m_effects[effect_y][effect_x].has_value() && 
+				m_visited_effects.contains({effect_x, effect_y}) == false
+				) {
+				switch (m_effects[effect_y][effect_x].value()) {
+				case Effect::HAND:
+					_handleBackToHand({ effect_x, effect_y }, neighbor_board_coord);
+					break;
+
+				case Effect::REMOVE:
+					_handleRemove({ effect_x, effect_y }, neighbor_board_coord);
+					break;
+
+				case Effect::HOLE:
+					_handleHole({ effect_x, effect_y }, neighbor_board_coord);
+					break;
+
+				default:
+					break;
+				}
+			}
 		}
 	}
 
-	void Explosion::_handleRemove(const Coord& coord) {
-		Coord board_coord{ _getMappedCoord(coord) };
+	void Explosion::_handleBackToHand(const Coord& effect_coord, const Coord& board_coord) {
+		try {
+			CombatCard card = std::move(m_board.popTopCardAt(board_coord));
 
-		m_board.removeTopCardAt(board_coord);
+			if (card.getColor() == color::ColorType::RED) {
+				m_player1.addCard(std::move(card));
+			}
+			else {
+				m_player2.addCard(std::move(card));
+			}
+
+			m_visited_effects.insert(effect_coord);
+
+			_handleRecursiveRemoval(effect_coord);
+		}
+		catch (const std::runtime_error& e) {
+			Logger::log(Level::INFO, "{} coord ({}, {})", e.what(), board_coord.first, board_coord.second);
+		}
 	}
 
-	void Explosion::_handleHole(const Coord& coord) {
-		Coord board_coord{ _getMappedCoord(coord) };
+	void Explosion::_handleRemove(const Coord& effect_coord, const Coord& board_coord) {
+		try {
+			m_board.removeTopCardAt(board_coord);
 
-		m_board.removeStack(board_coord);
+			m_visited_effects.insert(effect_coord);
 
-		CombatCard hole{ CombatCardType::HOLE, color::ColorType::DEFAULT };
+			_handleRecursiveRemoval(effect_coord);
+		}
+		catch (const std::runtime_error& e) {
+			Logger::log(Level::INFO, "{} coord ({}, {})", e.what(), board_coord.first, board_coord.second);
+		}
+	}
 
-		m_board.appendMove(board_coord, std::move(hole));
-	} 
+	void Explosion::_handleHole(const Coord& effect_coord, const Coord& board_coord) {
+		m_board.createHole(board_coord);
+	}
 
-	Coord Explosion::_getMappedCoord(const Coord& coord) {
-		Coord board_corner{ m_board.getBoudingRect().first };
+	Coord Explosion::_mapExplosionToBoard(const Coord& effect_coord) {
+		Logger::log(Level::INFO, "board {} {} explosion card {} {}", m_board_corner.value().first, m_board_corner.value().second, effect_coord.first, effect_coord.second);
 
-		return { board_corner.first + coord.first, board_corner.second + coord.second };
+		return { m_board_corner.value().first + 2 * effect_coord.first, m_board_corner.value().second + effect_coord.second };
 	}
 
 	void Explosion::setEffectForWidth(Board& board) {
@@ -268,4 +316,8 @@ namespace base {
 		}
 	}
 
+
+	std::vector<Coord> Explosion::getAffectedFields() const {
+		return {};
+	}
 }

@@ -22,6 +22,7 @@
     <ClCompile Include="BaseGameMode.cpp" />
     <ClCompile Include="Board.cpp" />
     <ClCompile Include="CombatCard.cpp" />
+    <ClCompile Include="Config.cpp" />
     <ClCompile Include="ElementalMode.cpp" />
     <ClCompile Include="ElementalService.cpp" />
     <ClCompile Include="ExplosionCard.cpp" />
@@ -48,6 +49,7 @@
     <ClInclude Include="colors.h" />
     <ClInclude Include="CombatCard.h" />
     <ClInclude Include="CombatCardType.h" />
+    <ClInclude Include="Config.h" />
     <ClInclude Include="ElementalMode.h" />
     <ClInclude Include="ElementalService.h" />
     <ClInclude Include="ExplosionCard.h" />
@@ -98,7 +100,7 @@
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>

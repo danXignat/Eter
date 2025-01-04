@@ -79,7 +79,7 @@ namespace base {
 		}
 	}
 
-	void ExplosionService::render_explosion() {
+	void ExplosionService::renderExplosion() {
 		m_card.render();
 	}
 }
