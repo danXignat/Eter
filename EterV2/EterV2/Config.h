@@ -20,11 +20,6 @@ namespace base {
         uint16_t getCardWidth(uint16_t);
         uint16_t getCardHeight(uint16_t);
 
-        struct Visitor {
-            void operator()(const Coord&);
-            void operator()(uint16_t);
-        };
-
         Config(const Config&) = delete;
         Config& operator=(const Config&) = delete;
         ~Config() = default;

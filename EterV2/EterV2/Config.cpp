@@ -49,12 +49,4 @@ namespace base {
             {"CardHeight", {m_card_height} }
         };
     }
-
-    void Config::Visitor::operator()(const Coord&) {
-
-    }
-
-    void Config::Visitor::operator()(uint16_t) {
-
-    }
 }
