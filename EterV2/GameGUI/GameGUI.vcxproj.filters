@@ -26,9 +26,6 @@
     <QtRcc Include="GameGUI.qrc">
       <Filter>Resource Files</Filter>
     </QtRcc>
-    <QtUic Include="GameGUI.ui">
-      <Filter>Form Files</Filter>
-    </QtUic>
     <QtMoc Include="GameGUI.h">
       <Filter>Header Files</Filter>
     </QtMoc>
@@ -40,5 +37,19 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="GamemodeController.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="settings.h">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="qt_includes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GamemodeController.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

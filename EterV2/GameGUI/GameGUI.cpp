@@ -1,120 +1,161 @@
 #include "GameGUI.h"
-#include <QGraphicsScene>
-#include <QGraphicsTextItem>
-#include "../EterV2/Board.h"
-#include "../EterV2/Player.h"  
-#include <QGraphicsPixmapItem>
-#include <QMouseEvent>
-#include <sstream>
-#include <iostream>
-#include <qdebug.h>
 
-GameGUI::GameGUI(base::Board& board, base::Player& redPlayer, base::Player& bluePlayer, QWidget* parent)
+#include <ranges>
+
+GameGUI::GameGUI(QWidget* parent)
     : QMainWindow(parent),
     scene{ new QGraphicsScene(this) },
     view{ new QGraphicsView(scene, this) },
-    gameBoard(board) {
+    gamemode{ base::GameModeFactory::get("200", { "titi", "gigi" })}
+    /*player_one{gamemode->getPlayerRed()},
+    player_two{gamemode->getPlayerBlue()},
+    game_board{gamemode->getBoard()}*/
+{
+
     setWindowTitle("Eter");
-    resize(1200, 800);
+    resize(WINDOW_WIDTH, WINDOW_HEIGHT);
 
-    view->setGeometry(0, 0, 1200, 800);
-    view->setMinimumSize(1200, 800);
+    scene->setSceneRect(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+    view->setGeometry(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+    view->setMinimumSize(WINDOW_WIDTH, WINDOW_HEIGHT);
 
+    drawPlayerCards(gamemode->getPlayerRed(), {100, 100});
+    drawPlayerCards(gamemode->getPlayerBlue(), { 100, 700 });
     drawAvailablePositions();
-    drawPlayerCards(redPlayer, 200, 200);
-    drawPlayerCards(bluePlayer, 200, 600);
 }
 
-GameGUI::~GameGUI() {
-    delete scene;
+GameGUI::~GameGUI() {}
+
+void GameGUI::createCardAt(color::ColorType color, base::CombatCardType type, QPointF pos) {
+    QString imagePath = QString(CARD_PATH)
+        .arg(color == color::ColorType::RED ? "red" : "blue")
+        .arg(combatCardToChar(type));
+
+    Card* card = new Card(color, type, imagePath);
+    connect(card, &Card::cardAppend, this, &GameGUI::onCardAppend);
+    card->setPos(pos);
+    scene->addItem(card);
 }
 
-void GameGUI::drawSquareAt(QGraphicsScene* scene, int row, int col) {
-    int x = col * 50;
-    int y = row * 25;
-
-    QRectF cellRect(x, y, 50, 50);
-    QBrush cellBrush(Qt::transparent);
-    scene->addRect(cellRect, QPen(Qt::white), cellBrush);
+void GameGUI::drawSquareAt(QPoint pos) {
+    QGraphicsRectItem* cell = new QGraphicsRectItem(pos.x() - CARD_SIZE / 2,
+        pos.y() - CARD_SIZE / 2,
+        CARD_SIZE, CARD_SIZE
+    );
+    cell->setPen(QPen(Qt::green));    
+    cell->setBrush(Qt::transparent);  
+    scene->addItem(cell);
 }
 
 void GameGUI::drawAvailablePositions() {
-    const auto& availableSpaces = gameBoard.availableSpaces();
+    const auto& availableSpaces = gamemode->getBoard().availableSpaces();
 
-    for (const auto& coord : availableSpaces) {
-        drawSquareAt(scene, coord.first, coord.second);
+    for (const auto& [x, y] : availableSpaces) {
+        drawSquareAt({ x, y });
+    }
+
+    for (QGraphicsItem* item : scene->items()) {
+        if (QGraphicsRectItem* rectItem = dynamic_cast<QGraphicsRectItem*>(item)) {
+            base::Coord pos{ 
+                rectItem->boundingRect().center().toPoint().x(),
+                rectItem->boundingRect().center().toPoint().y()
+            };
+
+            if (availableSpaces.contains(pos) == false) {
+                scene->removeItem(rectItem);
+                delete rectItem;
+            }
+        }
     }
 }
 
-void GameGUI::drawImageAt(QGraphicsScene* scene, int row, int col, const QString& imagePath) {
-    int x = col * 50;
-    int y = row * 50;
+/*
+    TODO:
+    eficientizare 
+    fucntie de conversie din base::Coord in QPointF si invers
+    clasa Board
+    clasa GamemodeController -> care se va ocupa de joc
+    clasa MainWindow
+*/
 
-    QPixmap pixmap(imagePath);
-    QPixmap scaledPixmap = pixmap.scaled(100, 100, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-
-    QGraphicsPixmapItem* item = scene->addPixmap(scaledPixmap);
-    item->setPos(x, y);
-}
-
-void GameGUI::drawPlayerCards(const base::Player& player, int xStart, int yStart) {
-    int x = xStart;
-    int y = yStart;
+void GameGUI::drawPlayerCards(const base::Player& player, QPointF start_point) {
+    QPointF curr_point{ start_point };
 
     const auto& cards = player.getCards();
 
-    for (const auto& [type, card] : cards) {
+    for (const auto& [type, _] : cards) {
+        createCardAt(player.getColor(), type, curr_point);
 
-        QString imagePath = QString("../eterCards/%1_%2.png")
-            .arg(player.getColor() == color::ColorType::RED ? "red" : "blue")
-            .arg(combatCardToChar(type));
-
-        Card* card = new Card(imagePath);
-        card->setPos(x, y);
-        scene->addItem(card);
-
-        x += 100;
+        curr_point += QPointF{CARD_SIZE, 0};
     }
+
 }
 
-Card::Card(const QString& imagePath, QGraphicsItem* parent)
-    : QGraphicsItem(parent), cardImage(imagePath) {
+void GameGUI::onCardAppend(color::ColorType color, base::CombatCardType type, QPoint coord) {
+    base::InputHandler input;
+    input.event_type = base::EventType::PlaceCombatCard;
+    input.card_type = type;
+    input.coord = base::Coord{ coord.x(), coord.y() };
+
+    gamemode->placeCombatCard(input);
+    gamemode->switchPlayer();
+    drawAvailablePositions();
+}
+
+Card::Card(color::ColorType color, base::CombatCardType type, const QString& imagePath, QGraphicsItem* parent)
+    : QGraphicsItem(parent), cardImage(imagePath),
+    color{ color },
+    type{type} {
+
     if (cardImage.isNull()) {
         qWarning() << "Failed to load card image:" << imagePath;
     }
     
-    // Enable the item to accept mouse events
     setFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsMovable);
 }
 
 QRectF Card::boundingRect() const {
-    return QRectF(0, 0, cardImage.width(), cardImage.height());
+    return QRectF(-CARD_SIZE / 2, -CARD_SIZE / 2, CARD_SIZE, CARD_SIZE);
 }
 
 void Card::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) {
     Q_UNUSED(option);
     Q_UNUSED(widget);
-    QPixmap scaledImage = cardImage.scaled(100, 100, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-    painter->drawPixmap(0, 0, scaledImage);
+    QPixmap scaledImage = cardImage.scaled(CARD_SIZE, CARD_SIZE, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+    painter->drawPixmap(-CARD_SIZE / 2, -CARD_SIZE / 2, scaledImage);
 }
 
 void Card::mousePressEvent(QGraphicsSceneMouseEvent* event) {
-    // Save the initial mouse position
     lastMousePosition = event->scenePos();
-    QGraphicsItem::mousePressEvent(event); // Call base class implementation
+    
+    QGraphicsItem::mousePressEvent(event);
 }
 
 void Card::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
-    // Calculate the mouse movement
     QPointF delta = event->scenePos() - lastMousePosition;
-    // Move the card
+    
     setPos(pos() + delta);
-    // Update the last mouse position
+    
     lastMousePosition = event->scenePos();
     QGraphicsItem::mouseMoveEvent(event);
 }
 
 void Card::mouseReleaseEvent(QGraphicsSceneMouseEvent* event) {
-    qDebug() << "Card released at position:" << pos();
+    QPointF cardCenter = sceneBoundingRect().center();  // Get card center in scene coordinates
+    QList<QGraphicsItem*> itemsUnderCard = scene()->items(cardCenter); // Get items at center
+
+    for (QGraphicsItem* item : itemsUnderCard) {
+        auto* cell = dynamic_cast<QGraphicsRectItem*>(item);
+        if (cell) {
+            QPointF target_coord{ cell->sceneBoundingRect().center() };
+
+            setPos(target_coord);
+            emit cardAppend(color, type, target_coord.toPoint());
+
+            break;
+        }
+    }
+
+    qDebug() << "Card snapped to:" << pos();
     QGraphicsItem::mouseReleaseEvent(event);
 }

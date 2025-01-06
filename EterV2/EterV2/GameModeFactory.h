@@ -8,7 +8,7 @@
 #include "TrainingMode.h"
 
 namespace base {
-	using GameModePtr = std::unique_ptr<IGameMode>;
+	using GameModePtr = std::unique_ptr<BaseGameMode>;
 
 	struct GameModeFactory {
 		static GameModePtr get(const std::string& id, const std::pair<std::string, std::string>& player_names);

@@ -19,6 +19,11 @@ namespace base {
 		virtual void run() = 0;
 
 	public:
+		const Player& getPlayerRed() const override;
+		const Player& getPlayerBlue() const override;
+		const Player& getCurrPlayer() const override;
+		const Board& getBoard() const override;
+
 		bool placeCombatCard(const InputHandler&);
 
 		virtual bool placeIllusion(const InputHandler&);

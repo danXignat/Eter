@@ -29,6 +29,22 @@ namespace base {
 		}
 	}
 
+	const Player& BaseGameMode::getPlayerRed() const {
+		return m_player_red;
+	}
+
+	const Player& BaseGameMode::getPlayerBlue() const {
+		return m_player_blue;
+	}
+
+	const Player& BaseGameMode::getCurrPlayer() const {
+		return m_curr_player.get();
+	}
+
+	const Board& BaseGameMode::getBoard() const {
+		return m_board;
+	}
+
 	void BaseGameMode::switchPlayer() {
 		if (m_curr_player.get().getColor() == color::ColorType::RED) {
 			m_curr_player = m_player_blue;

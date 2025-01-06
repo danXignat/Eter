@@ -97,16 +97,21 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="settings.h" />
     <QtRcc Include="GameGUI.qrc" />
-    <QtUic Include="GameGUI.ui" />
     <QtMoc Include="GameGUI.h" />
     <ClCompile Include="GameGUI.cpp" />
+    <ClCompile Include="GamemodeController.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\EterV2\EterV2.vcxproj">
       <Project>{cae92530-402a-4f9d-bb76-8f6f30190fb5}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="GamemodeController.h" />
+    <ClInclude Include="qt_includes.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">
