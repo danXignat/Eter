@@ -1,8 +1,8 @@
-#include "GameGUI.h"
+#include "MainWindow.h"
 
 #include <ranges>
 
-GameGUI::GameGUI(QWidget* parent)
+MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent),
     scene{ new QGraphicsScene(this) },
     view{ new QGraphicsView(scene, this) },
@@ -29,26 +29,26 @@ GameGUI::GameGUI(QWidget* parent)
     trainingButton->setGeometry(WINDOW_WIDTH / 2 - BOTTON_WIDTH/2, WINDOW_HEIGHT / 2 - 90, BOTTON_WIDTH, BOTTON_HEIGHT);
     mageDuelButton->setGeometry(WINDOW_WIDTH / 2 - BOTTON_WIDTH / 2, WINDOW_HEIGHT / 2 - 20, BOTTON_WIDTH, BOTTON_HEIGHT);
     elementalBattleButton->setGeometry(WINDOW_WIDTH / 2 - BOTTON_WIDTH / 2, WINDOW_HEIGHT / 2 + 50, BOTTON_WIDTH, BOTTON_HEIGHT);
-    connect(trainingButton, &QPushButton::clicked, this, &GameGUI::onTrainingModeSelected);
-    connect(mageDuelButton, &QPushButton::clicked, this, &GameGUI::onMageDuelModeSelected);
-    connect(elementalBattleButton, &QPushButton::clicked, this, &GameGUI::onElementalBattleModeSelected);
+    connect(trainingButton, &QPushButton::clicked, this, &MainWindow::onTrainingModeSelected);
+    connect(mageDuelButton, &QPushButton::clicked, this, &MainWindow::onMageDuelModeSelected);
+    connect(elementalBattleButton, &QPushButton::clicked, this, &MainWindow::onElementalBattleModeSelected);
 
 }
 
-GameGUI::~GameGUI() {}
+MainWindow::~MainWindow() {}
 
-void GameGUI::createCardAt(color::ColorType color, base::CombatCardType type, QPointF pos) {
+void MainWindow::createCardAt(color::ColorType color, base::CombatCardType type, QPointF pos) {
     QString imagePath = QString(CARD_PATH)
         .arg(color == color::ColorType::RED ? "red" : "blue")
         .arg(combatCardToChar(type));
 
     Card* card = new Card(color, type, imagePath);
-    connect(card, &Card::cardAppend, this, &GameGUI::onCardAppend);
+    connect(card, &Card::cardAppend, this, &MainWindow::onCardAppend);
     card->setPos(pos);
     scene->addItem(card);
 }
 
-void GameGUI::drawSquareAt(QPoint pos) {
+void MainWindow::drawSquareAt(QPoint pos) {
 
     int squareX = pos.x() - CARD_SIZE / 2;
     int squareY = pos.y() - CARD_SIZE / 2;
@@ -60,7 +60,7 @@ void GameGUI::drawSquareAt(QPoint pos) {
     scene->addItem(cell);
 }
 
-void GameGUI::drawAvailablePositions() {
+void MainWindow::drawAvailablePositions() {
     const auto& availableSpaces = gamemode->getBoard().availableSpaces();
 
     for (const auto& [x, y] : availableSpaces) {
@@ -93,7 +93,7 @@ void GameGUI::drawAvailablePositions() {
     clasa MainWindow
 */
 
-void GameGUI::drawPlayerCards(const base::Player& player, QPointF start_point) {
+void MainWindow::drawPlayerCards(const base::Player& player, QPointF start_point) {
     QPointF curr_point{ start_point };
 
     const auto& cards = player.getCards();
@@ -106,7 +106,7 @@ void GameGUI::drawPlayerCards(const base::Player& player, QPointF start_point) {
 
 }
 
-void GameGUI::onCardAppend(color::ColorType color, base::CombatCardType type, QPoint coord) {
+void MainWindow::onCardAppend(color::ColorType color, base::CombatCardType type, QPoint coord) {
     base::InputHandler input;
     input.event_type = base::EventType::PlaceCombatCard;
     input.card_type = type;
@@ -116,19 +116,19 @@ void GameGUI::onCardAppend(color::ColorType color, base::CombatCardType type, QP
     gamemode->switchPlayer();
     drawAvailablePositions();
 }
-void GameGUI::onTrainingModeSelected() {
+void MainWindow::onTrainingModeSelected() {
     initializeGameMode("100"); 
 }
 
-void GameGUI::onMageDuelModeSelected() {
+void MainWindow::onMageDuelModeSelected() {
     initializeGameMode("200"); 
 }
 
-void GameGUI::onElementalBattleModeSelected() {
+void MainWindow::onElementalBattleModeSelected() {
     initializeGameMode("300"); 
 }
 
-void GameGUI::initializeGameMode(const std::string& modeId) {
+void MainWindow::initializeGameMode(const std::string& modeId) {
     gamemode = base::GameModeFactory::get(modeId, { "titi", "gigi" });
 
     for (QWidget* widget : findChildren<QWidget*>()) {
@@ -216,5 +216,17 @@ QPointF coordToQPointF(const base::Coord& coord) {
    }
 
 base::Coord qPointFToCoord(const QPointF& point) {
-    return base::Coord{ static_cast<int>(point.x()), static_cast<int>(point.y()) };
+    return base::Coord{ static_cast<int16_t>(point.x()), static_cast<int>(point.y()) };
 }
+/*
+
+
+GameModeCotroler 
+
+place card -> aplica mutarea in backend 
+              si dupa o vezi in view
+
+
+mainwindow sa se ocupe de scene
+si gamecontroler
+*/
