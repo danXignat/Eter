@@ -97,10 +97,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="MainWindow.cpp">
+      <DynamicSource Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">input</DynamicSource>
+      <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(Filename).moc</QtMocFileName>
+      <DynamicSource Condition="'$(Configuration)|$(Platform)'=='Release|x64'">input</DynamicSource>
+      <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename).moc</QtMocFileName>
+    </ClCompile>
     <ClCompile Include="settings.h" />
-    <QtRcc Include="GameGUI.qrc" />
-    <QtMoc Include="GameGUI.h" />
-    <ClCompile Include="GameGUI.cpp" />
     <ClCompile Include="GamemodeController.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
@@ -111,6 +114,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GamemodeController.h" />
+    <QtMoc Include="MainWindow.h" />
     <ClInclude Include="qt_includes.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

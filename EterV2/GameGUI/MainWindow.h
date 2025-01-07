@@ -32,30 +32,56 @@ signals:
     void cardAppend(color::ColorType, base::CombatCardType, QPoint coord);
 };
 
-class Board : public QGraphicsItem {
-
-};
-
-class GameGUI : public QMainWindow {
+class RequestNameScene : public QWidget {
     Q_OBJECT
 
 public:
-    GameGUI(QWidget* parent = nullptr);
-    ~GameGUI();
+    explicit RequestNameScene(QWidget* parent = nullptr);
 
+signals:
+    void nameEntered(const QString& name);
+
+private slots:
+    void onNextClicked();
+
+private:
+    QLineEdit* nameInput;
+    QPushButton* nextButton;
+};
+
+class SelectModeScene : public QWidget {
+    Q_OBJECT
+
+public:
+    explicit SelectModeScene(QWidget* parent = nullptr);
+
+signals:
+    void modeSelected(const std::string& mode);
+
+private:
+    QPushButton* easyButton;
+    QPushButton* hardButton;
+};
+
+class GameScene : public QWidget {
+    Q_OBJECT
+
+public:
+    explicit GameScene(QWidget* parent = nullptr);
+
+    void startGame(const std::string& mode, const std::string& playerName);
     void createCardAt(color::ColorType color, base::CombatCardType type, QPointF pos);
     void drawPlayerCards(const base::Player& player, QPointF start_point);
     void drawSquareAt(QPoint pos);
     void drawAvailablePositions();
 
-protected:
-
 public slots:
     void onCardAppend(color::ColorType, base::CombatCardType, QPoint coord);
-    void onTrainingModeSelected();
-    void onMageDuelModeSelected();
-    void onElementalBattleModeSelected();
+
 private:
+    QVBoxLayout* layout;
+    QLabel* infoLabel;
+
     base::GameModePtr gamemode;
     /*const base::Player& player_one;
     const base::Player& player_two;
@@ -63,6 +89,24 @@ private:
 
     QGraphicsScene* scene;
     QGraphicsView* view;
+};
+
+class MainWindow : public QMainWindow {
+    Q_OBJECT
+
+public:
+    MainWindow(QWidget* parent = nullptr);
+
+private slots:
+    void onNameEntered(const QString& playerName);
+    void onModeSelected(const std::string& mode);
+
 private:
-    void initializeGameMode(const std::string& modeId);
+    QStackedWidget* stackedWidget;
+    RequestNameScene* requestNameScene;
+    SelectModeScene* selectModeScene;
+    GameScene* gameScene;
+
+    QString playerNameGlobal;
+    std::string selectedMode;
 };

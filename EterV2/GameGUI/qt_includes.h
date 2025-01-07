@@ -10,5 +10,8 @@
 #include <QPainter>
 #include <QBrush>
 #include <QPen>
-
+#include <qstackedwidget.h>
+#include <qboxlayout.h>
+#include <qlineedit.h>
+#include <qlabel.h>
 #endif // GRAPHICS_INCLUDES_H
