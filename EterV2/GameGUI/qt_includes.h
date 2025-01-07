@@ -2,6 +2,7 @@
 #define GRAPHICS_INCLUDES_H
 
 #include <QGraphicsItem>
+#include <QPushButton.h>
 #include <QGraphicsSceneMouseEvent>
 #include <QGraphicsView>
 #include <QGraphicsScene>

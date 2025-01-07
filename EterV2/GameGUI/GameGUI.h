@@ -52,7 +52,9 @@ protected:
 
 public slots:
     void onCardAppend(color::ColorType, base::CombatCardType, QPoint coord);
-
+    void onTrainingModeSelected();
+    void onMageDuelModeSelected();
+    void onElementalBattleModeSelected();
 private:
     base::GameModePtr gamemode;
     /*const base::Player& player_one;
@@ -61,5 +63,6 @@ private:
 
     QGraphicsScene* scene;
     QGraphicsView* view;
-   
+private:
+    void initializeGameMode(const std::string& modeId);
 };
