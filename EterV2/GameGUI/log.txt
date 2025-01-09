@@ -1,6 +1,0 @@
-[INFO] card(3) appended at (600, 400)
-[INFO] card(2) appended at (680, 400)
-[INFO] card(2) appended at (520, 320)
-[INFO] card(3) appended at (520, 480)
-[INFO] card(3) appended at (600, 560)
-[INFO] card(4) appended at (760, 480)

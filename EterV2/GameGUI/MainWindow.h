@@ -39,13 +39,14 @@ public:
     explicit RequestNameScene(QWidget* parent = nullptr);
 
 signals:
-    void nameEntered(const QString& name);
+    void nameEntered(const QString& bluePlayer, const QString& redPlayer);
 
 private slots:
     void onNextClicked();
 
 private:
-    QLineEdit* nameInput;
+    QLineEdit* playerBlueNameInput;
+    QLineEdit* playerRedNameInput;
     QPushButton* nextButton;
 };
 
@@ -59,8 +60,9 @@ signals:
     void modeSelected(const std::string& mode);
 
 private:
-    QPushButton* easyButton;
-    QPushButton* hardButton;
+    QPushButton* trainingButton;
+    QPushButton* mageDuelButton;
+    QPushButton* elementalBattleButton;
 };
 
 class GameScene : public QWidget {
@@ -69,7 +71,7 @@ class GameScene : public QWidget {
 public:
     explicit GameScene(QWidget* parent = nullptr);
 
-    void startGame(const std::string& mode, const std::string& playerName);
+    void startGame(const std::string& mode, const std::string& playerBlueName, const std::string& playerRedName);
     void createCardAt(color::ColorType color, base::CombatCardType type, QPointF pos);
     void drawPlayerCards(const base::Player& player, QPointF start_point);
     void drawSquareAt(QPoint pos);
@@ -81,6 +83,9 @@ public slots:
 private:
     QVBoxLayout* layout;
     QLabel* infoLabel;
+
+    QLabel* playerBlueNameLabel;
+    QLabel* playerRedNameLabel;
 
     base::GameModePtr gamemode;
     /*const base::Player& player_one;
@@ -98,7 +103,7 @@ public:
     MainWindow(QWidget* parent = nullptr);
 
 private slots:
-    void onNameEntered(const QString& playerName);
+    void onNameEntered(const QString& playerBlueName, const QString& playerRedName);
     void onModeSelected(const std::string& mode);
 
 private:
@@ -107,6 +112,7 @@ private:
     SelectModeScene* selectModeScene;
     GameScene* gameScene;
 
-    QString playerNameGlobal;
+    QString playerBlueNameGlobal;
+    QString playerRedNameGlobal;
     std::string selectedMode;
 };

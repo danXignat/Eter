@@ -74,49 +74,96 @@ base::Coord qPointFToCoord(const QPointF& point) {
 RequestNameScene::RequestNameScene(QWidget* parent) : QWidget(parent) {
     QVBoxLayout* layout = new QVBoxLayout(this);
 
-    nameInput = new QLineEdit(this);
-    nameInput->setPlaceholderText("Enter your name");
-    layout->addWidget(nameInput);
+    playerBlueNameInput = new QLineEdit(this);
+    playerBlueNameInput->setPlaceholderText("Enter Player 1 Name");
+    playerBlueNameInput->setFixedSize(300, 50); 
+    playerBlueNameInput->setStyleSheet("font-size: 18px;"); 
+    layout->addWidget(playerBlueNameInput, 0, Qt::AlignCenter);
+
+    playerRedNameInput = new QLineEdit(this);
+    playerRedNameInput->setPlaceholderText("Enter Player 2 Name");
+    playerRedNameInput->setFixedSize(300, 50);
+    playerRedNameInput->setStyleSheet("font-size: 18px;"); 
+    layout->addWidget(playerRedNameInput, 0, Qt::AlignCenter); 
 
     nextButton = new QPushButton("Next", this);
-    layout->addWidget(nextButton);
+    nextButton->setFixedSize(200, 50);
+    nextButton->setStyleSheet("font-size: 18px;"); 
+    layout->addWidget(nextButton, 0, Qt::AlignCenter); 
 
     connect(nextButton, &QPushButton::clicked, this, &RequestNameScene::onNextClicked);
 }
 
+
 void RequestNameScene::onNextClicked() {
-    emit nameEntered(nameInput->text());
+    emit nameEntered(playerBlueNameInput->text(), playerRedNameInput->text());
 }
+
 
 SelectModeScene::SelectModeScene(QWidget* parent) : QWidget(parent) {
     QVBoxLayout* layout = new QVBoxLayout(this);
 
-    easyButton = new QPushButton("Training", this);
-    hardButton = new QPushButton("Mage", this);
-    layout->addWidget(easyButton);
-    layout->addWidget(hardButton);
+    trainingButton = new QPushButton("Training", this);
+    trainingButton->setFixedSize(200, 50); 
+    trainingButton->setStyleSheet("font-size: 18px;"); 
+    layout->addWidget(trainingButton, 0, Qt::AlignCenter);
 
-    connect(easyButton, &QPushButton::clicked, this, [=]() { emit modeSelected("100"); });
-    connect(hardButton, &QPushButton::clicked, this, [=]() { emit modeSelected("200"); });
+    mageDuelButton = new QPushButton("Mage-Duel", this);
+    mageDuelButton->setFixedSize(200, 50); 
+    mageDuelButton->setStyleSheet("font-size: 18px;"); 
+    layout->addWidget(mageDuelButton, 0, Qt::AlignCenter); 
+
+    elementalBattleButton = new QPushButton("Elemental Battle", this);
+    elementalBattleButton->setFixedSize(200, 50);
+    elementalBattleButton->setStyleSheet("font-size: 18px;");
+    layout->addWidget(elementalBattleButton, 0, Qt::AlignCenter);
+
+    connect(trainingButton, &QPushButton::clicked, this, [=]() { emit modeSelected("100"); });
+    connect(mageDuelButton, &QPushButton::clicked, this, [=]() { emit modeSelected("200"); });
+    connect(elementalBattleButton, &QPushButton::clicked, this, [=]() { emit modeSelected("300"); });
+
 }
+
 
 GameScene::GameScene(QWidget* parent) : QWidget(parent),
     scene{ new QGraphicsScene(this) },
     view{ new QGraphicsView(scene, this) },
     gamemode{ nullptr }
+
     /*player_one{gamemode->getPlayerRed()},
     player_two{gamemode->getPlayerBlue()},
     game_board{gamemode->getBoard()}*/
 {
+    QVBoxLayout* mainLayout = new QVBoxLayout(this);
+
     scene->setSceneRect(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
     view->setGeometry(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
     view->setMinimumSize(WINDOW_WIDTH, WINDOW_HEIGHT);
     view->setRenderHint(QPainter::Antialiasing);
     view->setInteractive(true);
+
+
+    playerBlueNameLabel = new QLabel(this);
+    playerBlueNameLabel->setText("Player 1's cards:");
+    playerBlueNameLabel->setStyleSheet("font-size: 18px; font-weight: bold;");
+    playerBlueNameLabel->move(70, WINDOW_HEIGHT - 180); 
+    playerBlueNameLabel->resize(200, 30);
+
+
+    playerRedNameLabel = new QLabel(this);
+    playerRedNameLabel->setText("Player 2's cards:");
+    playerRedNameLabel->setStyleSheet("font-size: 18px; font-weight: bold;");
+    playerRedNameLabel->move(70, 30);
+    playerRedNameLabel->resize(200, 30);
+
+    view->setParent(this);
 }
 
-void GameScene::startGame(const std::string& mode, const std::string& playerName) {
-    gamemode = base::GameModeFactory::get(mode, { playerName, playerName });
+void GameScene::startGame(const std::string& mode, const std::string& playerBlueName, const std::string& playerRedName) {
+    gamemode = base::GameModeFactory::get(mode, { playerBlueName, playerRedName });
+
+    playerBlueNameLabel->setText(QString::fromStdString(playerBlueName) + "'s cards:");
+    playerRedNameLabel->setText(QString::fromStdString(playerRedName) + "'s cards:");
 
     qreal cardStartPos;
 
@@ -230,20 +277,20 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
 
     setCentralWidget(stackedWidget);
 
-    // Connect signals and slots for transitions
     connect(requestNameScene, &RequestNameScene::nameEntered, this, &MainWindow::onNameEntered);
     connect(selectModeScene, &SelectModeScene::modeSelected, this, &MainWindow::onModeSelected);
 }
 
-void MainWindow::onNameEntered(const QString& playerName) {
-    // Handle player name, then switch to the mode selection scene
-    playerNameGlobal = playerName; // Store globally if needed
-    stackedWidget->setCurrentIndex(1); // Switch to SelectModeScene
+void MainWindow::onNameEntered(const QString& playerBlueName, const QString& playerRedName) {
+    playerBlueNameGlobal = playerBlueName;
+    playerRedNameGlobal = playerRedName;
+    stackedWidget->setCurrentIndex(1);
 }
 
+
 void MainWindow::onModeSelected(const std::string& mode) {
-    // Handle mode selection, then switch to the game scene
-    selectedMode = mode; // Store globally if needed
-    stackedWidget->setCurrentIndex(2); // Switch to GameScene
-    gameScene->startGame(selectedMode, playerNameGlobal.toStdString()); // Initialize the game
+    
+    selectedMode = mode; 
+    stackedWidget->setCurrentIndex(2); 
+    gameScene->startGame(selectedMode, playerBlueNameGlobal.toStdString(), playerRedNameGlobal.toStdString()); 
 }
