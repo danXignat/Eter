@@ -25,9 +25,20 @@ void Card::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWid
     painter->drawPixmap(-CARD_SIZE / 2, -CARD_SIZE / 2, scaledImage);
 }
 
+void Card::moveCardBack() {
+    this->setPos(lastCardPosition);
+}
+base::CombatCardType Card::getType() const {
+    return type;
+}
+color::ColorType Card::getColor() const {
+    return color;
+}
+
+
 void Card::mousePressEvent(QGraphicsSceneMouseEvent* event) {
     lastMousePosition = event->scenePos();
-
+    lastCardPosition = pos();
     qDebug() << "pressed" << "\n";
 
     QGraphicsItem::mousePressEvent(event);
@@ -48,15 +59,24 @@ void Card::mouseReleaseEvent(QGraphicsSceneMouseEvent* event) {
 
     for (QGraphicsItem* item : itemsUnderCard) {
         auto* cell = dynamic_cast<QGraphicsRectItem*>(item);
-        if (cell) {
+        if (cell ) {
             QPointF target_coord{ cell->sceneBoundingRect().center() };
 
             setPos(target_coord);
-            emit cardAppend(color, type, target_coord.toPoint());
+            
+            break;
+        }
+        auto* card = dynamic_cast<Card*>(item);
+        if (card && card!=this) {
+            QPointF target_coord{ card->sceneBoundingRect().center() };
 
+            setPos(target_coord);
+            qDebug() << "cartof ???";
             break;
         }
     }
+
+    emit cardAppend(this, this->pos().toPoint());
 
     qDebug() << "Card snapped to:" << pos();
     QGraphicsItem::mouseReleaseEvent(event);
@@ -214,7 +234,7 @@ void GameScene::drawAvailablePositions() {
         if (QGraphicsRectItem* rectItem = dynamic_cast<QGraphicsRectItem*>(item)) {
             base::Coord pos{
                 rectItem->boundingRect().center().toPoint().x(),
-                rectItem->boundingRect().center().toPoint().y()
+                rectItem->boundingRect().center().toPoint().y()  
             };
 
             if (availableSpaces.contains(pos) == false) {
@@ -247,15 +267,19 @@ void GameScene::drawPlayerCards(const base::Player& player, QPointF start_point)
 
 }
 
-void GameScene::onCardAppend(color::ColorType color, base::CombatCardType type, QPoint coord) {
+void GameScene::onCardAppend(Card* card, QPoint coord) {
     base::InputHandler input;
     input.event_type = base::EventType::PlaceCombatCard;
-    input.card_type = type;
+    input.card_type = card->getType();
     input.coord = base::Coord{ coord.x(), coord.y() };
 
-    gamemode->placeCombatCard(input);
-    gamemode->switchPlayer();
-    drawAvailablePositions();
+    if (!gamemode->placeCombatCard(input)) {
+        card->moveCardBack();
+    }
+    else {
+        gamemode->switchPlayer();
+        drawAvailablePositions();
+    }
 }
 
 MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {

@@ -17,6 +17,12 @@ public:
     QRectF boundingRect() const override;
     void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = nullptr) override;
 
+    void moveCardBack();
+
+    base::CombatCardType getType() const;
+    color::ColorType getColor() const;
+
+
 protected:
     void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
     void mouseMoveEvent(QGraphicsSceneMouseEvent* event) override;
@@ -25,11 +31,13 @@ protected:
 private:
     QPixmap cardImage;
     QPointF lastMousePosition;
+    QPointF lastCardPosition;
     color::ColorType color;
     base::CombatCardType type;
 
+
 signals:
-    void cardAppend(color::ColorType, base::CombatCardType, QPoint coord);
+    void cardAppend(Card* card, QPoint coord);
 };
 
 class RequestNameScene : public QWidget {
@@ -78,7 +86,7 @@ public:
     void drawAvailablePositions();
 
 public slots:
-    void onCardAppend(color::ColorType, base::CombatCardType, QPoint coord);
+    void onCardAppend(Card* card, QPoint coord);
 
 private:
     QVBoxLayout* layout;
