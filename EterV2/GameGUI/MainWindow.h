@@ -21,6 +21,8 @@ public:
 
     base::CombatCardType getType() const;
     color::ColorType getColor() const;
+    bool isPlaced();
+    void setPlaced();
 
 protected:
     void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
@@ -33,6 +35,7 @@ private:
     QPointF lastCardPosition;
     color::ColorType color;
     base::CombatCardType type;
+    bool placed;
 
 signals:
     void cardAppend(Card* card);
