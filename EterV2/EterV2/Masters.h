@@ -66,12 +66,12 @@ namespace base {
 		bool apply(Board& board, Player& player) override;
 		std::vector<Coord> getChoices(Board& board, Player& player);
 	};
-	enum class BorderType {
+	/*enum class BorderType {
 		Top,
 		Bottom,
 		Left,
 		Right
-	};
+	};*/
 	class MasterOfWaterBack : public MageCard {
 	public:
 		MasterOfWaterBack();

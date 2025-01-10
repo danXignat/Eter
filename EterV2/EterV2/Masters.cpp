@@ -445,7 +445,7 @@ namespace base {
         return borders.empty() ? std::nullopt : std::make_optional(borders);
     }
 
-   static std::string_view borderToString(BorderType border) {
+   /*static std::string_view borderToString(BorderType border) {
 
         switch (border) {
         case BorderType::Top:
@@ -464,7 +464,7 @@ namespace base {
             return "Unknown";
         }
 
-    }
+    }*/
 
     std::pair<uint16_t, char> MasterOfWaterBack::selectBorders(const std::optional<std::unordered_map<BorderType, std::vector<Coord>>>& borders, Board& board) const {
        

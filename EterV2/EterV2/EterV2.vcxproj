@@ -19,7 +19,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ArenaService.cpp" />
     <ClCompile Include="BaseGameMode.cpp" />
     <ClCompile Include="Board.cpp" />
     <ClCompile Include="CombatCard.cpp" />
@@ -41,12 +40,11 @@
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="PowerCard.cpp" />
     <ClCompile Include="PowerCards.cpp" />
-    <ClCompile Include="TournamentMode.cpp" />
+    <ClCompile Include="TimedMode.cpp" />
     <ClCompile Include="TrainingMode.cpp" />
     <ClCompile Include="WinManager.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ArenaService.h" />
     <ClInclude Include="BaseGameMode.h" />
     <ClInclude Include="Board.h" />
     <ClInclude Include="colors.h" />
@@ -73,7 +71,8 @@
     <ClInclude Include="PowerCardType.h" />
     <ClInclude Include="ServiceType.h" />
     <ClInclude Include="Signal.h" />
-    <ClInclude Include="TournamentMode.h" />
+    <ClInclude Include="TimedMode.h" />
+    <ClInclude Include="Timer.h" />
     <ClInclude Include="TrainingMode.h" />
     <ClInclude Include="typedefs.h" />
     <ClInclude Include="utils.h" />
@@ -110,7 +109,7 @@
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>

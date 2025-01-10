@@ -5,11 +5,13 @@
 Card::Card(color::ColorType color, base::CombatCardType type, const QString& imagePath, QGraphicsItem* parent)
     : QGraphicsItem(parent), cardImage(imagePath),
     color{ color },
-    type{ type } {
+    type{ type },
+    placed{ false } {
 
     if (cardImage.isNull()) {
         qWarning() << "Failed to load card image:" << imagePath;
     }
+    
     setZValue(5);
     setFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsMovable);
 }
@@ -22,6 +24,7 @@ void Card::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWid
     Q_UNUSED(option);
     Q_UNUSED(widget);
     QPixmap scaledImage = cardImage.scaled(CARD_SIZE, CARD_SIZE, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+
     painter->drawPixmap(-CARD_SIZE / 2, -CARD_SIZE / 2, scaledImage);
 }
 
@@ -34,10 +37,16 @@ base::CombatCardType Card::getType() const {
 color::ColorType Card::getColor() const {
     return color;
 }
+void Card::setPlaced() {
+    placed = true;
+}
 
 
 
 void Card::mousePressEvent(QGraphicsSceneMouseEvent* event) {
+    if (placed) {
+        return;
+    }
     lastMousePosition = event->scenePos();
     lastCardPosition = pos();
     qDebug() << "pressed" << "\n";
@@ -45,6 +54,9 @@ void Card::mousePressEvent(QGraphicsSceneMouseEvent* event) {
 }
 
 void Card::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
+    if (placed) {
+        return;
+    }
     QPointF delta = event->scenePos() - lastMousePosition;
 
     setPos(pos() + delta);
@@ -54,6 +66,9 @@ void Card::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
 }
 
 void Card::mouseReleaseEvent(QGraphicsSceneMouseEvent* event) {
+    if (placed) {
+        return;
+    }
     QPointF cardCenter = sceneBoundingRect().center();  // Get card center in scene coordinates
     QList<QGraphicsItem*> itemsUnderCard = scene()->items(cardCenter); // Get items at center
 
@@ -80,6 +95,45 @@ void Card::mouseReleaseEvent(QGraphicsSceneMouseEvent* event) {
 
     qDebug() << "Card snapped to:" << pos();
     QGraphicsItem::mouseReleaseEvent(event);
+}
+
+//Deck::Deck():
+//
+//{
+//
+//}
+
+Deck::Deck(GameScene* gameControler, const base::Player& player, QPointF start_point) :
+    QWidget(gameControler),
+    gameControler {gameControler},
+    player{ player },
+    start_point{start_point}
+{ 
+    drawPlayerCards();
+}
+
+void Deck::createCardAt(color::ColorType color, base::CombatCardType type, QPointF pos) {
+    QString imagePath = QString(CARD_PATH)
+        .arg(color == color::ColorType::RED ? "red" : "blue")
+        .arg(combatCardToChar(type));
+
+    Card* card = new Card(color, type, imagePath);
+    connect(card, &Card::cardAppend, gameControler, &GameScene::onCardAppend);
+    card->setPos(pos);
+    gameControler->getScene()->addItem(card);
+}
+
+void Deck::drawPlayerCards() {
+    QPointF curr_point{ start_point };
+
+    const auto& cards = player.getCards();
+
+    for (const auto& [type, _] : cards) {
+        createCardAt(player.getColor(), type, curr_point);
+
+        curr_point += QPointF{ CARD_SIZE, 0 };
+    }
+
 }
 
 
@@ -141,10 +195,12 @@ SelectModeScene::SelectModeScene(QWidget* parent) : QWidget(parent) {
 GameScene::GameScene(QWidget* parent) : QWidget(parent),
     scene{ new QGraphicsScene(this) },
     view{ new QGraphicsView(scene, this) },
-    gamemode{ nullptr }
+    gamemode{ nullptr },
+    playerBlue {nullptr},
+    playerRed {nullptr}
 
     /*player_one{gamemode->getPlayerRed()},
-    player_two{gamemode->getPlayerBlue()},
+   player_two{gamemode->getPlayerBlue()},
     game_board{gamemode->getBoard()}*/
 {
     QVBoxLayout* mainLayout = new QVBoxLayout(this);
@@ -174,7 +230,8 @@ GameScene::GameScene(QWidget* parent) : QWidget(parent),
 
 void GameScene::startGame(const std::string& mode, const std::string& playerBlueName, const std::string& playerRedName) {
     gamemode = base::GameModeFactory::get(mode, { playerBlueName, playerRedName });
-
+    playerRed = new Deck ( this, gamemode->getPlayerRed(), {130, 70} );
+    playerBlue = new Deck ( this, gamemode->getPlayerBlue(), {130, 70} );
     playerBlueNameLabel->setText(QString::fromStdString(playerBlueName) + "'s cards:");
     playerRedNameLabel->setText(QString::fromStdString(playerRedName) + "'s cards:");
 
@@ -187,21 +244,11 @@ void GameScene::startGame(const std::string& mode, const std::string& playerBlue
         cardStartPos = 240;
     }
 
-    drawPlayerCards(gamemode->getPlayerRed(), { cardStartPos, 100 });
-    drawPlayerCards(gamemode->getPlayerBlue(), { cardStartPos, 700 });
-
     drawAvailablePositions();
 }
 
-void GameScene::createCardAt(color::ColorType color, base::CombatCardType type, QPointF pos) {
-    QString imagePath = QString(CARD_PATH)
-        .arg(color == color::ColorType::RED ? "red" : "blue")
-        .arg(combatCardToChar(type));
-
-    Card* card = new Card(color, type, imagePath);
-    connect(card, &Card::cardAppend, this, &GameScene::onCardAppend);
-    card->setPos(pos);
-    scene->addItem(card);
+QGraphicsScene* GameScene::getScene() {
+    return scene;
 }
 
 void GameScene::drawSquareAt(QPoint pos) {
@@ -247,18 +294,6 @@ void GameScene::drawAvailablePositions() {
     clasa MainWindow
 */
 
-void GameScene::drawPlayerCards(const base::Player& player, QPointF start_point) {
-    QPointF curr_point{ start_point };
-
-    const auto& cards = player.getCards();
-
-    for (const auto& [type, _] : cards) {
-        createCardAt(player.getColor(), type, curr_point);
-
-        curr_point += QPointF{ CARD_SIZE, 0 };
-    }
-
-}
 
 void GameScene::onCardAppend(Card* card) {
     base::InputHandler input;
@@ -271,7 +306,9 @@ void GameScene::onCardAppend(Card* card) {
     }
     else {
         gamemode->switchPlayer();
+        gamemode->getCurrPlayer();
         drawAvailablePositions();
+        card->setPlaced();
     }
 }
 
