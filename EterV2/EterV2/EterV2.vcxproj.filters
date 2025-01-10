@@ -68,6 +68,12 @@
     <ClCompile Include="Config.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
+    <ClCompile Include="TournamentMode.cpp">
+      <Filter>GameMode\GameModes</Filter>
+    </ClCompile>
+    <ClCompile Include="ArenaService.cpp">
+      <Filter>GameMode\Services</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="GameMode">
@@ -194,6 +200,12 @@
     </ClInclude>
     <ClInclude Include="Config.h">
       <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="TournamentMode.h">
+      <Filter>GameMode\GameModes</Filter>
+    </ClInclude>
+    <ClInclude Include="ArenaService.h">
+      <Filter>GameMode\Services</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

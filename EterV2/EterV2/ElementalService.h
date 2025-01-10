@@ -24,7 +24,6 @@ namespace base {
 
 	private:
 		std::unique_ptr<PowerCard>_factory(PowerCardType ability);
-		PowerCardType _getPowerCard(PowerCardType type);
 
 	private:
 		Board& m_board;

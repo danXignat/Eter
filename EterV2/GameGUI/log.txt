@@ -1,8 +1,6 @@
 [INFO] card(2) appended at (600, 400)
-[WARNING] This card must be played on an empty space
-[WARNING] This card must be played on an empty space
-[INFO] card(E) appended at (690, 490)
-[WARNING] Card too small
-[WARNING] Card too small
-[WARNING] Card too small
-[WARNING] Card too small
+[INFO] card(2) appended at (510, 490)
+[INFO] card(3) appended at (420, 580)
+[INFO] card(4) appended at (510, 400)
+[INFO] card(1) appended at (420, 400)
+[WARNING] not available place
