@@ -8,12 +8,12 @@
 
 int main(int argc, char *argv[])
 {
-    QApplication app(argc, argv);
+    QApplication app{ argc, argv };
     
     base::Config::getInstance()
         .setStartPoint({ WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2 })
-        .setCardSpacingX(CARD_SIZE)
-        .setCardSpacingY(CARD_SIZE);
+        .setCardSpacingX(CARD_SIZE + 10)
+        .setCardSpacingY(CARD_SIZE + 10);
 
     MainWindow window;
     window.show();
