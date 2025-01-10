@@ -68,6 +68,9 @@
     <ClCompile Include="Config.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
+    <ClCompile Include="TimedMode.cpp">
+      <Filter>GameMode\GameModes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="GameMode">
@@ -194,6 +197,12 @@
     </ClInclude>
     <ClInclude Include="Config.h">
       <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Timer.h">
+      <Filter>GameMode\GameModes</Filter>
+    </ClInclude>
+    <ClInclude Include="TimedMode.h">
+      <Filter>GameMode\GameModes</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

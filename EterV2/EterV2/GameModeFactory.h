@@ -6,12 +6,13 @@
 #include "GameModeType.h"
 #include "ServiceType.h"
 #include "TrainingMode.h"
+#include "TimedMode.h"
 
 namespace base {
 	using GameModePtr = std::unique_ptr<BaseGameMode>;
 
 	struct GameModeFactory {
-		static GameModePtr get(const std::string& id, const std::pair<std::string, std::string>& player_names);
+		static GameModePtr get(const std::string& id, const std::pair<std::string, std::string>& player_names, int time_limit_seconds = 60);
 
 		static GameModeType getGameModeType(const std::string& id);
 

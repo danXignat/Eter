@@ -68,5 +68,33 @@ namespace base {
 	inline std::string_view getMasterDescription(MageTypeAbility ability) {
 		return mapMageTypeAbilities.at(ability);
 	}
+	enum class BorderType {
+		Top,
+		Bottom,
+		Left,
+		Right
+	};
+
+	static std::string_view borderToString(BorderType border) { 
+
+		switch (border) {
+		case BorderType::Top:
+			return "Top";
+
+		case BorderType::Bottom:
+			return "Bottom";
+
+		case BorderType::Left:
+			return "Left";
+
+		case BorderType::Right:
+			return "Right";
+
+		default:
+			return "Unknown";
+		}
+
+	}
+
 
 }

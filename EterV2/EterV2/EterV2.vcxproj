@@ -40,6 +40,7 @@
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="PowerCard.cpp" />
     <ClCompile Include="PowerCards.cpp" />
+    <ClCompile Include="TimedMode.cpp" />
     <ClCompile Include="TrainingMode.cpp" />
     <ClCompile Include="WinManager.cpp" />
   </ItemGroup>
@@ -70,6 +71,8 @@
     <ClInclude Include="PowerCardType.h" />
     <ClInclude Include="ServiceType.h" />
     <ClInclude Include="Signal.h" />
+    <ClInclude Include="TimedMode.h" />
+    <ClInclude Include="Timer.h" />
     <ClInclude Include="TrainingMode.h" />
     <ClInclude Include="typedefs.h" />
     <ClInclude Include="utils.h" />
@@ -100,13 +103,13 @@
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
