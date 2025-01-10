@@ -74,6 +74,7 @@ private:
     QPushButton* elementalBattleButton;
 };
 
+
 class GameScene : public QWidget {
     Q_OBJECT
 
@@ -81,10 +82,9 @@ public:
     explicit GameScene(QWidget* parent = nullptr);
 
     void startGame(const std::string& mode, const std::string& playerBlueName, const std::string& playerRedName);
-    void createCardAt(color::ColorType color, base::CombatCardType type, QPointF pos);
-    void drawPlayerCards(const base::Player& player, QPointF start_point);
     void drawSquareAt(QPoint pos);
     void drawAvailablePositions();
+    QGraphicsScene* getScene();
 
 public slots:
     void onCardAppend(Card* card);
@@ -100,9 +100,27 @@ private:
     /*const base::Player& player_one;
     const base::Player& player_two;
     const base::Board& game_board;*/
-
+    Deck* playerBlue;
+    Deck* playerRed;
     QGraphicsScene* scene;
     QGraphicsView* view;
+};
+class Deck : QWidget {
+
+public:
+
+    Deck(GameScene* gameControler, const base::Player& player, QPointF start_point);
+
+    void drawPlayerCards();
+    void createCardAt(color::ColorType color, base::CombatCardType type, QPointF pos);
+    void showCards();
+    void hideCards();
+private:
+
+    QPointF start_point;
+    GameScene* gameControler;
+    const base::Player& player;
+
 };
 
 class MainWindow : public QMainWindow {
@@ -125,3 +143,4 @@ private:
     QString playerRedNameGlobal;
     std::string selectedMode;
 };
+
