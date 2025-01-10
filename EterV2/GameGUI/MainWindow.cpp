@@ -1,7 +1,7 @@
 #include "MainWindow.h"
 
 #include <ranges>
-
+#include "utils.h"
 Card::Card(color::ColorType color, base::CombatCardType type, const QString& imagePath, QGraphicsItem* parent)
     : QGraphicsItem(parent), cardImage(imagePath),
     color{ color },
@@ -10,7 +10,7 @@ Card::Card(color::ColorType color, base::CombatCardType type, const QString& ima
     if (cardImage.isNull()) {
         qWarning() << "Failed to load card image:" << imagePath;
     }
-
+    setZValue(5);
     setFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsMovable);
 }
 
@@ -36,11 +36,11 @@ color::ColorType Card::getColor() const {
 }
 
 
+
 void Card::mousePressEvent(QGraphicsSceneMouseEvent* event) {
     lastMousePosition = event->scenePos();
     lastCardPosition = pos();
     qDebug() << "pressed" << "\n";
-
     QGraphicsItem::mousePressEvent(event);
 }
 
@@ -63,7 +63,7 @@ void Card::mouseReleaseEvent(QGraphicsSceneMouseEvent* event) {
             QPointF target_coord{ cell->sceneBoundingRect().center() };
 
             setPos(target_coord);
-            
+            setZValue(1);
             break;
         }
         auto* card = dynamic_cast<Card*>(item);
@@ -71,25 +71,18 @@ void Card::mouseReleaseEvent(QGraphicsSceneMouseEvent* event) {
             QPointF target_coord{ card->sceneBoundingRect().center() };
 
             setPos(target_coord);
-            qDebug() << "cartof ???";
+            setZValue(card->zValue()+1);
             break;
         }
     }
-
-    emit cardAppend(this, this->pos().toPoint());
+    
+    emit cardAppend(this);
 
     qDebug() << "Card snapped to:" << pos();
     QGraphicsItem::mouseReleaseEvent(event);
 }
 
-//todo  fa un headerr utils unde pui functiile astea de conversie
-QPointF coordToQPointF(const base::Coord& coord) {
-    return QPointF(static_cast<qreal>(coord.first), static_cast<qreal>(coord.second));
-}
 
-base::Coord qPointFToCoord(const QPointF& point) {
-    return base::Coord{ static_cast<int16_t>(point.x()), static_cast<int>(point.y()) };
-}
 
 RequestNameScene::RequestNameScene(QWidget* parent) : QWidget(parent) {
     QVBoxLayout* layout = new QVBoxLayout(this);
@@ -267,11 +260,11 @@ void GameScene::drawPlayerCards(const base::Player& player, QPointF start_point)
 
 }
 
-void GameScene::onCardAppend(Card* card, QPoint coord) {
+void GameScene::onCardAppend(Card* card) {
     base::InputHandler input;
     input.event_type = base::EventType::PlaceCombatCard;
     input.card_type = card->getType();
-    input.coord = base::Coord{ coord.x(), coord.y() };
+    input.coord = gui::utils::qPointFToCoord(card->pos());
 
     if (!gamemode->placeCombatCard(input)) {
         card->moveCardBack();

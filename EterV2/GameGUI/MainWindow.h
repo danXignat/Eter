@@ -22,7 +22,6 @@ public:
     base::CombatCardType getType() const;
     color::ColorType getColor() const;
 
-
 protected:
     void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
     void mouseMoveEvent(QGraphicsSceneMouseEvent* event) override;
@@ -35,9 +34,8 @@ private:
     color::ColorType color;
     base::CombatCardType type;
 
-
 signals:
-    void cardAppend(Card* card, QPoint coord);
+    void cardAppend(Card* card);
 };
 
 class RequestNameScene : public QWidget {
@@ -86,7 +84,7 @@ public:
     void drawAvailablePositions();
 
 public slots:
-    void onCardAppend(Card* card, QPoint coord);
+    void onCardAppend(Card* card);
 
 private:
     QVBoxLayout* layout;
