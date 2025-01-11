@@ -14,4 +14,6 @@
 #include <qboxlayout.h>
 #include <qlineedit.h>
 #include <qlabel.h>
+#include <QDebug>
+#include <QtWidgets/QMainWindow>
 #endif // GRAPHICS_INCLUDES_H

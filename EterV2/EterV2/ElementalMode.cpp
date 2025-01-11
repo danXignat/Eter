@@ -21,7 +21,7 @@ namespace base {
 	void ElementalMode::run() {
 		this->render();
 
-		while (m_win_manager.won() == false) {
+		while (true) {
 			InputHandler input;
 			try {
 				input.read();								//asta da handle la inputu de la tastatura

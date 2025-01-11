@@ -62,7 +62,7 @@ namespace base {
 
 		uint16_t m_effect_count;
 		std::optional<Coord> m_board_corner;
-		std::unordered_set<Coord, CoordFunctor> m_visited_effects;
+		std::unordered_set<Coord, utils::CoordFunctor> m_visited_effects;
 		std::vector<std::vector<std::optional<Effect>>> m_effects;
 		Coord m_effect_corner1, m_effect_corner2;
 	};

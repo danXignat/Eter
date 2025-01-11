@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <array>
 
+#include "WinManager.h"
 #include "CombatCard.h"
 #include "CombatCardType.h"
 #include "Player.h"
@@ -15,14 +16,11 @@
 #include "typedefs.h"
 #include "Config.h"
 
-using namespace utils;
-
 namespace base {
 	class Board {
 	public:
 		using Stack = std::vector<CombatCard>;
 
-		Board(uint16_t, Player&, Player&);
 		Board(GameSizeType, Player&, Player&);
 		Board(const Board&) = delete;
 		Board& operator=(const Board&) = delete;
@@ -40,10 +38,10 @@ namespace base {
 		Coord getLeftCorner() const;
 		std::pair<Coord, Coord> getBoudingRect() const;
 		std::pair<uint16_t, uint16_t> getBoundingRectSize() const;
-		const std::unordered_set<Coord, CoordFunctor>& availableSpaces() const;
-		const std::unordered_map<Coord, Stack, CoordFunctor>& getCombatCards() const;
+		const std::unordered_set<Coord, utils::CoordFunctor>& availableSpaces() const;
+		const std::unordered_map<Coord, Stack, utils::CoordFunctor>& getCombatCards() const;
 		std::optional<CombatCardRef> getTopCard(const Coord& coord);
-		const std::vector<CombatCard>& operator[](const Coord& coord);
+		const std::vector<CombatCard>& operator[](const Coord& coord) const;
 		std::unordered_set<int16_t> getFixedRows() const;
 		std::unordered_set<int16_t> getFixedColumns() const; 
 		Coord getRightMostOnRow(int16_t y) const;
@@ -52,10 +50,10 @@ namespace base {
 		Coord getBottomMostOnColumn(int16_t x) const;
 		std::vector<Coord> getCoordsOnRow(int16_t row_index) const;
 		std::vector<Coord> getCoordsOnColumn(int16_t col_index) const;
-		
+		std::optional<Coord> getWinCoord() const;
+
 		void createHole(const Coord&);
 		void appendMove(const Coord&, CombatCard&&);
-		void appendAnyCard(const Coord&, CombatCard&&);
 		void moveRow(uint16_t from_y, uint16_t to_y);
 		void moveColumn(uint16_t from_x, uint16_t to_x);
 		void moveStack(const Coord& from_coord, const Coord& to_coord);
@@ -91,18 +89,15 @@ namespace base {
 		void sideViewRender();
 
 	private:
+		void _setWinPosition(const Coord&);
 		void _updateAvailableSpaces(const Coord&);
 		void _reinitialise();
-		bool _isConex(const std::unordered_set<Coord, CoordFunctor>&) const;
+		bool _isConex(const std::unordered_set<Coord, utils::CoordFunctor>&) const;
 		void _addUsedCard(CombatCard&&);
 		void _addUsedStack(Stack&& stack);
 
 	private:
 		struct BoundingRect {
-			uint16_t size;
-			Coord corner1, corner2;
-			bool fixed_width, fixed_height;
-
 			BoundingRect();
 			BoundingRect(uint16_t);
 			BoundingRect(uint16_t size, const Coord& coord);
@@ -113,15 +108,21 @@ namespace base {
 			bool withinHeight(const Coord&) const;
 			bool within(const Coord&) const;
 			bool isFixed() const;
+
+			uint16_t size;
+			Coord corner1, corner2;
+			bool fixed_width, fixed_height;
 		};
 
 	private:
-		uint16_t m_size;
-		BoundingRect m_bounding_rect;
 		Player& m_player1, & m_player2;
 
-		std::unordered_map<Coord, Stack, CoordFunctor> m_combat_cards;
-		std::unordered_set<Coord, CoordFunctor> m_available_spaces;
+		std::optional<Coord> m_win_pos;
+		uint16_t m_size;
+		BoundingRect m_bounding_rect;
+
+		std::unordered_map<Coord, Stack, utils::CoordFunctor> m_combat_cards;
+		std::unordered_set<Coord, utils::CoordFunctor> m_available_spaces;
 
 	///------------------------------------------------Iterator---------------------------------------------
 

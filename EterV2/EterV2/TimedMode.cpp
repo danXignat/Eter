@@ -67,7 +67,7 @@ namespace base {
     void TimedMode::run() {
         this->render();
 
-        while (m_win_manager.won() == false) {
+        while (m_board.getWinCoord().has_value() == false) {
             
             bool red_expired = red_timer->hasTimeExpired();
             bool blue_expired = blue_timer->hasTimeExpired();

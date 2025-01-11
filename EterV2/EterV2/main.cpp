@@ -6,7 +6,7 @@
 #include "Board.h"
 #include "Player.h"
 #include "Config.h"
-#include"ArenaService.h"
+//#include"ArenaService.h"
 
 void testExplosion() {
 	base::Player p1{ "Ilie", color::ColorType::RED, base::GameSizeType::BIG};
@@ -62,24 +62,24 @@ void testConfig() {
 		std::cout << x << " " << y << std::endl;
 	}
 }
-void testArenaService() {
-
-	base::Player player1("Player1", color::ColorType::RED, base::GameSizeType::BIG);
-	base::Player player2("Player2", color::ColorType::BLUE, base::GameSizeType::BIG);
-
-	base::Board board(base::GameSizeType::BIG, player1, player2);
-
-	board.appendMove({ 10, 5 }, base::CombatCard(base::CombatCardType::FOUR, color::ColorType::BLUE));
-	board.appendMove({ 12, 5 }, base::CombatCard(base::CombatCardType::THREE, color::ColorType::RED));
-	board.appendMove({ 14, 5 }, base::CombatCard(base::CombatCardType::FOUR, color::ColorType::BLUE));
-	board.appendMove({ 16, 5 }, base::CombatCard(base::CombatCardType::FOUR, color::ColorType::BLUE));
-
-	board.render();
-	board.sideViewRender();
-
-	base::ArenaService arenaService(base::GameSizeType::BIG, player1, player2);
-	arenaService.renderArena(board);
-}
+//void testArenaService() {
+//
+//	base::Player player1("Player1", color::ColorType::RED, base::GameSizeType::BIG);
+//	base::Player player2("Player2", color::ColorType::BLUE, base::GameSizeType::BIG);
+//
+//	base::Board board(base::GameSizeType::BIG, player1, player2);
+//
+//	board.appendMove({ 10, 5 }, base::CombatCard(base::CombatCardType::FOUR, color::ColorType::BLUE));
+//	board.appendMove({ 12, 5 }, base::CombatCard(base::CombatCardType::THREE, color::ColorType::RED));
+//	board.appendMove({ 14, 5 }, base::CombatCard(base::CombatCardType::FOUR, color::ColorType::BLUE));
+//	board.appendMove({ 16, 5 }, base::CombatCard(base::CombatCardType::FOUR, color::ColorType::BLUE));
+//
+//	board.render();
+//	board.sideViewRender();
+//
+//	base::ArenaService arenaService(base::GameSizeType::BIG, player1, player2);
+//	arenaService.renderArena(board);
+//}
 
 int main() {
 	system("start powershell -Command \"Get-Content -Path 'log.txt' -Wait\"");

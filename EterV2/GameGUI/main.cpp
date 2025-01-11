@@ -12,8 +12,8 @@ int main(int argc, char *argv[])
     
     base::Config::getInstance()
         .setStartPoint({ WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2 })
-        .setCardSpacingX(CARD_SIZE + 10)
-        .setCardSpacingY(CARD_SIZE + 10);
+        .setCardSpacingX(CARD_SIZE + CARD_OFFSET)
+        .setCardSpacingY(CARD_SIZE + CARD_OFFSET);
 
     MainWindow window;
     window.show();

@@ -8,7 +8,6 @@ namespace base {
 		const std::pair<std::string, std::string>& player_names,
 		const std::vector<ServiceType>& services
 	) :
-		m_win_manager{ m_board },
 		m_player_red{ player_names.first, color::ColorType::RED, game_size },
 		m_player_blue{ player_names.second, color::ColorType::BLUE, game_size },
 		m_board{ game_size, m_player_red, m_player_blue },
@@ -18,7 +17,7 @@ namespace base {
 			switch (service) {
 				using enum ServiceType;
 			case ILLUSION:
-				m_illusion_service.emplace(m_board, m_win_manager);
+				//m_illusion_service.emplace(m_board, m_win_manager);
 				break;
 			case EXPLOSION:
 				m_explosion_service.emplace(m_board, m_player_red, m_player_blue);
@@ -43,6 +42,14 @@ namespace base {
 
 	const Board& BaseGameMode::getBoard() const {
 		return m_board;
+	}
+
+	std::optional<color::ColorType> BaseGameMode::getWinningColor() const {
+		if (auto win_coord = m_board.getWinCoord(); win_coord.has_value()) {
+			return m_board[*win_coord].back().getColor();
+		}
+
+		return std::nullopt;
 	}
 
 	void BaseGameMode::switchPlayer() {
@@ -70,8 +77,6 @@ namespace base {
 			CombatCard card = m_curr_player.get().getCard(card_type);
 
 			m_board.appendMove(coord, std::move(card));
-
-			m_win_manager.addCard(coord);
 
 			return true;
 		}
