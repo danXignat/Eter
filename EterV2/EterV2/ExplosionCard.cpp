@@ -74,7 +74,9 @@ namespace base {
 
 		for (int16_t i = 0; i < m_board.size(); ++i) {
 			for (int16_t j = 0; j < m_board.size(); ++j) {
-				rez[{i, j}] = *m_effects.at(i).at(j);
+				if (m_effects.at(i).at(j).has_value()) {
+					rez[{i, j}] = *m_effects.at(i).at(j);
+				}
 			}
 		}
 

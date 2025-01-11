@@ -51,6 +51,13 @@ void GameView::drawPlayerCards(const base::Player& player, QPointF start_point) 
 
 }
 
+void GameView::drawExplosion(const base::ExplosionService& service, QPointF start_point) {
+    explosion = new Explosion(service.getEffectCoords());
+    explosion->setPos(start_point);
+    scene->addItem(explosion);
+
+}
+
 void GameView::_initLabels(const QString& name_red, const QString& name_blue) {
 
     red_name_label = new QLabel(this);
@@ -194,13 +201,14 @@ GameController::GameController(
     view->drawPlayerCards(model->getPlayerRed(), { cardStartPos, 700 });
     view->drawPlayerCards(model->getPlayerBlue(), { cardStartPos, 700 });
     view->drawAvailablePositions(model->getBoard());
-
+    view->drawExplosion(model->getExplosionService(), {500,555});
     using enum color::ColorType;
     color::ColorType color{ model->getCurrPlayer().getColor() };
     color::ColorType other_color{ (color == RED) ? BLUE : RED };
 
     view->setDeckVisible(color, true);
     view->setDeckVisible(other_color, false);
+
 }
 
 void GameController::onCardAppend(Card* card) {

@@ -101,3 +101,23 @@ void Card::mouseReleaseEvent(QGraphicsSceneMouseEvent* event) {
     qDebug() << "Card snapped to:" << pos();
     QGraphicsItem::mouseReleaseEvent(event);
 }
+
+Explosion::Explosion(const std::unordered_map<base::Coord, base::Effect, base::utils::CoordFunctor>& effects)  
+    : baseImage { EXPLOSION_PATH }
+{
+    if (baseImage.isNull()) {
+        qWarning() << "Failed to load card image:" << EXPLOSION_PATH;
+    }
+    setZValue(5);
+    setFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsMovable);
+}
+QRectF Explosion::boundingRect() const {
+    return QRectF(-EXPLOSION_SIZE / 2, -EXPLOSION_SIZE / 2, EXPLOSION_SIZE, EXPLOSION_SIZE);
+}
+void Explosion::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) {
+    Q_UNUSED(option);
+    Q_UNUSED(widget);
+    QPixmap scaledImage = baseImage.scaled(EXPLOSION_SIZE, EXPLOSION_SIZE, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+
+    painter->drawPixmap(-EXPLOSION_SIZE / 2, -EXPLOSION_SIZE / 2, scaledImage);
+}

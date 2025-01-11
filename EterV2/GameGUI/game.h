@@ -25,6 +25,7 @@ public:
 
     void drawPlayerCards(const base::Player& player, QPointF start_point);
     void drawAvailablePositions(const base::Board& board);
+    void drawExplosion(const base::ExplosionService& effect, QPointF start_point);
     void setDeckVisible(color::ColorType color, bool visible);
     void showWin(color::ColorType color);
 
@@ -43,6 +44,7 @@ private:
     QLabel* won_label;
 
     QGraphicsScene* scene;
+    Explosion* explosion;
 
     QList<Card*> red_deck;
     QList<Card*> blue_deck;

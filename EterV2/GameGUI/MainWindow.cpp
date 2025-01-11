@@ -50,9 +50,9 @@ SelectModeScene::SelectModeScene(QWidget* parent) : QWidget(parent) {
     elementalBattleButton->setStyleSheet("font-size: 18px;");
     layout->addWidget(elementalBattleButton, 0, Qt::AlignCenter);
 
-    connect(trainingButton, &QPushButton::clicked, this, [=]() { emit modeSelected("100"); });
-    connect(mageDuelButton, &QPushButton::clicked, this, [=]() { emit modeSelected("200"); });
-    connect(elementalBattleButton, &QPushButton::clicked, this, [=]() { emit modeSelected("300"); });
+    connect(trainingButton, &QPushButton::clicked, this, [=]() { emit modeSelected("102"); });
+    connect(mageDuelButton, &QPushButton::clicked, this, [=]() { emit modeSelected("202"); });
+    connect(elementalBattleButton, &QPushButton::clicked, this, [=]() { emit modeSelected("302"); });
 }
 
 GameScene::GameScene(const std::string& mode, const QString& playerBlueName, const QString& playerRedName, QWidget* parent) :
