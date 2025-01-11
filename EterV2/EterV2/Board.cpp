@@ -10,14 +10,6 @@ using namespace logger;
 namespace base {
 	//----------------------------Constructors--------------------------------
 
-	Board::Board(uint16_t size, Player& player1, Player& player2) :
-		m_size{ size },
-		m_bounding_rect{ size },
-		m_available_spaces{ Config::getInstance().getStartPoint() },
-		m_player1{ player1 }, m_player2{ player2 } {
-
-	}
-
 	Board::Board(GameSizeType size_type, Player& player1, Player& player2) :
 		m_size{ static_cast<uint16_t>(size_type) },
 		m_bounding_rect{ static_cast<uint16_t>(size_type) },
@@ -25,7 +17,6 @@ namespace base {
 		m_player1{ player1 }, m_player2{ player2 } {
 
 	}
-
 
 	//----------------------------MODIFIERS--------------------------------
 
@@ -50,6 +41,8 @@ namespace base {
 
 		_updateAvailableSpaces(coord);
 
+		_setWinPosition(coord);
+
 		Logger::log(
 			Level::INFO,
 			"card({}) appended at ({}, {})",
@@ -57,20 +50,6 @@ namespace base {
 		);
 	}
 	
-	void Board::appendAnyCard(const Coord& coord, CombatCard&& card) {
-		m_bounding_rect.add(coord);
-
-		m_combat_cards[coord].emplace_back(std::move(card));
-
-		_updateAvailableSpaces(coord);
-
-		Logger::log(
-			Level::INFO,
-			"card({}) appended at ({}, {})",
-			combatCardToChar(m_combat_cards[coord].back().getType()), coord.first, coord.second
-		);
-	}
-
 	void Board::moveStack(const Coord& from_coord, const Coord& to_coord) {
 		if (m_combat_cards.contains(to_coord)) {
 			throw std::runtime_error("Destination must be an empty space!");
@@ -515,11 +494,11 @@ namespace base {
 		}
 	}
 
-	const std::unordered_set<Coord, CoordFunctor>& Board::availableSpaces() const {
+	const std::unordered_set<Coord, utils::CoordFunctor>& Board::availableSpaces() const {
 		return m_available_spaces;
 	}
 
-	const std::unordered_map<Coord, std::vector<CombatCard>, CoordFunctor>& Board::getCombatCards() const {
+	const std::unordered_map<Coord, std::vector<CombatCard>, utils::CoordFunctor>& Board::getCombatCards() const {
 		return m_combat_cards;
 	}
 
@@ -553,7 +532,7 @@ namespace base {
 			return false;
 		}
 
-		std::unordered_set<Coord, CoordFunctor> new_config{
+		std::unordered_set<Coord, utils::CoordFunctor> new_config{
 			std::ranges::begin(m_combat_cards | std::views::keys),
 			std::ranges::end(m_combat_cards | std::views::keys)
 		};
@@ -570,7 +549,7 @@ namespace base {
 			return false;
 		}
 
-		std::unordered_set<Coord, CoordFunctor> simulated_config{
+		std::unordered_set<Coord, utils::CoordFunctor> simulated_config{
 			std::ranges::begin(m_combat_cards | std::views::keys),
 			std::ranges::end(m_combat_cards | std::views::keys)
 		};
@@ -593,7 +572,7 @@ namespace base {
 			Logger::log(Level::WARNING, "Column {} is out of bounds.", col_index);
 			return false;
 		}
-		std::unordered_set<Coord, CoordFunctor> simulated_config{
+		std::unordered_set<Coord, utils::CoordFunctor> simulated_config{
 			std::ranges::begin(m_combat_cards | std::views::keys),
 			std::ranges::end(m_combat_cards | std::views::keys)
 		};
@@ -625,7 +604,7 @@ namespace base {
 			return false;
 		}
 
-		std::unordered_set<Coord, CoordFunctor> new_config{
+		std::unordered_set<Coord, utils::CoordFunctor> new_config{
 			std::ranges::begin(m_combat_cards | std::views::keys),
 			std::ranges::end(m_combat_cards | std::views::keys)
 		};
@@ -636,7 +615,7 @@ namespace base {
 		return _isConex(new_config);
 	}
 
-	bool Board::_isConex(const std::unordered_set<Coord, CoordFunctor>& board_coords) const { // bfs 
+	bool Board::_isConex(const std::unordered_set<Coord, utils::CoordFunctor>& board_coords) const { // bfs 
 		if (board_coords.size() == 0 ||
 			board_coords.size() == 1 ||
 			board_coords.size() == 2
@@ -644,7 +623,7 @@ namespace base {
 			return true;
 		}
 
-		std::unordered_set<Coord, CoordFunctor> visited;
+		std::unordered_set<Coord, utils::CoordFunctor> visited;
 		std::queue<Coord> queue;
 
 		Coord first_coord{ *board_coords.begin() };
@@ -673,7 +652,7 @@ namespace base {
 
 	bool Board::isValidMoveStacks(const std::vector<std::pair<Coord, Coord>>& moves) const {
 
-		std::unordered_set<Coord, CoordFunctor> new_config{
+		std::unordered_set<Coord, utils::CoordFunctor> new_config{
 			std::ranges::begin(m_combat_cards | std::views::keys),
 			std::ranges::end(m_combat_cards | std::views::keys)
 		};
@@ -712,7 +691,7 @@ namespace base {
 			Logger::log(Level::WARNING, "Final destination ({}, {}) is not valid.", final_coord.first, final_coord.second);
 			return false;
 		}
-		std::unordered_set<Coord, CoordFunctor> simulated_config{
+		std::unordered_set<Coord, utils::CoordFunctor> simulated_config{
 			std::ranges::begin(m_combat_cards | std::views::keys),
 			std::ranges::end(m_combat_cards | std::views::keys)
 		};
@@ -900,7 +879,7 @@ namespace base {
 		return m_size;
 	}
 
-	const std::vector<CombatCard>& Board::operator[](const Coord& coord) {
+	const std::vector<CombatCard>& Board::operator[](const Coord& coord) const {
 		return m_combat_cards.at(coord);
 	}
 
@@ -924,6 +903,47 @@ namespace base {
 			(m_bounding_rect.corner2.first - m_bounding_rect.corner1.first + 2) / 2,
 			m_bounding_rect.corner2.second - m_bounding_rect.corner1.second + 1
 		};
+	}
+
+	std::optional<Coord> Board::getWinCoord() const {
+		return m_win_pos;
+	}
+
+	void Board::_setWinPosition(const Coord& coord) {
+		std::unordered_map<uint16_t, int16_t> x_count, y_count;
+		x_count.reserve(m_size);
+		y_count.reserve(m_size);
+		int16_t diag1{ 0 }, diag2{ 0 };
+
+		for (const auto& [coord, stack] : m_combat_cards) {
+			auto [x, y] { coord };
+			color::ColorType color{ stack.back().getColor() };
+			int16_t incr{ (color == color::ColorType::RED) ? -1 : 1 };
+
+			x_count[x] += incr;
+			y_count[y] += incr;
+
+			if (this->isFixed()) {
+				Coord mapped{ utils::mapCoordToMatrix(this->getLeftCorner(), coord)};
+
+				if (mapped.first == mapped.second) {
+					diag1 += incr;
+				}
+
+				if (mapped.first + mapped.second == m_size - 1) {
+					diag2 += incr;
+				}
+			}
+		}
+
+		const auto& [x, y] = coord;
+
+		bool won_on_lines = abs(diag1) == m_size || abs(diag2) == m_size;
+		bool won_on_diags = abs(y_count[y]) == m_size || abs(x_count[x]) == m_size;
+
+		if (won_on_lines || won_on_diags) {
+			m_win_pos.emplace(coord);
+		}
 	}
 
 	///----------------------------Private Methods--------------------------------
@@ -1083,7 +1103,6 @@ namespace base {
 	bool Board::BoundingRect::isFixed() const {
 		return fixed_width && fixed_height;
 	}
-
 
 	///-----------------------------------------Iterator-------------------------------
 

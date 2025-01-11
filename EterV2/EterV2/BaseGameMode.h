@@ -23,9 +23,9 @@ namespace base {
 		const Player& getPlayerBlue() const override;
 		const Player& getCurrPlayer() const override;
 		const Board& getBoard() const override;
+		std::optional<color::ColorType> getWinningColor() const;
 
 		bool placeCombatCard(const InputHandler&);
-
 		virtual bool placeIllusion(const InputHandler&);
 
 		virtual bool isExplosionAvailable();
@@ -44,7 +44,6 @@ namespace base {
 		PlayerRef m_curr_player;
 
 		Board m_board;
-		WinManager m_win_manager;
 
 		std::optional<IllusionService> m_illusion_service;
 		std::optional<ExplosionService> m_explosion_service;

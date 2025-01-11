@@ -2,12 +2,11 @@
 
 namespace base {
 	//---------------------------------Constructor------------------------------
-	WinManager::WinManager(Board& board)
-		: board{ board },
-		board_size{ board.size() },
+	WinManager::WinManager(uint16_t size)
+		: board_size{ size },
 		m_diag1{ 0 },
 		m_diag2{ 0 },
-		m_are_diags_init{ false },
+		m_is_fixed{ false },
 		m_won{ false }
 	{}
 
@@ -20,22 +19,8 @@ namespace base {
 		m_rows[y] += increment;
 		m_cols[x] += increment;
 
-		if (board.isFixed() && m_are_diags_init == false) {
-			_setDiags();
-		}
-		else if (m_are_diags_init == true) {
-			const auto& [corner_x, corner_y] = board.getLeftCorner();
+		if (m_is_fixed) {
 
-			uint16_t local_x = (x - corner_x) / 2;
-			uint16_t local_y = y - corner_y;
-
-			if (local_x == local_y) {
-				m_diag1 += increment;
-			}
-
-			if (local_x + local_y == board_size - 1) {
-				m_diag2 += increment;
-			}
 		}
 
 		_trySetWin(coord);
@@ -43,6 +28,15 @@ namespace base {
 
 	void WinManager::removeCard(const Coord& coord) {
 
+	}
+
+	void WinManager::setFixed(bool fixed) {
+		if (m_is_fixed == true && fixed == false) {
+			m_diag1 = 0;
+			m_diag2 = 0;
+		}
+
+		m_is_fixed = fixed;
 	}
 
 	//----------------------------------------Getters--------------------------
@@ -54,7 +48,7 @@ namespace base {
 	//------------------------------------------Helpers------------------------------
 
 	void WinManager::_setDiags() {
-		for (uint16_t i = 0; i < board_size; i++) {
+		/*for (uint16_t i = 0; i < board_size; i++) {
 			const auto& [x, y] = board.getLeftCorner();
 
 			Coord pos1{ x + 2 * i, y + i };
@@ -71,7 +65,7 @@ namespace base {
 			m_diag2 += board.hasStack(pos2) ? getIncrement(pos2) : 0;
 		}
 
-		m_are_diags_init = true;
+		m_are_diags_init = true;*/
 	}
 
 	void WinManager::_trySetWin(const Coord& coord) {
@@ -86,7 +80,7 @@ namespace base {
 	}
 
 	int16_t WinManager::_getIncrement(const Coord& coord) {
-		using namespace color;
+		/*using namespace color;
 
 		int16_t increment{0};
 		size_t stack_size = board[coord].size();
@@ -106,6 +100,7 @@ namespace base {
 			}
 		}
 
-		return increment;
+		return increment;*/
+		return 1;
 	}
 }

@@ -2,18 +2,17 @@
 #include <unordered_map>
 #include <cstdint>
 
-#include "Board.h"
-
 #include "typedefs.h"
 
 namespace base {
 	class WinManager {
 	public:
 
-		WinManager(Board&);
+		WinManager(uint16_t);
 		bool won() const;
 		void addCard(const Coord&);
 		void removeCard(const Coord&);
+		void setFixed(bool);
 
 	private:
 		void _setDiags();
@@ -25,13 +24,12 @@ namespace base {
 		static constexpr const int16_t red_increment = -1;
 
 	public:
-		Board& board;
 		uint16_t board_size;
 
 		std::unordered_map<uint16_t, int16_t> m_rows, m_cols;
 		int16_t m_diag1, m_diag2;
 
-		bool m_are_diags_init;
+		bool m_is_fixed;
 		bool m_won;
 	};
 }

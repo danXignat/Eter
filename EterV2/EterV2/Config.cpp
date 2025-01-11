@@ -41,19 +41,23 @@ namespace base {
         return *m_instance;
     }
 
-    Coord Config::getStartPoint() {
+    Coord Config::getStartPoint() const {
         return m_start_point;
     }
 
-    uint16_t Config::getCardSpacingX() {
+    Coord Config::getSpacing() const {
+        return { m_card_space_x, m_card_space_y };
+    }
+
+    uint16_t Config::getCardSpacingX() const {
         return m_card_space_x;
     }
 
-    uint16_t Config::getCardSpacingY() {
+    uint16_t Config::getCardSpacingY() const {
         return m_card_space_y;
     }
 
-    const std::array<Coord, 8>& Config::getOffsets() {
+    const std::array<Coord, 8>& Config::getOffsets() const {
         return m_mapped_offsets;
     }
 

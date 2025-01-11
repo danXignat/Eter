@@ -19,10 +19,12 @@ namespace base {
         Config& setCardSpacingX(uint16_t);
         Config& setCardSpacingY(uint16_t);
 
-        Coord    getStartPoint();
-        uint16_t getCardSpacingX();
-        uint16_t getCardSpacingY();
-        const std::array<Coord, 8>& getOffsets();
+        Coord    getStartPoint() const;
+        Coord    getSpacing() const;
+        uint16_t getCardSpacingX() const;
+        uint16_t getCardSpacingY() const;
+
+        const std::array<Coord, 8>& getOffsets() const;
     
     public:
         Config(const Config&) = delete;
