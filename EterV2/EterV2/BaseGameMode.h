@@ -22,21 +22,17 @@ namespace base {
 		const Player& getPlayerRed() const override;
 		const Player& getPlayerBlue() const override;
 		const Player& getCurrPlayer() const override;
-		const Board& getBoard() const override;
+		const Board&  getBoard() const override;
+		const ExplosionService& getExplosionService();
+
 		std::optional<color::ColorType> getWinningColor() const;
+		void switchPlayer();
 
 		bool placeCombatCard(const InputHandler&);
-		virtual bool placeIllusion(const InputHandler&);
-
-		virtual bool isExplosionAvailable();
-		virtual void setExplosion();
-		virtual void detonateExplosion();
-
-		virtual bool useMage();
-
-		virtual bool usePower();
-
-		void switchPlayer();
+		bool placeIllusion(const InputHandler&);
+		void rotateExplosionLeft();
+		void rotateExplosionRight();
+		void applyExplosion();
 
 	protected:
 		Player m_player_red;

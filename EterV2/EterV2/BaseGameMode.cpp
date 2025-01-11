@@ -111,27 +111,20 @@ namespace base {
 		}
 	}
 
-	bool BaseGameMode::isExplosionAvailable() {
-		if (m_explosion_service.has_value()) {
-			return m_explosion_service->checkAvailability();
-		}
-		
-		return false;
+	const ExplosionService& BaseGameMode::getExplosionService() {
+		return *m_explosion_service;
 	}
 
-	void BaseGameMode::setExplosion() {
-		m_explosion_service->setting();
+	void BaseGameMode::rotateExplosionLeft() {
+		m_explosion_service->card.rotateLeft();
 	}
 
-	void BaseGameMode::detonateExplosion() {
-		m_explosion_service->apply();
+	void BaseGameMode::rotateExplosionRight() {
+		m_explosion_service->card.rotateRight();
 	}
 
-	bool BaseGameMode::useMage() {
-		return false;
+	void BaseGameMode::applyExplosion() {
+		m_explosion_service->card.apply();
 	}
 
-	bool BaseGameMode::usePower() {
-		return false;
-	}
 }

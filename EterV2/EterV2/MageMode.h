@@ -16,7 +16,7 @@ namespace base {
 		MageMode(const std::vector<ServiceType>&, const std::pair<std::string, std::string>&);
 		void run() override;
 		void render();
-		bool useMage() override;
+		bool useMage();
 
 	private:
 		MageService m_mage_service;

@@ -68,6 +68,19 @@ namespace base {
 		}
 	}
 
+	std::unordered_map<Coord, Effect, utils::CoordFunctor> Explosion::getEffectCoords() const {
+		std::unordered_map<Coord, Effect, utils::CoordFunctor> rez;
+		rez.reserve(m_effect_count);
+
+		for (int16_t i = 0; i < m_board.size(); ++i) {
+			for (int16_t j = 0; j < m_board.size(); ++j) {
+				rez[{i, j}] = *m_effects.at(i).at(j);
+			}
+		}
+
+		return rez;
+	}
+
 	void Explosion::_handleRecursiveRemoval(const Coord& effect_coord) {
 		auto [curr_x, curr_y] { effect_coord };
 
