@@ -1,5 +1,5 @@
 #pragma once
-#include "qwebengineview.h"
+//#include "qwebengineview.h"
 #include "qt_includes.h"
 #include "..\EterV2\GameModeFactory.h"
 #include "items.h"
@@ -35,7 +35,7 @@ private:
     Card* _createCardAt(color::ColorType color, base::CombatCardType type, QPointF pos);
     
 private:
-    QWebEngineView* webView;
+    //QWebEngineView* webView;
     QVBoxLayout* layout;
     QLabel* infoLabel;
     QLabel* red_name_label;
