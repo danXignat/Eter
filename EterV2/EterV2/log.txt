@@ -1,4 +1,4 @@
-[INFO] explosion effect [2, 2] -> 1
-[INFO] explosion effect [2, 3] -> 0
-[INFO] explosion effect [3, 0] -> 1
-[INFO] explosion effect [3, 3] -> 1
+[INFO] card(4) appended at (10, 5)
+[INFO] card(3) appended at (12, 5)
+[INFO] card(4) appended at (14, 5)
+[INFO] card(4) appended at (16, 5)

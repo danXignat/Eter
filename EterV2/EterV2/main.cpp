@@ -89,13 +89,13 @@ int main() {
 		.setCardSpacingX(2)
 		.setCardSpacingY(1);
 
-    base::GameModePtr game_mode{ base::GameModeFactory::get("123", { "titi", "gigi" }) };
-	game_mode->run();
-	
+ //   base::GameModePtr game_mode{ base::GameModeFactory::get("123", { "titi", "gigi" }) };
+	//game_mode->run();
+	//
 
 	//testConfig();
 
 	//testExplosion();
-	//testArenaService();
+	testArenaService();
 }
 
