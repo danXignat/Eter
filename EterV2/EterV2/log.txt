@@ -1,0 +1,4 @@
+[INFO] card(4) appended at (10, 5)
+[INFO] card(3) appended at (12, 5)
+[INFO] card(4) appended at (14, 5)
+[INFO] card(4) appended at (16, 5)
