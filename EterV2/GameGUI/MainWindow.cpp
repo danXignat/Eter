@@ -6,17 +6,19 @@
 RequestNameScene::RequestNameScene(QWidget* parent) : QWidget(parent) {
     QVBoxLayout* layout = new QVBoxLayout(this);
 
-    playerBlueNameInput = new QLineEdit(this);
-    playerBlueNameInput->setPlaceholderText("Enter Player 1 Name");
-    playerBlueNameInput->setFixedSize(300, 50); 
-    playerBlueNameInput->setStyleSheet("font-size: 18px;"); 
-    layout->addWidget(playerBlueNameInput, 0, Qt::AlignCenter);
-
     playerRedNameInput = new QLineEdit(this);
     playerRedNameInput->setPlaceholderText("Enter Player 2 Name");
+    playerRedNameInput->setText("Player RED");
     playerRedNameInput->setFixedSize(300, 50);
     playerRedNameInput->setStyleSheet("font-size: 18px;"); 
     layout->addWidget(playerRedNameInput, 0, Qt::AlignCenter); 
+
+    playerBlueNameInput = new QLineEdit(this);
+    playerBlueNameInput->setPlaceholderText("Enter Player 1 Name");
+    playerBlueNameInput->setText("Player BLUE");
+    playerBlueNameInput->setFixedSize(300, 50); 
+    playerBlueNameInput->setStyleSheet("font-size: 18px;"); 
+    layout->addWidget(playerBlueNameInput, 0, Qt::AlignCenter);
 
     nextButton = new QPushButton("Next", this);
     nextButton->setFixedSize(200, 50);
@@ -26,11 +28,9 @@ RequestNameScene::RequestNameScene(QWidget* parent) : QWidget(parent) {
     connect(nextButton, &QPushButton::clicked, this, &RequestNameScene::onNextClicked);
 }
 
-
 void RequestNameScene::onNextClicked() {
-    emit nameEntered(playerBlueNameInput->text(), playerRedNameInput->text());
+    emit nameEntered(playerRedNameInput->text(), playerBlueNameInput->text());
 }
-
 
 SelectModeScene::SelectModeScene(QWidget* parent) : QWidget(parent) {
     QVBoxLayout* layout = new QVBoxLayout(this);
@@ -53,14 +53,12 @@ SelectModeScene::SelectModeScene(QWidget* parent) : QWidget(parent) {
     connect(trainingButton, &QPushButton::clicked, this, [=]() { emit modeSelected("100"); });
     connect(mageDuelButton, &QPushButton::clicked, this, [=]() { emit modeSelected("200"); });
     connect(elementalBattleButton, &QPushButton::clicked, this, [=]() { emit modeSelected("300"); });
-
 }
 
 GameScene::GameScene(const std::string& mode, const QString& playerBlueName, const QString& playerRedName, QWidget* parent) :
     QWidget(parent),
-    controller{ new GameController(this, mode, playerRedName, playerBlueName) }
+    controller{ this, mode, playerRedName, playerBlueName }
 {}
-
 
 MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
     setWindowTitle("Eter");

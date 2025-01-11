@@ -56,13 +56,13 @@ void GameView::_initLabels(const QString& name_red, const QString& name_blue) {
     red_name_label = new QLabel(this);
     red_name_label->setText(name_red + "'s cards:");
     red_name_label->setStyleSheet("font-size: 18px; font-weight: bold;");
-    red_name_label->move(70, 30);
+    red_name_label->move(70, WINDOW_HEIGHT - 150);
     red_name_label->resize(200, 30);
 
     blue_name_label = new QLabel(this);
     blue_name_label->setText(name_blue + "'s cards:");
     blue_name_label->setStyleSheet("font-size: 18px; font-weight: bold;");
-    blue_name_label->move(70, WINDOW_HEIGHT - 180);
+    blue_name_label->move(70, WINDOW_HEIGHT - 150);
     blue_name_label->resize(200, 30);
 
     won_label = new QLabel(this);
@@ -148,6 +148,7 @@ void GameView::drawAvailablePositions(const base::Board& board) {
 
 void GameView::setDeckVisible(color::ColorType color, bool visible) {
     if (color == color::ColorType::RED) {
+        red_name_label->setVisible(visible);
         for (auto card : red_deck) {
             if (card->isPlaced() == false) {
                 card->setVisible(visible);
@@ -155,6 +156,7 @@ void GameView::setDeckVisible(color::ColorType color, bool visible) {
         }
     }
     else {
+        blue_name_label->setVisible(visible);
         for (auto card : blue_deck) {
             if (card->isPlaced() == false) {
                 card->setVisible(visible);

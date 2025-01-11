@@ -46,7 +46,7 @@ public:
     explicit GameScene(const std::string& mode, const QString& playerBlueName, const QString& playerRedName, QWidget* parent = nullptr);
 
 private:
-    GameController* controller;
+    GameController controller;
 };
 
 
