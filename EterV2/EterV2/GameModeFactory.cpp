@@ -1,15 +1,15 @@
-#include "GameModeFactory.h"
+﻿#include "GameModeFactory.h"
 
 #include "MageMode.h"
 #include "ElementalMode.h"
 
 namespace base {
-	GameModePtr GameModeFactory::get(const std::string& id, const std::pair<std::string, std::string>& player_names, int time_limit_seconds ) {
+	GameModePtr GameModeFactory::get(const std::string& id, const std::pair<std::string, std::string>& player_names ,int seconds_limit) {
 		auto services = GameModeFactory::getServiceConfig(id);
-
+	
 		switch (GameModeFactory::getGameModeType(id)) {
 		case GameModeType::TrainingMode: {
-			return std::make_unique<TrainingMode>(services, player_names);
+			return std::make_unique<TrainingMode>(services, player_names); 
 		}
 		case GameModeType::MageMode: {
 			return std::make_unique<MageMode>(services, player_names);
@@ -22,7 +22,7 @@ namespace base {
 			return nullptr;
 		}
 		case GameModeType::TimedMode: {
-			return std::make_unique<TimedMode>(services, player_names, time_limit_seconds);
+			return std::make_unique<TimedMode>(services, player_names, seconds_limit);
 		}
 		default: {
 			return nullptr;
