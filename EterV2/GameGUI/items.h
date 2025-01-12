@@ -1,6 +1,7 @@
 #pragma once
 #include "qt_includes.h"
 #include "..\EterV2\CombatCard.h"
+#include "..\EterV2\ExplosionCard.h"
 
 class Card : public QObject, public QGraphicsItem {
     Q_OBJECT
@@ -33,4 +34,21 @@ private:
     base::CombatCardType type;
     bool placed;
 
+};
+
+class Explosion : public QObject, public QGraphicsItem {
+    Q_OBJECT
+signals:
+    void leftRotate();
+    void rightRotate();
+    void activate();
+
+public:
+    explicit Explosion(const std::unordered_map<base::Coord, base::Effect, base::utils::CoordFunctor>&);
+
+    void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = nullptr) override;
+    QRectF boundingRect() const override;
+
+private:
+    QPixmap baseImage;
 };

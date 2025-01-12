@@ -38,6 +38,8 @@ namespace base {
 		void rotateLeft();
 		void rotateRight();
 
+		std::unordered_map<Coord, Effect, utils::CoordFunctor> getEffectCoords() const;
+
 	public:
 		static constexpr const uint16_t MIN_EFFECTS_3x3 = 2;
 		static constexpr const uint16_t MAX_EFFECTS_3x3 = 4;

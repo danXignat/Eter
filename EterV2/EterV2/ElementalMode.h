@@ -15,7 +15,7 @@ namespace base {
 		ElementalMode(const std::vector<ServiceType>&, const std::pair<std::string, std::string>&);
 		void run() override;
 		void render();
-		bool usePower() override;
+		bool usePower();
 
 	private:
 		ElementalService m_elemental_service;

@@ -7,11 +7,11 @@ namespace base {
 	ExplosionService::ExplosionService(Board& board, Player& player1, Player& player2)
 		: m_board{board},
 		m_player1{ player1 }, m_player2{ player2 },
-		m_card{board, player1, player2} {
+		card{board, player1, player2} {
 		
 	}
 
-	bool ExplosionService::checkAvailability() {
+	bool ExplosionService::checkAvailability() const {
 		std::unordered_map<uint16_t, uint16_t> x_field_counter;
 		std::unordered_map<uint16_t, uint16_t> y_field_counter;
 
@@ -28,19 +28,23 @@ namespace base {
 	}
 
 	void ExplosionService::apply() {
-		m_card.apply();
+		card.apply();
+	}
+
+	std::unordered_map<Coord, Effect, utils::CoordFunctor> ExplosionService::getEffectCoords() const {
+		return card.getEffectCoords();
 	}
 
 	void ExplosionService::setting() {
 		if (m_board.fixedWidth() == false) {
-			m_card.setEffectForWidth(m_board);
+			card.setEffectForWidth(m_board);
 		}
 		else if (m_board.fixedHeight() == false) {
-			m_card.setEffectForHeight(m_board);
+			card.setEffectForHeight(m_board);
 		}
 
-		m_card.color = true;
-		m_card.render();
+		card.color = true;
+		card.render();
 		bool is_setting = true;
 		while (is_setting) {
 			if (_kbhit()) {
@@ -53,13 +57,13 @@ namespace base {
 
 					switch (ch) {
 					case 77:							//right arrow
-						m_card.rotateRight();
-						m_card.render();
+						card.rotateRight();
+						card.render();
 						break;
 
 					case 75:							//left arrow
-						m_card.rotateLeft();
-						m_card.render();
+						card.rotateLeft();
+						card.render();
 						break;
 
 					default:
@@ -69,23 +73,23 @@ namespace base {
 					break;
 				}
 				case 'a': {
-					m_card.moveEffect(Direction::LEFT);
-					m_card.render();
+					card.moveEffect(Direction::LEFT);
+					card.render();
 					break;
 				}
 				case 'd': {
-					m_card.moveEffect(Direction::RIGHT);
-					m_card.render();
+					card.moveEffect(Direction::RIGHT);
+					card.render();
 					break;
 				}
 				case 's': {
-					m_card.moveEffect(Direction::DOWN);
-					m_card.render();
+					card.moveEffect(Direction::DOWN);
+					card.render();
 					break;
 				}
 				case 'w': {
-					m_card.moveEffect(Direction::UP);
-					m_card.render();
+					card.moveEffect(Direction::UP);
+					card.render();
 					break;
 				}
 				case 13:
@@ -97,7 +101,7 @@ namespace base {
 	}
 
 	void ExplosionService::renderExplosion() {
-		m_card.render();
+		card.render();
 	}
 
 }

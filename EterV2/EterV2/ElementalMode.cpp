@@ -53,11 +53,11 @@ namespace base {
 				break;
 			}
 
-			if (isExplosionAvailable()) {
+			/*if (isExplosionAvailable()) {
 				this->render();
 				setExplosion();
 				detonateExplosion();
-			}
+			}*/
 
 			if (action_succed) {
 				switchPlayer();
