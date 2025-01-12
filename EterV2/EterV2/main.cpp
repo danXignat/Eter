@@ -70,7 +70,7 @@ void testArenaService() {
 	base::Board board(base::GameSizeType::BIG, player1, player2);
 
 	board.appendMove({ 10, 5 }, base::CombatCard(base::CombatCardType::FOUR, color::ColorType::BLUE));
-	board.appendMove({ 12, 5 }, base::CombatCard(base::CombatCardType::THREE, color::ColorType::RED));
+	board.appendMove({ 12, 5 }, base::CombatCard(base::CombatCardType::THREE, color::ColorType::BLUE));
 	board.appendMove({ 14, 5 }, base::CombatCard(base::CombatCardType::FOUR, color::ColorType::BLUE));
 	board.appendMove({ 16, 5 }, base::CombatCard(base::CombatCardType::FOUR, color::ColorType::BLUE));
 
