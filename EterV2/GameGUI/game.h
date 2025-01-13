@@ -5,15 +5,6 @@
 #include "items.h"
 #include "utils.h"
 
-namespace std {
-    template<>
-    struct hash<QPointF> {
-        size_t operator()(const QPointF& point) const {
-            return qHashMulti(0, point.x(), point.y());
-        }
-    };
-}
-
 class GameView : public QGraphicsView {
 	Q_OBJECT
 
@@ -25,9 +16,10 @@ public:
 
     void drawPlayerCards(const base::Player& player, QPointF start_point);
     void drawAvailablePositions(const base::Board& board);
-    void drawExplosion(const base::ExplosionService& effect, QPointF start_point);
+    void drawExplosion(const base::ExplosionService& effect, uint16_t, QPointF start_point);
     void setDeckVisible(color::ColorType color, bool visible);
     void showWin(color::ColorType color);
+    void setExplosionViewActive(const QPointF& p1, const QPointF& p2);
 
     void _initWebView();
 private:
@@ -44,11 +36,26 @@ private:
     QLabel* won_label;
 
     QGraphicsScene* scene;
-    Explosion* explosion;
+    ExplosionView* explosion;
 
     QList<Card*> red_deck;
     QList<Card*> blue_deck;
     QHash<QPointF, QGraphicsRectItem*> m_available_cells;
+};
+
+class ExplosionController : public QObject {
+    Q_OBJECT
+
+public:
+    ExplosionController(QObject* parent, base::ExplosionService& service);
+    void checkUpdate();
+
+private:
+    base::ExplosionService& model;
+    ExplosionView* view;
+
+public slots:
+    
 };
 
 class GameController : public QObject{

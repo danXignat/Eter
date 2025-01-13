@@ -13,3 +13,12 @@ namespace gui {
         }
     }
 }
+
+namespace std {
+    template<>
+    struct hash<QPointF> {
+        size_t operator()(const QPointF& point) const {
+            return qHashMulti(0, point.x(), point.y());
+        }
+    };
+}

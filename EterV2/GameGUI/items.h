@@ -1,4 +1,5 @@
 #pragma once
+#include "utils.h"
 #include "qt_includes.h"
 #include "..\EterV2\CombatCard.h"
 #include "..\EterV2\ExplosionCard.h"
@@ -36,7 +37,14 @@ private:
 
 };
 
-class Explosion : public QObject, public QGraphicsItem {
+class TargetZone : public QGraphicsRectItem {
+public:
+    TargetZone(QPointF coord1, QPointF coord2);
+    void show();
+    void hide();
+};
+
+class ExplosionView : public QObject, public QGraphicsItem {
     Q_OBJECT
 signals:
     void leftRotate();
@@ -44,11 +52,39 @@ signals:
     void activate();
 
 public:
-    explicit Explosion(const std::unordered_map<base::Coord, base::Effect, base::utils::CoordFunctor>&);
+    explicit ExplosionView(const std::unordered_map<base::Coord, base::Effect, base::utils::CoordFunctor>&, uint16_t);
 
+    void setActive();
+    void setTargetZone(TargetZone* zone);
+
+   // void advance(int phase) override;
     void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = nullptr) override;
     QRectF boundingRect() const override;
 
+
+protected:
+    void keyPressEvent(QKeyEvent* event) override;
+    void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
+    void mouseMoveEvent(QGraphicsSceneMouseEvent* event) override;
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override;
+
 private:
-    QPixmap baseImage;
+    QPointF mapEffectToCard(const base::Coord& coord);
+
+private:
+    QPixmap* explosionImage;
+    QPixmap* handImage;
+    QPixmap* removeImage;
+    QPixmap* holeImage;
+
+    TargetZone* m_zone;
+
+    bool active;
+    uint16_t m_board_size;
+    double m_cell_size;
+    QHash<QPointF, QPixmap*> m_effects;
+
+    QPointF dragOffset;
+    QPointF lastCardPosition;
 };
+

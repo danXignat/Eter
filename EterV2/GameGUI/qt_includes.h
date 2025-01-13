@@ -16,4 +16,7 @@
 #include <qlabel.h>
 #include <QDebug>
 #include <QtWidgets/QMainWindow>
+#include <QKeyEvent>
+#include <QColor>
+#include <QRect>
 #endif // GRAPHICS_INCLUDES_H

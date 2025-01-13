@@ -3,17 +3,21 @@
 #include "settings.h"
 
 GameView::GameView(const QString& name_red, const QString& name_blue, QWidget* parent) :
-	QGraphicsView{ parent },
-	scene{ new QGraphicsScene(this) } {
-    
-	setScene(scene);
+    QGraphicsView{ parent },
+    scene{ new QGraphicsScene(this) } {
+
+    setScene(scene);
     scene->setSceneRect(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 
-    this->setGeometry(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
-    this->setMinimumSize(WINDOW_WIDTH, WINDOW_HEIGHT);
-    this->setRenderHint(QPainter::Antialiasing);
-    this->setInteractive(true);
+    setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
+    setFixedSize(WINDOW_WIDTH, WINDOW_HEIGHT);
+
+    setSceneRect(scene->sceneRect());
+
+    setRenderHint(QPainter::Antialiasing);
+    setInteractive(true);
     _initLabels(name_red, name_blue);
     //_initWebView();
 }
@@ -23,7 +27,7 @@ Card* GameView::_createCardAt(color::ColorType color, base::CombatCardType type,
         .arg(color == color::ColorType::RED ? "red" : "blue")
         .arg(combatCardToChar(type));
 
-    Card* card = new Card(color, type, imagePath);
+    Card* card = new Card(color, type, imagePath);  
     connect(card, &Card::cardAppend, this, &GameView::cardAppend);
     card->setPos(pos);
     scene->addItem(card);
@@ -51,8 +55,8 @@ void GameView::drawPlayerCards(const base::Player& player, QPointF start_point) 
 
 }
 
-void GameView::drawExplosion(const base::ExplosionService& service, QPointF start_point) {
-    explosion = new Explosion(service.getEffectCoords());
+void GameView::drawExplosion(const base::ExplosionService& service, uint16_t board_size, QPointF start_point) {
+    explosion = new ExplosionView(service.getEffectCoords(), board_size);
     explosion->setPos(start_point);
     scene->addItem(explosion);
 
@@ -172,6 +176,14 @@ void GameView::setDeckVisible(color::ColorType color, bool visible) {
     }
 }
 
+void GameView::setExplosionViewActive(const QPointF& p1, const QPointF& p2) {
+    TargetZone* zone{ new TargetZone(p1 - QPointF{CARD_SIZE, CARD_SIZE}, p2 + QPointF{CARD_SIZE, CARD_SIZE}) };
+    scene->addItem(zone);
+
+    explosion->setActive();
+    explosion->setTargetZone(zone);
+}
+
 void GameView::showWin(color::ColorType color) {
     QString player_name{ (color == color::ColorType::RED) ? "RED" : "BLUE"};
 
@@ -190,7 +202,7 @@ GameController::GameController(
     view{ new GameView(name_red, name_blue, parent) } {
 
     qreal cardStartPos;
-    if (mode == "100") {
+    if (mode.front() == '1') {
         cardStartPos = 360;
     }
     else {
@@ -201,14 +213,14 @@ GameController::GameController(
     view->drawPlayerCards(model->getPlayerRed(), { cardStartPos, 700 });
     view->drawPlayerCards(model->getPlayerBlue(), { cardStartPos, 700 });
     view->drawAvailablePositions(model->getBoard());
-    view->drawExplosion(model->getExplosionService(), {500,555});
+    view->drawExplosion(model->getExplosionService(), model->getBoard().size(), {1000,555});
+
     using enum color::ColorType;
     color::ColorType color{ model->getCurrPlayer().getColor() };
     color::ColorType other_color{ (color == RED) ? BLUE : RED };
 
     view->setDeckVisible(color, true);
     view->setDeckVisible(other_color, false);
-
 }
 
 void GameController::onCardAppend(Card* card) {
@@ -234,6 +246,12 @@ void GameController::onCardAppend(Card* card) {
 
         if (auto win_color = model->getWinningColor(); win_color.has_value()) {
             view->showWin(win_color.value());
+        }
+
+        if (model->getExplosionService().checkAvailability()) {
+            auto [coord1, coord2]{ model->getBoard().getBoudingRect() };
+
+            view->setExplosionViewActive(gui::utils::coordToQPointF(coord1), gui::utils::coordToQPointF(coord2));
         }
     }
 }
