@@ -17,11 +17,11 @@ namespace base {
         m_base_mode(std::move(base_mode)) {
     }
 
-	void TournamentMode::run() {
+    void TournamentMode::run() {
 
-	}
+    }
 
-	void TournamentMode::render() {
+    void TournamentMode::render() {
         m_board.render();
         m_board.sideViewRender();
         m_arena_service.renderArena(m_board);
@@ -32,7 +32,7 @@ namespace base {
         else if (auto* elementalMode = dynamic_cast<ElementalMode*>(m_base_mode.get())) {
             elementalMode->render();
         }
-	}
+    }
 
     bool TournamentMode::processGameInput(const InputHandler& input) {
         if (m_base_mode) {
@@ -45,7 +45,8 @@ namespace base {
                 }
                 return succes;
             }
-        }
+            }
             return false;
+        }
     }
 }

@@ -15,8 +15,10 @@ namespace base {
 	public:
 		TournamentMode(const std::vector<ServiceType>& services, const std::pair<std::string, std::string>& player_names,
 						std::unique_ptr<BaseGameMode>base_mode);
+
 		void run() override;
 		void render();
+		bool processGameInput(const InputHandler& input);
 
 	private:
 		ArenaService m_arena_service;
