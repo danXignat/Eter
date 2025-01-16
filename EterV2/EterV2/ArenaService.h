@@ -8,7 +8,6 @@ namespace base {
     class ArenaService {
     public:
         explicit ArenaService(GameSizeType size, Player& player1, Player& player2);
-        ArenaService(GameSizeType size, const Coord& startCoord, Player& player1, Player& player2);
 
         void renderArena(const Board& board);
         Coord getArenaBoard(const Coord& coord, const Board& board);
@@ -18,6 +17,7 @@ namespace base {
         uint16_t getSize() const;
         const std::unordered_map<Coord, color::ColorType, utils::CoordFunctor> getMarker();
         void placeMarker(const Coord& coord, const Board& board, color::ColorType winnerColor);
+        void checkAndPlaceWinMarker(const Board& board);
 
     private:
         std::unordered_map<Coord, color::ColorType, utils::CoordFunctor>m_marker;

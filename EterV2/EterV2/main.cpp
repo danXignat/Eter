@@ -6,6 +6,7 @@
 #include "Board.h"
 #include "Player.h"
 #include "Config.h"
+#include"ArenaService.h"
 
 void testExplosion() {
 	base::Player p1{ "Ilie", color::ColorType::RED, base::GameSizeType::BIG};
@@ -62,19 +63,46 @@ void testConfig() {
 	}
 }
 
+void testArenaService() {
+
+	base::Player player1("Player1", color::ColorType::RED, base::GameSizeType::BIG);
+	base::Player player2("Player2", color::ColorType::BLUE, base::GameSizeType::BIG);
+
+	base::Board board(base::GameSizeType::BIG, player1, player2);
+	base::ArenaService arenaService(base::GameSizeType::BIG, player1, player2);
+
+	board.appendMove({ 10, 5 }, base::CombatCard(base::CombatCardType::ONE, color::ColorType::BLUE));
+	board.appendMove({ 12, 5 }, base::CombatCard(base::CombatCardType::TWO, color::ColorType::BLUE));
+	board.appendMove({ 14, 5 }, base::CombatCard(base::CombatCardType::THREE, color::ColorType::BLUE));
+	board.appendMove({ 16, 5 }, base::CombatCard(base::CombatCardType::FOUR, color::ColorType::BLUE));
+	board.appendMove({ 10, 6 }, base::CombatCard(base::CombatCardType::FOUR, color::ColorType::RED));
+	board.appendMove({ 10, 4 }, base::CombatCard(base::CombatCardType::TWO, color::ColorType::RED));
+	board.appendMove({ 10, 3 }, base::CombatCard(base::CombatCardType::TWO, color::ColorType::RED));
+
+
+	board.render();
+	board.sideViewRender();
+	arenaService.renderArena(board);
+
+	//arenaService.placeMarker({ 10, 5 }, board, color::ColorType::BLUE);
+	//arenaService.placeMarker({ 14, 6 }, board, color::ColorType::RED);
+}
+
 int main() {
 	system("start powershell -Command \"Get-Content -Path 'log.txt' -Wait\"");
 
 	base::Config::getInstance()
 		.setStartPoint({ 10, 5 })
-		.setCardSpacingX(4)
-		.setCardSpacingY(2);
+		.setCardSpacingX(2)
+		.setCardSpacingY(1);
 
-    base::GameModePtr game_mode{ base::GameModeFactory::get("123", { "titi", "gigi" }) };
-	game_mode->run();
+  /*  base::GameModePtr game_mode{ base::GameModeFactory::get("323", { "titi", "gigi" }) };
+	game_mode->run();*/
 
 	//testConfig();
 
 	//testExplosion();
+
+	testArenaService();
 }
 
