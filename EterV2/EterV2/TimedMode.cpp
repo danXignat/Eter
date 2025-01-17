@@ -1,5 +1,4 @@
-﻿// TimedMode.cpp
-#include "TimedMode.h"
+﻿#include "TimedMode.h"
 #include "InputHandler.h"
 #include "logger.h"
 #include <iostream>
@@ -42,7 +41,6 @@ namespace base {
     void TimedMode::renderGameState() {
         system("cls");
 
-        // Folosim un cast pentru a evita problema const
         Board& board = const_cast<Board&>(m_base_mode->getBoard());
         board.render();
         board.sideViewRender();
@@ -152,7 +150,6 @@ namespace base {
                     bool action_succeeded = processGameInput(input);
                     if (action_succeeded) {
                         switchTimers();
-                        // Acum trebuie să apelăm și switchPlayer pentru BaseGameMode
                         m_base_mode->switchPlayer();
                     }
                 }

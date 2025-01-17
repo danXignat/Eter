@@ -6,7 +6,7 @@ namespace base {
     GameModePtr GameModeFactory::get(const std::string& id, const std::pair<std::string, std::string>& player_names, int time_limit_seconds) {
         auto services = GameModeFactory::getServiceConfig(id);
 
-        //  pt TimedMode (5) 
+        //  pt timedmode (5) 
         if (id.length() > 1 && static_cast<GameModeType>(id[0] - '0') == GameModeType::TimedMode) {
             auto secondary_mode = static_cast<GameModeType>(id[1] - '0');
             std::unique_ptr<BaseGameMode> base_mode;

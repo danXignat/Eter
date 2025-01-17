@@ -1,4 +1,3 @@
-// TimedMode.h
 #pragma once
 #include <string>
 #include <optional>
