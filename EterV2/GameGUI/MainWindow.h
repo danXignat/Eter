@@ -56,6 +56,9 @@ class MainWindow : public QMainWindow {
 public:
     MainWindow(QWidget* parent = nullptr);
 
+protected:
+    void keyPressEvent(QKeyEvent* event) override;
+    void showPauseMenu();
 private slots:
     void onNameEntered(const QString& playerBlueName, const QString& playerRedName);
     void onModeSelected(const std::string& mode);

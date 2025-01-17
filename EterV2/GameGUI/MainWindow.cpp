@@ -1,7 +1,9 @@
 #include "MainWindow.h"
+#include "PauseMenuDialog.h"
 
 #include <ranges>
 #include "utils.h"
+
 
 RequestNameScene::RequestNameScene(QWidget* parent) : QWidget(parent) {
     QVBoxLayout* layout = new QVBoxLayout(this);
@@ -95,4 +97,37 @@ void MainWindow::onModeSelected(const std::string& mode) {
     gameScene = new GameScene(mode, playerRedNameGlobal, playerBlueNameGlobal);
     stackedWidget->addWidget(gameScene);
     stackedWidget->setCurrentIndex(2); 
+}
+
+void MainWindow::showPauseMenu() {
+    QDialog pauseDialog(this);
+    pauseDialog.setWindowTitle("Pause Menu");
+    pauseDialog.resize(300, 200);
+
+    QPushButton* continueButton = new QPushButton("Continue Playing", &pauseDialog);
+    QPushButton* exitButton = new QPushButton("Exit", &pauseDialog);
+
+    QVBoxLayout* layout = new QVBoxLayout(&pauseDialog);
+    layout->addWidget(continueButton);
+    layout->addWidget(exitButton);
+
+    exitButton->setDefault(true);
+    exitButton->setFocus();
+
+    continueButton->setMinimumSize(100, 50);
+    exitButton->setMinimumSize(150, 50);
+
+    connect(continueButton, &QPushButton::clicked, &pauseDialog, &QDialog::accept);
+    connect(exitButton, &QPushButton::clicked, qApp, &QApplication::quit);
+
+    pauseDialog.exec();
+}
+
+void MainWindow::keyPressEvent(QKeyEvent* event) {
+    if (event->key() == Qt::Key_Escape) {
+        showPauseMenu();
+    }
+    else {
+        QMainWindow::keyPressEvent(event);
+    }
 }
