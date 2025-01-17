@@ -185,11 +185,23 @@ void GameView::setExplosionViewActive(const QPointF& p1, const QPointF& p2) {
 }
 
 void GameView::showWin(color::ColorType color) {
-    QString player_name{ (color == color::ColorType::RED) ? "RED" : "BLUE"};
+    QString imagePath = (color == color::ColorType::RED)
+        ? "../pictures/win/red_victory.png"
+        : "../pictures/win/blue_victory.png";
 
-    QString text{ player_name + " won" };
+    QPixmap pixmap(imagePath);
+    if (pixmap.isNull()) {
+        qDebug() << "Failed to load image:" << imagePath;
+        return;
+    }
 
-    won_label->setText(text);
+    QSize labelSize(1000, 500); // Set desired dimensions
+    QPixmap scaledPixmap = pixmap.scaled(labelSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+
+    // Set the pixmap on the QLabel
+    won_label->setPixmap(scaledPixmap);
+    won_label->setFixedSize(labelSize);
+    won_label->move(350, 180);
     won_label->setVisible(true);
 }
 
