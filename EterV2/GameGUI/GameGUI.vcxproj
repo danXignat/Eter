@@ -115,6 +115,7 @@
       <DynamicSource Condition="'$(Configuration)|$(Platform)'=='Release|x64'">input</DynamicSource>
       <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename).moc</QtMocFileName>
     </ClCompile>
+    <ClCompile Include="PauseMenuDialog.cpp" />
     <ClCompile Include="settings.h" />
     <ClCompile Include="game.cpp" />
     <ClCompile Include="main.cpp" />
@@ -127,6 +128,7 @@
   <ItemGroup>
     <QtMoc Include="game.h" />
     <QtMoc Include="items.h" />
+    <QtMoc Include="PauseMenuDialog.h" />
     <ClInclude Include="utils.h" />
     <QtMoc Include="MainWindow.h" />
     <ClInclude Include="qt_includes.h" />

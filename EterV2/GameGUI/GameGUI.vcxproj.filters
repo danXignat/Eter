@@ -38,6 +38,9 @@
     <ClCompile Include="items.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="PauseMenuDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="qt_includes.h">
@@ -55,6 +58,9 @@
       <Filter>Header Files</Filter>
     </QtMoc>
     <QtMoc Include="items.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="PauseMenuDialog.h">
       <Filter>Header Files</Filter>
     </QtMoc>
   </ItemGroup>
