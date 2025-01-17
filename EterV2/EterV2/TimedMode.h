@@ -1,15 +1,10 @@
+// TimedMode.h
 #pragma once
 #include <string>
+#include <optional>
 #include <memory>
-#include <chrono>
 #include "BaseGameMode.h"
 #include "Timer.h"
-#include "TrainingMode.h"
-#include "MageMode.h"
-#include "ElementalMode.h"
-#include "InputHandler.h"
-#include "utils.h"
-#include "colors.h"
 
 namespace base {
     class TimedMode : public BaseGameMode {
@@ -20,17 +15,21 @@ namespace base {
             std::unique_ptr<BaseGameMode> base_mode);
 
         void run() override;
+        void render();
+        const Player& getPlayerRed() const override { return m_base_mode->getPlayerRed(); }
+        const Player& getPlayerBlue() const override { return m_base_mode->getPlayerBlue(); }
+        const Player& getCurrPlayer() const override { return m_base_mode->getCurrPlayer(); }
+        const Board& getBoard() const override { return m_base_mode->getBoard(); }
 
     private:
-        std::unique_ptr<BaseGameMode> m_base_mode;
         std::unique_ptr<Timer> m_red_timer;
         std::unique_ptr<Timer> m_blue_timer;
-        int m_time_limit;
-        Board* m_board;
-        void displayTimeSelection();
-        void renderGameState();
         void renderTimers();
         void switchTimers();
+        int m_time_limit;
+        void displayTimeSelection();
+        void renderGameState();
         bool processGameInput(const InputHandler& input);
+        std::unique_ptr<BaseGameMode> m_base_mode;
     };
 }
