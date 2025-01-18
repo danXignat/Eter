@@ -32,8 +32,8 @@ namespace base {
                 m_mage_service = std::make_unique<MageService>(m_board);
             }
             else if (service == ServiceType::ELEMENTAL) {
-                m_elemental_service = std::make_unique<ElementalService>(m_board);
-            }
+                m_elemental_service = std::make_unique<ElementalService>(m_board, m_player_red, m_player_blue); 
+            } 
         }
     }
 
