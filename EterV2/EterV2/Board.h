@@ -64,6 +64,7 @@ namespace base {
 		void shiftColumnDown(const std::vector<Coord>& col_coords);
 		void shiftColumnUp(const std::vector<Coord>& col_coords);
 		void mergeStacks(const std::vector<Coord>& coords, const Coord& final_coord);
+		void appendSpecialCard(const Coord& coord, CombatCard&& card);
 		void blockRow(uint16_t row, color::ColorType owner);
 		void blockColumn(uint16_t column, color::ColorType owner);
 		void clearBlockedRow();

@@ -165,6 +165,13 @@ namespace base {
 		_reinitialise();
 	}
 
+	void Board::appendSpecialCard(const Coord& coord,  CombatCard&& card) {
+		if (!m_combat_cards.contains(coord)) {
+			throw std::runtime_error("Stack does not exist at this position");
+		}
+		m_combat_cards[coord].push_back(std::move(card));
+	}
+
 	void Board::blockRow(uint16_t row, color::ColorType owner){
 		m_blocked_row = row; 
 		m_blocked_row_owner = owner; 
