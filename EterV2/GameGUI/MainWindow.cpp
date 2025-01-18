@@ -24,12 +24,11 @@ RequestNameScene::RequestNameScene(QWidget* parent) : QWidget(parent) {
 
     background.load("../pictures/estetics/name_select.png");
     NextButton* nextButton = new NextButton(this);
-    this->resize(490, 60);
-    nextButton->setFixedSize(450, 200);
-    nextButton->move(800, 600);
+    nextButton->setFixedSize(365, 92);
+    nextButton->move(WINDOW_WIDTH-385, WINDOW_HEIGHT-122);
     nextButton->raise();
     nextButton->show();
-
+    nextButton->setMouseTracking(true);
     connect(nextButton, &QPushButton::clicked, this, &RequestNameScene::onNextClicked);
 }
 
@@ -156,13 +155,15 @@ void NextButton::paintEvent(QPaintEvent* event){
 
 void NextButton::enterEvent(QEnterEvent* event) {
     qDebug() << "Hover started";
+
     currentPixmap.load("../pictures/estetics/next_hover.png");
     currentPixmap = currentPixmap.scaled(width(), height(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    qDebug() << currentPixmap.size();
     update();
     QPushButton::enterEvent(event);
 }
 
-void NextButton::leaveEvent(QEnterEvent* event){
+void NextButton::leaveEvent(QEvent* event){
     qDebug() << "Hover ended";
     currentPixmap.load("../pictures/estetics/next_normal.png");
     currentPixmap = currentPixmap.scaled(width(), height(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
@@ -171,6 +172,7 @@ void NextButton::leaveEvent(QEnterEvent* event){
 }
 
 void NextButton::mousePressEvent(QMouseEvent* event){
+    
     currentPixmap.load("../pictures/estetics/next_click.png");
     currentPixmap = currentPixmap.scaled(width(), height(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
     update();
@@ -179,8 +181,15 @@ void NextButton::mousePressEvent(QMouseEvent* event){
 
 void NextButton::mouseReleaseEvent(QMouseEvent* event){
 
-    currentPixmap.load("../pictures/estetics/next_hover.png");
+    currentPixmap.load("../pictures/estetics/next_normal.png");
     currentPixmap = currentPixmap.scaled(width(), height(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    
     update();
     QPushButton::mouseReleaseEvent(event);
+}
+bool NextButton::event(QEvent* event) {
+    if (event->type() == QEvent::Leave) {
+        qDebug() << "Generic Leave event detected";
+    }
+    return QPushButton::event(event); // Pass to the base class
 }

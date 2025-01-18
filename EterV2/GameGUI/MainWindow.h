@@ -18,11 +18,13 @@ protected:
 
     void enterEvent(QEnterEvent* event) override;
 
-    void leaveEvent(QEnterEvent* event);
+    void leaveEvent(QEvent* event);
 
     void mousePressEvent(QMouseEvent* event) override;
 
     void mouseReleaseEvent(QMouseEvent* event) override;
+
+    bool event(QEvent* event);
 private:
     QPixmap currentPixmap;
 };
