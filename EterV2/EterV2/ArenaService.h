@@ -19,6 +19,8 @@ namespace base {
         void placeMarker(const Coord& coord, const Board& board, color::ColorType winnerColor);
         void checkAndPlaceWinMarker(const Board& board);
 
+        bool checkArenaWin();
+
     private:
         std::unordered_map<Coord, color::ColorType, utils::CoordFunctor>m_marker;
         uint16_t m_size;

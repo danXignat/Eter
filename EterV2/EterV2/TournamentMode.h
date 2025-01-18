@@ -19,10 +19,18 @@ namespace base {
 		void run() override;
 		void render();
 		bool processGameInput(const InputHandler& input);
+		void displayModeSelection();
+		void handleGameEnd();
+		void updateScores();
 
 	private:
+		static const uint16_t MAX_GAMES = 5;
 		ArenaService m_arena_service;
 		std::unique_ptr<BaseGameMode> m_base_mode;
+		uint16_t m_games_played;
+		uint16_t m_red_wins;
+		uint16_t m_blue_wins;
+		bool m_tournament_ended;
 	};
 
 }

@@ -34,7 +34,6 @@ namespace base {
 	public:
 		Flame();
 
-		void flipIllusion(Board& board, const Player& player);
 		void apply(Board& board, Player& player) override;
 
 	};
@@ -43,8 +42,14 @@ namespace base {
 	public:
 		Fire();
 
+		Fire(Player& red_player, Player& blue_player);
+
 		void apply(Board& board, Player& player) override;
 		std::vector<Coord>getDuplicateCards(Board& board, const Player& player);
+
+	private:
+		/*Player& m_red_player;
+		Player& m_blue_player;*/
 
 	};
 

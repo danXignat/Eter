@@ -17,8 +17,37 @@ namespace base {
         m_base_mode(std::move(base_mode)) {
     }
 
-    void TournamentMode::run() {
+    void TournamentMode::displayModeSelection() {
+        system("cls");
+        std::cout << " Select tournament Mode:\n";
+        std::cout << "1. Training Mode\n";
+        std::cout << "2. Mage Mode\n";
+        std::cout << "3. Elemental Mode\n";
+        std::cout << " 4. Mage + Elemental Mode\n";
+    }
 
+    void TournamentMode::run() {
+        if (!m_base_mode) {
+            displayModeSelection();
+            uint16_t choice;
+            std::cin >> choice;
+        }
+
+        while (!m_tournament_ended) {
+            system("cls");
+            render();
+        }
+        InputHandler input;
+        try {
+            input.read();
+            bool action_succeded = processGameInput(input);
+            if (action_succeded) {
+                switchPlayer();
+            }
+        }
+        catch (const std::runtime_error& err) {
+            Logger::log(Level::ERROR, err.what());
+        }
     }
 
     void TournamentMode::render() {

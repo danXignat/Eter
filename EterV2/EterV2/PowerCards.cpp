@@ -10,6 +10,26 @@ namespace base {
     }
 
     void ControllerExplosion::apply(Board& board, Player& player) {
+        ExplosionService explosionService(board, player, player);
+
+        if (!explosionService.checkAvailability()) {
+            Logger::log(Level::WARNING, "No valid spaces for explosion");
+            return;
+        }
+
+        explosionService.setting();
+
+        auto effectCoords = explosionService.getEffectCoords();
+
+        if (!effectCoords.empty()) {
+            explosionService.renderExplosion();
+            explosionService.apply();
+
+            Logger::log(Level::INFO, "Controller Explosion power card was used succesfully");
+        }
+        else {
+            Logger::log(Level::WARNING, "No valid explosion effects to apply");
+        }
     }
 
     ////------------------------------------------ Destruction -------------------------------------------
@@ -66,10 +86,17 @@ namespace base {
 
     ////------------------------------------------ Fire -------------------------------------------
 
+
     Fire::Fire() {
         m_ability = PowerCardType::Fire;
-
     }
+
+   /* Fire::Fire(Player& red_player, Player& blue_player)
+        : m_red_player{ red_player },
+        m_blue_player{ blue_player } {
+
+        m_ability = PowerCardType::Fire;
+    }*/
 
     void Fire::apply(Board& board, Player& player) {
         std::vector<Coord>duplicateCoord = getDuplicateCards(board, player);
@@ -77,9 +104,21 @@ namespace base {
             for (const auto& coord : duplicateCoord) {
                 auto top_card = board.getTopCard(coord);
                 CombatCard& card = top_card->get();
-                player.addCard(std::move(card));
-                board.removeTopCardAt(coord);
+                color::ColorType cardColor = card.getColor();
 
+                if (cardColor == player.getColor()) {
+                    player.addCard(std::move(card));
+                    board.popTopCardAt(coord);
+                }
+
+              /*  if (cardColor == m_red_player.getColor()) {
+                    m_red_player.addCard(std::move(card));
+                    board.popTopCardAt(coord);
+                }
+                else {
+                    m_blue_player.addCard(std::move(card));
+                    board.popTopCardAt(coord);
+                }*/
                 Logger::log(Level::INFO, "Fire power removed top cards and put then back in the player's hand");
             }
         }
@@ -232,7 +271,6 @@ namespace base {
                 Logger::log(Level::WARNING, "No visible card at these coordinates");
             }
             else {
-                player.addCard(std::move(card));
                 board.removeTopCardAt(coord);
                 Logger::log(Level::INFO, "Squall ability: Returned a visible card to the opponent's hand.");
                 break;
@@ -267,12 +305,10 @@ namespace base {
                     auto card = player.getCard(card_type);
                     if (player.getColor() == card.getColor()) {
                         board.removeCardFromStackAt(coord, card);
-                        player.addCard(std::move(card));
                         Logger::log(Level::INFO, "Moved card from board to player hand.");
                     }
                     else {
                         board.removeCardFromStackAt(coord, card);
-                        player.addCard(std::move(card));
                     }
                 }
             }
