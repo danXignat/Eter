@@ -22,12 +22,23 @@ RequestNameScene::RequestNameScene(QWidget* parent) : QWidget(parent) {
     playerBlueNameInput->setStyleSheet("font-size: 18px;"); 
     layout->addWidget(playerBlueNameInput, 0, Qt::AlignCenter);
 
-    nextButton = new QPushButton("Next", this);
-    nextButton->setFixedSize(200, 50);
-    nextButton->setStyleSheet("font-size: 18px;"); 
-    layout->addWidget(nextButton, 0, Qt::AlignCenter); 
+    background.load("../pictures/estetics/name_select.png");
+    NextButton* nextButton = new NextButton(this);
+    this->resize(490, 60);
+    nextButton->setFixedSize(450, 200);
+    nextButton->move(800, 600);
+    nextButton->raise();
+    nextButton->show();
 
     connect(nextButton, &QPushButton::clicked, this, &RequestNameScene::onNextClicked);
+}
+
+void RequestNameScene::paintEvent(QPaintEvent* event) {
+    QPainter painter(this);
+
+    painter.drawPixmap(0, 0, width(), height(), background);
+
+    QWidget::paintEvent(event);
 }
 
 void RequestNameScene::onNextClicked() {
@@ -130,4 +141,46 @@ void MainWindow::keyPressEvent(QKeyEvent* event) {
     else {
         QMainWindow::keyPressEvent(event);
     }
+}
+
+NextButton::NextButton(QWidget* parent )
+    : QPushButton(parent), currentPixmap("../pictures/estetics/next_normal.png") {
+    setFixedSize(currentPixmap.size());
+}
+
+void NextButton::paintEvent(QPaintEvent* event){
+    QPainter painter(this);
+    currentPixmap = currentPixmap.scaled(width(), height(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    painter.drawPixmap(0, 0, currentPixmap);
+}
+
+void NextButton::enterEvent(QEnterEvent* event) {
+    qDebug() << "Hover started";
+    currentPixmap.load("../pictures/estetics/next_hover.png");
+    currentPixmap = currentPixmap.scaled(width(), height(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    update();
+    QPushButton::enterEvent(event);
+}
+
+void NextButton::leaveEvent(QEnterEvent* event){
+    qDebug() << "Hover ended";
+    currentPixmap.load("../pictures/estetics/next_normal.png");
+    currentPixmap = currentPixmap.scaled(width(), height(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    update();
+    QPushButton::leaveEvent(event);
+}
+
+void NextButton::mousePressEvent(QMouseEvent* event){
+    currentPixmap.load("../pictures/estetics/next_click.png");
+    currentPixmap = currentPixmap.scaled(width(), height(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    update();
+    QPushButton::mousePressEvent(event);
+}
+
+void NextButton::mouseReleaseEvent(QMouseEvent* event){
+
+    currentPixmap.load("../pictures/estetics/next_hover.png");
+    currentPixmap = currentPixmap.scaled(width(), height(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    update();
+    QPushButton::mouseReleaseEvent(event);
 }

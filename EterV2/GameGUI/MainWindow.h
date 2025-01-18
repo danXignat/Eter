@@ -6,6 +6,27 @@
 #include "..\EterV2\GameModeFactory.h"
 #include "..\EterV2\InputHandler.h"
 
+class NextButton : public QPushButton {
+    Q_OBJECT
+public:
+
+    explicit NextButton(QWidget* parent = nullptr);
+
+protected:
+
+    void paintEvent(QPaintEvent* event) override;
+
+    void enterEvent(QEnterEvent* event) override;
+
+    void leaveEvent(QEnterEvent* event);
+
+    void mousePressEvent(QMouseEvent* event) override;
+
+    void mouseReleaseEvent(QMouseEvent* event) override;
+private:
+    QPixmap currentPixmap;
+};
+
 class RequestNameScene : public QWidget {
     Q_OBJECT
 
@@ -17,11 +38,13 @@ signals:
 
 private slots:
     void onNextClicked();
-
+protected:
+    void paintEvent(QPaintEvent* event) override;
 private:
     QLineEdit* playerBlueNameInput;
     QLineEdit* playerRedNameInput;
-    QPushButton* nextButton;
+    NextButton nextButton;
+    QPixmap background;
 };
 
 class SelectModeScene : public QWidget {
