@@ -40,7 +40,7 @@ namespace base {
 
 	class Fire :public PowerCard {
 	public:
-		Fire();
+		Fire()=default;
 
 		Fire(Player& red_player, Player& blue_player);
 
@@ -48,8 +48,8 @@ namespace base {
 		std::vector<Coord>getDuplicateCards(Board& board, const Player& player);
 
 	private:
-		/*Player& m_red_player;
-		Player& m_blue_player;*/
+		Player& m_red_player;
+		Player& m_blue_player;
 
 	};
 
@@ -81,10 +81,15 @@ namespace base {
 
 	class Gale :public PowerCard {
 	public:
-		Gale();
+		Gale() = default;
+		Gale(Player& red_player, Player& blue_player);
 
 		void apply(Board& board, Player& player) override;
 
+
+	private:
+		Player& m_red_player;
+		Player& m_blue_player;
 	};
 
 	class Hurricane :public PowerCard {

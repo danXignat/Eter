@@ -15,7 +15,7 @@ namespace base {
 	class ElementalService {
 	public:
 		ElementalService() = default;
-		ElementalService(Board& board);
+		ElementalService(Board& board, Player& red_player, Player& blue_player);
 		void apply(char choice, Player& player);
 		void renderCards() const;
 
@@ -27,6 +27,8 @@ namespace base {
 
 	private:
 		Board& m_board;
+
+		Player& m_red_player, &m_blue_player;
 
 		PowerCardType type_card1;
 		PowerCardType type_card2;

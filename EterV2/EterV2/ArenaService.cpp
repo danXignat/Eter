@@ -15,6 +15,18 @@ namespace base {
         m_marker{} {
     }
 
+    const std::unordered_map<Coord, color::ColorType, utils::CoordFunctor>ArenaService::getMarker() const {
+        return m_marker;
+    }
+
+    uint16_t  ArenaService::getSize() const {
+        return m_size;
+    }
+
+    const Coord& ArenaService::getTransformedCoord() const {
+        return m_transformedCoord;
+    }
+
     void ArenaService::renderArena(const Board& board) {
         Coord startPos = base::Config::getInstance().getStartPoint();
         startPos.first += 40;
@@ -56,7 +68,6 @@ namespace base {
 
     void ArenaService::placeMarker(const Coord& coord, const Board& board, color::ColorType winnerColor) {
 
-
         Coord arenaCoord = getArenaBoard(coord, board);
 
         auto existingMarker = m_marker.find(arenaCoord);
@@ -92,5 +103,10 @@ namespace base {
                     (winnerColor == color::ColorType::RED ? "RED" : "BLUE"));
             }
         }
+    }
+
+    uint16_t ArenaService::countMarkers(color::ColorType color) const {
+        return std::count_if(m_marker.begin(), m_marker.end(),
+            [color](const auto& pair) { return pair.second == color; });
     }
 }

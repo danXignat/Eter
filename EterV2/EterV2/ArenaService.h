@@ -15,11 +15,11 @@ namespace base {
         // Getters
         const Coord& getTransformedCoord() const;
         uint16_t getSize() const;
-        const std::unordered_map<Coord, color::ColorType, utils::CoordFunctor> getMarker();
+        const std::unordered_map<Coord, color::ColorType, utils::CoordFunctor> getMarker() const ;
         void placeMarker(const Coord& coord, const Board& board, color::ColorType winnerColor);
         void checkAndPlaceWinMarker(const Board& board);
-
         bool checkArenaWin();
+        uint16_t countMarkers(color::ColorType color) const;
 
     private:
         std::unordered_map<Coord, color::ColorType, utils::CoordFunctor>m_marker;

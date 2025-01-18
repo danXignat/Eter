@@ -1,6 +1,7 @@
 ﻿#include "GameModeFactory.h"
 #include "MageMode.h"
 #include "ElementalMode.h"
+#include "TournamentMode.h"
 
 namespace base {
     GameModePtr GameModeFactory::get(const std::string& id, const std::pair<std::string, std::string>& player_names, int time_limit_seconds) {
@@ -31,6 +32,10 @@ namespace base {
             }
 
             return std::make_unique<TimedMode>(services, player_names, time_limit_seconds, std::move(base_mode));
+        }
+
+        if (id[0] == '4') {
+            return std::make_unique<TournamentMode>(services, player_names);
         }
 
         

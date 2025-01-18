@@ -11,7 +11,8 @@
 using namespace logger;
 
 namespace base {
-	ElementalService::ElementalService(Board& board) : m_board{ board } {
+	ElementalService::ElementalService(Board& board, Player& red_player, Player& blue_player) : m_board{ board },
+		m_red_player{ red_player }, m_blue_player{ blue_player } {
 		std::random_device rd;
 		std::mt19937 gen(rd());
 
@@ -22,8 +23,8 @@ namespace base {
 		/*type_p1 = static_cast<PowerCardType>(choices[0]);
 		type_p2 = static_cast<PowerCardType>(choices[1]);*/
 
-		type_card1 = PowerCardType::Blizzard;
-		type_card2 = PowerCardType::Blizzard;
+		type_card1 = PowerCardType::Gale;
+		type_card2 = PowerCardType::Gale;
 
 		card1 = _factory(type_card1);
 		card2 = _factory(type_card2);
@@ -80,7 +81,7 @@ namespace base {
 			return std::make_unique<Flame>();
 
 		case PowerCardType::Fire:
-			return std::make_unique<Fire>();
+			return std::make_unique<Fire>(m_red_player, m_blue_player);
 
 		case PowerCardType::Ash:
 			return std::make_unique<Ash>();
@@ -92,7 +93,7 @@ namespace base {
 			return std::make_unique<Squall>();
 
 		case PowerCardType::Gale:
-			return std::make_unique<Gale>();
+			return std::make_unique<Gale>(m_red_player, m_blue_player);
 
 		case PowerCardType::Hurricane:
 			return std::make_unique<Hurricane>();

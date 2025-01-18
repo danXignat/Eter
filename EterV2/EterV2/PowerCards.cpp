@@ -87,38 +87,28 @@ namespace base {
     ////------------------------------------------ Fire -------------------------------------------
 
 
-    Fire::Fire() {
-        m_ability = PowerCardType::Fire;
-    }
 
-   /* Fire::Fire(Player& red_player, Player& blue_player)
+
+    Fire::Fire(Player& red_player, Player& blue_player)
         : m_red_player{ red_player },
         m_blue_player{ blue_player } {
 
         m_ability = PowerCardType::Fire;
-    }*/
+    }
 
     void Fire::apply(Board& board, Player& player) {
         std::vector<Coord>duplicateCoord = getDuplicateCards(board, player);
         if (duplicateCoord.size() > 1) {
             for (const auto& coord : duplicateCoord) {
-                auto top_card = board.getTopCard(coord);
-                CombatCard& card = top_card->get();
+                auto card = board.popTopCardAt(coord);
                 color::ColorType cardColor = card.getColor();
 
-                if (cardColor == player.getColor()) {
-                    player.addCard(std::move(card));
-                    board.popTopCardAt(coord);
-                }
-
-              /*  if (cardColor == m_red_player.getColor()) {
+                if (cardColor == m_red_player.getColor()) {
                     m_red_player.addCard(std::move(card));
-                    board.popTopCardAt(coord);
                 }
                 else {
                     m_blue_player.addCard(std::move(card));
-                    board.popTopCardAt(coord);
-                }*/
+                }
                 Logger::log(Level::INFO, "Fire power removed top cards and put then back in the player's hand");
             }
         }
@@ -292,25 +282,28 @@ namespace base {
     }
 
     ////------------------------------------------ Gale -------------------------------------------
-    Gale::Gale() {
+    Gale::Gale(Player& red_player, Player& blue_player) 
+        :m_red_player{ red_player }, m_blue_player{ blue_player } {
         m_ability = PowerCardType::Gale;
     }
 
     void Gale::apply(Board& board, Player& player) {
 
-        for (auto& [coord, stack] : board) {
-            if (stack.size() > 1) {
-                for (int i = 0; i < stack.size() - 1; i++) {
-                    const CombatCardType& card_type = stack[i].getType();
-                    auto card = player.getCard(card_type);
-                    if (player.getColor() == card.getColor()) {
-                        board.removeCardFromStackAt(coord, card);
-                        Logger::log(Level::INFO, "Moved card from board to player hand.");
-                    }
+        for (const auto& [coord, stack] : board) {
+            while (stack.size() > 1) {
+                for (size_t i = 0; i < stack.size() - 1; ++i) {
+                   const CombatCard& card = stack[i];
+                   CombatCard popCard= board.popCardFromStackAt(coord, card);
+                   color::ColorType cardColor = popCard.getColor();
+
+                   if (cardColor == m_red_player.getColor()) {
+                       m_red_player.addCard(std::move(popCard));
+                   }
                     else {
-                        board.removeCardFromStackAt(coord, card);
+                        m_blue_player.addCard(std::move(popCard));
                     }
                 }
+                Logger::log(Level::INFO, "Moved cards from board to player hand.");
             }
         }
     }
