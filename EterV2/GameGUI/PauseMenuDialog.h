@@ -10,7 +10,7 @@ class PauseMenuScene : public QWidget {
 
 public:
     explicit PauseMenuScene(QWidget* parent = nullptr);
-
+    void paintEvent(QPaintEvent* event);
 signals:
     void continueGameRequested();
 

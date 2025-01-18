@@ -95,6 +95,7 @@ private:
     SelectModeScene* selectModeScene;
     GameScene* gameScene = nullptr;
     PauseMenuScene* pauseMenuScene;
+    QGraphicsRectItem* overlay = nullptr;
     QWidget* lastScene = nullptr;
     QString playerBlueNameGlobal;
     QString playerRedNameGlobal;
