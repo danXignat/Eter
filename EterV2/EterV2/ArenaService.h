@@ -16,10 +16,16 @@ namespace base {
         const Coord& getTransformedCoord() const;
         uint16_t getSize() const;
         const std::unordered_map<Coord, color::ColorType, utils::CoordFunctor> getMarker() const ;
+        std::optional<Coord>getWinPosition() const;
+
         void placeMarker(const Coord& coord, const Board& board, color::ColorType winnerColor);
         void checkAndPlaceWinMarker(const Board& board);
-        bool checkArenaWin();
         uint16_t countMarkers(color::ColorType color) const;
+        bool hasWinner() const;
+
+
+    private:
+        void _checkWinPosition(const Coord& coord);
 
     private:
         std::unordered_map<Coord, color::ColorType, utils::CoordFunctor>m_marker;
@@ -27,6 +33,8 @@ namespace base {
         Coord m_transformedCoord;
         Player& m_player1;
         Player& m_player2;
+
+        std::optional<Coord>m_win_pos;
     };
 
 } 
