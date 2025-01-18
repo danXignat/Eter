@@ -82,16 +82,14 @@ int main() {
 
 	base::Config::getInstance()
 		.setStartPoint({ 10, 5 })
-		.setCardSpacingX(2)
-		.setCardSpacingY(1);
+		.setCardSpacingX(4)
+		.setCardSpacingY(2);
 
-    base::GameModePtr game_mode{ base::GameModeFactory::get("4", { "titi", "gigi" }) };
+    base::GameModePtr game_mode{ base::GameModeFactory::get("523", { "titi", "gigi" }) };
 	game_mode->run();
 
 	//testConfig();
 
 	//testExplosion();
-
-	//testArenaService();
 }
 

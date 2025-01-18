@@ -82,17 +82,21 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
 
     requestNameScene = new RequestNameScene();
     selectModeScene = new SelectModeScene();
+    pauseMenuScene = new PauseMenuScene();
     /*gameScene = new GameScene();*/
 
     // Add scenes to the QStackedWidget
     stackedWidget->addWidget(requestNameScene); // Index 0
-    stackedWidget->addWidget(selectModeScene);  // Index 1
-    //stackedWidget->addWidget(gameScene);        // Index 2
+    stackedWidget->addWidget(selectModeScene);// Index 1
+    //stackedWidget->addWidget(gameScene);// Index 2
+    stackedWidget->addWidget(pauseMenuScene);
+            
 
     setCentralWidget(stackedWidget);
 
     connect(requestNameScene, &RequestNameScene::nameEntered, this, &MainWindow::onNameEntered);
     connect(selectModeScene, &SelectModeScene::modeSelected, this, &MainWindow::onModeSelected);
+    connect(pauseMenuScene, &PauseMenuScene::continueGameRequested, this, &MainWindow::onResumeGame);
 }
 
 void MainWindow::onNameEntered(const QString& playerBlueName, const QString& playerRedName) {
@@ -104,44 +108,83 @@ void MainWindow::onNameEntered(const QString& playerBlueName, const QString& pla
 
 void MainWindow::onModeSelected(const std::string& mode) {
     selectedMode = mode; 
+    if (gameScene != nullptr) {
+        stackedWidget->removeWidget(gameScene);
+        delete gameScene;
+        gameScene = nullptr;
+    }
     gameScene = new GameScene(mode, playerRedNameGlobal, playerBlueNameGlobal);
     stackedWidget->addWidget(gameScene);
-    stackedWidget->setCurrentIndex(2); 
+    stackedWidget->setCurrentWidget(gameScene);
+    qDebug() << "Switched to GameScene with mode:" << QString::fromStdString(mode);
 }
 
-void MainWindow::showPauseMenu() {
-    QDialog pauseDialog(this);
-    pauseDialog.setWindowTitle("Pause Menu");
-    pauseDialog.resize(300, 200);
-
-    QPushButton* continueButton = new QPushButton("Continue Playing", &pauseDialog);
-    QPushButton* exitButton = new QPushButton("Exit", &pauseDialog);
-
-    QVBoxLayout* layout = new QVBoxLayout(&pauseDialog);
-    layout->addWidget(continueButton);
-    layout->addWidget(exitButton);
-
-    exitButton->setDefault(true);
-    exitButton->setFocus();
-
-    continueButton->setMinimumSize(100, 50);
-    exitButton->setMinimumSize(150, 50);
-
-    connect(continueButton, &QPushButton::clicked, &pauseDialog, &QDialog::accept);
-    connect(exitButton, &QPushButton::clicked, qApp, &QApplication::quit);
-
-    pauseDialog.exec();
-}
+//void MainWindow::showPauseMenu() {
+//    QDialog pauseDialog(this);
+//    pauseDialog.setWindowTitle("Pause Menu");
+//    pauseDialog.resize(300, 200);
+//
+//    QPushButton* continueButton = new QPushButton("Continue Playing", &pauseDialog);
+//    QPushButton* exitButton = new QPushButton("Exit", &pauseDialog);
+//
+//    QVBoxLayout* layout = new QVBoxLayout(&pauseDialog);
+//    layout->addWidget(continueButton);
+//    layout->addWidget(exitButton);
+//
+//    exitButton->setDefault(true);
+//    exitButton->setFocus();
+//
+//    continueButton->setMinimumSize(100, 50);
+//    exitButton->setMinimumSize(150, 50);
+//
+//    connect(continueButton, &QPushButton::clicked, &pauseDialog, &QDialog::accept);
+//    connect(exitButton, &QPushButton::clicked, qApp, &QApplication::quit);
+//
+//    pauseDialog.exec();
+//}
 
 void MainWindow::keyPressEvent(QKeyEvent* event) {
     if (event->key() == Qt::Key_Escape) {
-        showPauseMenu();
+        if (stackedWidget->currentWidget() != pauseMenuScene) {
+            // Store the current scene before switching to the pause menu
+            lastScene = stackedWidget->currentWidget();
+            stackedWidget->setCurrentWidget(pauseMenuScene);
+        }
+        else {
+            // Return to the last active scene
+            if (lastScene != nullptr) {
+                stackedWidget->setCurrentWidget(lastScene);
+                lastScene = nullptr; // Reset lastScene to avoid stale references
+            }
+            else {
+                // Fallback to a default scene if lastScene is not set
+                if (gameScene != nullptr) {
+                    stackedWidget->setCurrentWidget(gameScene);
+                }
+                else {
+                    stackedWidget->setCurrentWidget(selectModeScene);
+                }
+            }
+        }
     }
     else {
         QMainWindow::keyPressEvent(event);
     }
 }
 
+
+void MainWindow::onResumeGame() {
+    if (lastScene != nullptr) {
+        stackedWidget->setCurrentWidget(lastScene); // Return to the last scene
+        lastScene = nullptr; // Clear the lastScene reference
+        qDebug() << "Returned to the last scene.";
+    }
+    else {
+        // Fallback logic in case lastScene is null
+        qDebug() << "Error: lastScene is null. Returning to default.";
+        stackedWidget->setCurrentWidget(selectModeScene); // Default fallback
+    }
+}
 NextButton::NextButton(QWidget* parent )
     : QPushButton(parent), currentPixmap("../pictures/estetics/next_normal.png") {
     setFixedSize(currentPixmap.size());

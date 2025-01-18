@@ -2,9 +2,10 @@
 #include <QVBoxLayout>
 #include <QApplication>
 
-PauseMenuDialog::PauseMenuDialog(QWidget* parent)
-    : QDialog(parent) {
+PauseMenuScene::PauseMenuScene(QWidget* parent)
+    : QWidget(parent) {
     setWindowTitle("Pause Menu");
+    resize(300, 200);
 
     continueButton = new QPushButton("Continue Playing", this);
     exitButton = new QPushButton("Exit", this);
@@ -13,14 +14,15 @@ PauseMenuDialog::PauseMenuDialog(QWidget* parent)
     layout->addWidget(continueButton);
     layout->addWidget(exitButton);
 
-    connect(continueButton, &QPushButton::clicked, this, &PauseMenuDialog::onContinueClicked);
-    connect(exitButton, &QPushButton::clicked, this, &PauseMenuDialog::onExitClicked);
+    connect(continueButton, &QPushButton::clicked, this, &PauseMenuScene::onContinueClicked);
+    connect(exitButton, &QPushButton::clicked, this, &PauseMenuScene::onExitClicked);
 }
 
-void PauseMenuDialog::onContinueClicked() {
-    close();
+void PauseMenuScene::onContinueClicked() {
+    // Logic to switch back to the previous game scene
+    emit continueGameRequested();
 }
 
-void PauseMenuDialog::onExitClicked() {
+void PauseMenuScene::onExitClicked() {
     QApplication::quit();
 }
