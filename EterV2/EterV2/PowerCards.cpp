@@ -764,8 +764,74 @@ namespace base {
     }
 
     void Blizzard::apply(Board& board, Player& player) {
-    }
+        
+        if (board.availableSpaces().empty()) {
+            Logger::log(Level::WARNING, "No available spaces for opponent's next turn");
+            return;
+        }
 
+        std::cout << "Choose what to block (R for Row, C for Column): ";
+        char choice;
+        std::cin >> choice;
+
+        if (toupper(choice) == 'R') {
+          
+            std::unordered_set<uint16_t> rows;
+            for (const auto& [coord, stack] : board.getCombatCards()) {
+                rows.insert(coord.second);
+            }
+            for (const auto& y : board.availableSpaces()) {
+                rows.insert(y.second); 
+            }
+
+            std::cout << "Available rows to block: ";
+            for (uint16_t row : rows) {
+                std::cout << row << " ";
+            }
+
+            std::cout << "\nEnter the row number you want to block: ";
+            uint16_t chosen_row;
+            std::cin >> chosen_row;
+
+            if (rows.find(chosen_row) == rows.end()) {
+                Logger::log(Level::WARNING, "Invalid row selection");
+                return;
+            }
+
+            board.blockRow(chosen_row, player.getColor());
+            Logger::log(Level::INFO, "Row {} has been blocked for the opponent's next turn", chosen_row);
+        }
+        else if (toupper(choice) == 'C') {
+            
+            std::unordered_set<uint16_t> columns;
+            for (const auto& [coord, stack] : board.getCombatCards()) {
+                columns.insert(coord.first);
+            }
+            for (const auto& x : board.availableSpaces()) {
+                columns.insert(x.first);
+            }
+
+            std::cout << "Available columns to block: ";
+            for (uint16_t col : columns) {
+                std::cout << col << " ";
+            }
+
+            std::cout << "\nEnter the column number you want to block: ";
+            uint16_t chosen_column;
+            std::cin >> chosen_column;
+
+            if (columns.find(chosen_column) == columns.end()) {
+                Logger::log(Level::WARNING, "Invalid column selection");
+                return;
+            }
+
+            board.blockColumn(chosen_column, player.getColor());
+            Logger::log(Level::INFO, "Column {} has been blocked for the opponent's next turn", chosen_column);
+        }
+        else {
+            Logger::log(Level::WARNING, "Invalid choice. Please enter R for Row or C for Column");
+        }
+    }
     ////------------------------------------------ Waterfall -------------------------------------------
     Waterfall::Waterfall() {
         m_ability = PowerCardType::Waterfall;

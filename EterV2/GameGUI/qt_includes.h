@@ -19,4 +19,9 @@
 #include <QKeyEvent>
 #include <QColor>
 #include <QRect>
+#include <QPushButton>
+#include <QVBoxLayout>
+#include <QApplication>
+#include <QDialog>
+#include <QEnterEvent>
 #endif // GRAPHICS_INCLUDES_H

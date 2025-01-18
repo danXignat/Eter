@@ -1,7 +1,9 @@
 #include "MainWindow.h"
+#include "PauseMenuDialog.h"
 
 #include <ranges>
 #include "utils.h"
+
 
 RequestNameScene::RequestNameScene(QWidget* parent) : QWidget(parent) {
     QVBoxLayout* layout = new QVBoxLayout(this);
@@ -20,12 +22,23 @@ RequestNameScene::RequestNameScene(QWidget* parent) : QWidget(parent) {
     playerBlueNameInput->setStyleSheet("font-size: 18px;"); 
     layout->addWidget(playerBlueNameInput, 0, Qt::AlignCenter);
 
-    nextButton = new QPushButton("Next", this);
-    nextButton->setFixedSize(200, 50);
-    nextButton->setStyleSheet("font-size: 18px;"); 
-    layout->addWidget(nextButton, 0, Qt::AlignCenter); 
+    background.load("../pictures/estetics/name_select.png");
+    NextButton* nextButton = new NextButton(this);
+    this->resize(490, 60);
+    nextButton->setFixedSize(450, 200);
+    nextButton->move(800, 600);
+    nextButton->raise();
+    nextButton->show();
 
     connect(nextButton, &QPushButton::clicked, this, &RequestNameScene::onNextClicked);
+}
+
+void RequestNameScene::paintEvent(QPaintEvent* event) {
+    QPainter painter(this);
+
+    painter.drawPixmap(0, 0, width(), height(), background);
+
+    QWidget::paintEvent(event);
 }
 
 void RequestNameScene::onNextClicked() {
@@ -95,4 +108,79 @@ void MainWindow::onModeSelected(const std::string& mode) {
     gameScene = new GameScene(mode, playerRedNameGlobal, playerBlueNameGlobal);
     stackedWidget->addWidget(gameScene);
     stackedWidget->setCurrentIndex(2); 
+}
+
+void MainWindow::showPauseMenu() {
+    QDialog pauseDialog(this);
+    pauseDialog.setWindowTitle("Pause Menu");
+    pauseDialog.resize(300, 200);
+
+    QPushButton* continueButton = new QPushButton("Continue Playing", &pauseDialog);
+    QPushButton* exitButton = new QPushButton("Exit", &pauseDialog);
+
+    QVBoxLayout* layout = new QVBoxLayout(&pauseDialog);
+    layout->addWidget(continueButton);
+    layout->addWidget(exitButton);
+
+    exitButton->setDefault(true);
+    exitButton->setFocus();
+
+    continueButton->setMinimumSize(100, 50);
+    exitButton->setMinimumSize(150, 50);
+
+    connect(continueButton, &QPushButton::clicked, &pauseDialog, &QDialog::accept);
+    connect(exitButton, &QPushButton::clicked, qApp, &QApplication::quit);
+
+    pauseDialog.exec();
+}
+
+void MainWindow::keyPressEvent(QKeyEvent* event) {
+    if (event->key() == Qt::Key_Escape) {
+        showPauseMenu();
+    }
+    else {
+        QMainWindow::keyPressEvent(event);
+    }
+}
+
+NextButton::NextButton(QWidget* parent )
+    : QPushButton(parent), currentPixmap("../pictures/estetics/next_normal.png") {
+    setFixedSize(currentPixmap.size());
+}
+
+void NextButton::paintEvent(QPaintEvent* event){
+    QPainter painter(this);
+    currentPixmap = currentPixmap.scaled(width(), height(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    painter.drawPixmap(0, 0, currentPixmap);
+}
+
+void NextButton::enterEvent(QEnterEvent* event) {
+    qDebug() << "Hover started";
+    currentPixmap.load("../pictures/estetics/next_hover.png");
+    currentPixmap = currentPixmap.scaled(width(), height(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    update();
+    QPushButton::enterEvent(event);
+}
+
+void NextButton::leaveEvent(QEnterEvent* event){
+    qDebug() << "Hover ended";
+    currentPixmap.load("../pictures/estetics/next_normal.png");
+    currentPixmap = currentPixmap.scaled(width(), height(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    update();
+    QPushButton::leaveEvent(event);
+}
+
+void NextButton::mousePressEvent(QMouseEvent* event){
+    currentPixmap.load("../pictures/estetics/next_click.png");
+    currentPixmap = currentPixmap.scaled(width(), height(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    update();
+    QPushButton::mousePressEvent(event);
+}
+
+void NextButton::mouseReleaseEvent(QMouseEvent* event){
+
+    currentPixmap.load("../pictures/estetics/next_hover.png");
+    currentPixmap = currentPixmap.scaled(width(), height(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    update();
+    QPushButton::mouseReleaseEvent(event);
 }

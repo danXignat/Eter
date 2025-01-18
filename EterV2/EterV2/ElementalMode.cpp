@@ -38,7 +38,15 @@ namespace base {
 				using enum EventType;
 
 			case PlaceCombatCard:
-				action_succed = placeCombatCard(input);
+				if (m_board.isRowBlocked(input.coord.second, m_curr_player.get().getColor()) || 
+					(m_board.isColumnBlocked(input.coord.first, m_curr_player.get().getColor()))) {
+					Logger::log(Level::WARNING, "This row is blocked by Blizzard");
+					action_succed=false;
+					m_board.clearBlockedRow();
+				}
+				else {
+					action_succed = placeCombatCard(input);
+				}
 				break;
 
 			case PlaceIllusion:

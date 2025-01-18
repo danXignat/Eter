@@ -165,6 +165,31 @@ namespace base {
 		_reinitialise();
 	}
 
+	void Board::appendSpecialCard(const Coord& coord,  CombatCard&& card) {
+		if (!m_combat_cards.contains(coord)) {
+			throw std::runtime_error("Stack does not exist at this position");
+		}
+		m_combat_cards[coord].push_back(std::move(card));
+	}
+
+	void Board::blockRow(uint16_t row, color::ColorType owner){
+		m_blocked_row = row; 
+		m_blocked_row_owner = owner; 
+	}
+
+	void Board::blockColumn(uint16_t column, color::ColorType owner){
+		m_blocked_column = column;
+		m_blocked_row_owner = owner;
+	}
+
+	void Board::clearBlockedRow(){
+		m_blocked_row.reset();
+	}
+
+	void Board::clearBlockedColumn(){
+		m_blocked_column.reset();
+	}
+
 
 	/*void Board::moveRow(uint16_t from_y, uint16_t to_y) {
 		if (from_y == to_y) {
@@ -705,6 +730,19 @@ namespace base {
 			}
 		}
 		return _isConex(simulated_config);
+	}
+
+	bool Board::isRowBlocked(uint16_t row, color::ColorType player_color) const{
+		return m_blocked_row.has_value() && 
+			*m_blocked_row == row && 
+			m_blocked_row_owner != player_color; 
+	}
+
+	bool Board::isColumnBlocked(uint16_t column, color::ColorType player_color) const
+	{
+		return m_blocked_column.has_value() &&
+			*m_blocked_column == column &&
+			m_blocked_row_owner != player_color;
 	}
 
 
