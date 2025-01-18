@@ -4,63 +4,62 @@
 #include <iostream>
 #include <conio.h>
 #include <thread>
-#include "MageMode.h"
-#include "ElementalMode.h"
-#include "TrainingMode.h"
 
 using namespace logger;
 
 namespace base {
+
     TimedMode::TimedMode(const std::vector<ServiceType>& services,
         const std::pair<std::string, std::string>& player_names,
         int time_limit_seconds,
         std::unique_ptr<BaseGameMode> base_mode)
         : BaseGameMode(base_mode->getBoard().getSize() == 3 ? GameSizeType::SMALL : GameSizeType::BIG,
-            player_names, services),
-        m_base_mode(std::move(base_mode)),
-        m_time_limit(time_limit_seconds)
+            player_names, services)
+        , m_time_limit(time_limit_seconds)
+        , m_base_mode(std::move(base_mode))
     {
-        m_red_timer = std::make_unique<Timer>(time_limit_seconds);
-        m_blue_timer = std::make_unique<Timer>(time_limit_seconds);
     }
-
-    void TimedMode::renderTimers(){
-      
-            utils::printAtCoordinate("Time remaining:", { 50, 2 });
-
-            std::cout << color::to_string(color::ColorType::RED);
-            utils::printAtCoordinate("RED: " + std::to_string(m_red_timer->getRemainingTime()) + "s", { 50, 3 });
-            std::cout << color::to_string(color::ColorType::DEFAULT);
-
-            std::cout << color::to_string(color::ColorType::BLUE);
-            utils::printAtCoordinate("BLUE: " + std::to_string(m_blue_timer->getRemainingTime()) + "s", { 50, 4 });
-            std::cout << color::to_string(color::ColorType::DEFAULT);
-        
+    
+    TimedMode::TimedMode(const std::vector<ServiceType>& services,
+        const std::pair<std::string, std::string>& player_names,
+        int time_limit_seconds)
+        : BaseGameMode(GameSizeType::BIG, player_names, services)
+        , m_time_limit(time_limit_seconds)
+    {
+    
+        for (const auto& service : services) {
+            if (service == ServiceType::MAGE) {
+                m_mage_service = std::make_unique<MageService>(m_board);
+            }
+            else if (service == ServiceType::ELEMENTAL) {
+                m_elemental_service = std::make_unique<ElementalService>(m_board);
+            }
+        }
     }
 
     void TimedMode::renderGameState() {
         system("cls");
 
-        Board& board = const_cast<Board&>(m_base_mode->getBoard());
-        board.render();
-        board.sideViewRender();
-
-        m_base_mode->getPlayerRed().renderCards();
-        m_base_mode->getPlayerBlue().renderCards();
-
-        if (auto* mageMode = dynamic_cast<MageMode*>(m_base_mode.get())) {
-            mageMode->render();
-        }
-        else if (auto* elementalMode = dynamic_cast<ElementalMode*>(m_base_mode.get())) {
-            elementalMode->render();
-        }
-        else if (auto* trainingMode = dynamic_cast<TrainingMode*>(m_base_mode.get())) {
+        if (auto* trainingMode = dynamic_cast<TrainingMode*>(m_base_mode.get())) {
             trainingMode->render();
+        }
+        else {
+            m_board.render();
+            m_board.sideViewRender();
+            m_player_red.renderCards();
+            m_player_blue.renderCards();
+
+            if (m_mage_service) {
+                m_mage_service->renderCard(m_curr_player);
+            }
+            if (m_elemental_service) {
+                m_elemental_service->renderCards();
+            }
         }
 
         renderTimers();
 
-        if (m_base_mode->getCurrPlayer().getColor() == color::ColorType::RED) {
+        if (m_curr_player.get().getColor() == color::ColorType::RED) {
             std::cout << color::to_string(color::ColorType::RED);
             utils::printAtCoordinate("RED turn", { 1, 12 });
             std::cout << color::to_string(color::ColorType::DEFAULT);
@@ -79,29 +78,46 @@ namespace base {
     bool TimedMode::processGameInput(const InputHandler& input) {
         bool action_succeeded = false;
 
-        switch (input.event_type) {
-        case EventType::UseMage:
-            if (auto* mageMode = dynamic_cast<MageMode*>(m_base_mode.get())) {
-                action_succeeded = mageMode->useMage();
+        if (m_base_mode) {
+           
+            switch (input.event_type) {
+            case EventType::PlaceCombatCard:
+            case EventType::PlaceIllusion:
+                action_succeeded = m_base_mode->placeCombatCard(input);
+                break;
+            default:
+                break;
             }
-            break;
+        }
+        else {
+            
+            switch (input.event_type) {
+            case EventType::UseMage:
+                if (m_mage_service) {
+                    action_succeeded = m_mage_service->apply(m_curr_player.get());
+                }
+                break;
 
-        case EventType::UsePower:
-            if (auto* elementalMode = dynamic_cast<ElementalMode*>(m_base_mode.get())) {
-                action_succeeded = elementalMode->usePower();
+            case EventType::UsePower:
+                if (m_elemental_service) {
+                    char choice;
+                    std::cin >> choice;
+                    m_elemental_service->apply(choice, m_curr_player.get());
+                    action_succeeded = true;
+                }
+                break;
+
+            case EventType::PlaceCombatCard:
+                action_succeeded = placeCombatCard(input);
+                break;
+
+            case EventType::PlaceIllusion:
+                action_succeeded = placeIllusion(input);
+                break;
+
+            default:
+                break;
             }
-            break;
-
-        case EventType::PlaceCombatCard:
-            action_succeeded = m_base_mode->placeCombatCard(input);
-            break;
-
-        case EventType::PlaceIllusion:
-            action_succeeded = m_base_mode->placeIllusion(input);
-            break;
-
-        default:
-            break;
         }
 
         return action_succeeded;
@@ -132,7 +148,7 @@ namespace base {
         m_blue_timer = std::make_unique<Timer>(m_time_limit);
         m_red_timer->start();
 
-        while (!m_base_mode->getBoard().getWinCoord().has_value()) {
+        while (!m_board.getWinCoord().has_value()) {
             renderGameState();
 
             if (m_red_timer->hasTimeExpired() || m_blue_timer->hasTimeExpired()) {
@@ -150,7 +166,7 @@ namespace base {
                     bool action_succeeded = processGameInput(input);
                     if (action_succeeded) {
                         switchTimers();
-                        m_base_mode->switchPlayer();
+                        switchPlayer();
                     }
                 }
                 catch (const std::runtime_error& err) {
@@ -165,20 +181,33 @@ namespace base {
         m_red_timer->stop();
         m_blue_timer->stop();
 
-        if (m_base_mode->getBoard().getWinCoord().has_value()) {
-            std::cout << (m_base_mode->getCurrPlayer().getColor() == color::ColorType::BLUE ?
+        if (m_board.getWinCoord().has_value()) {
+            std::cout << (m_curr_player.get().getColor() == color::ColorType::BLUE ?
                 "Player RED has won!\n" : "Player BLUE has won!\n");
         }
 
         std::cin.get();
         std::cin.get();
     }
+
     void TimedMode::render() {
-       
         renderGameState();
     }
+
+    void TimedMode::renderTimers() {
+        utils::printAtCoordinate("Time remaining:", { 50, 2 });
+
+        std::cout << color::to_string(color::ColorType::RED);
+        utils::printAtCoordinate("RED: " + std::to_string(m_red_timer->getRemainingTime()) + "s", { 50, 3 });
+        std::cout << color::to_string(color::ColorType::DEFAULT);
+
+        std::cout << color::to_string(color::ColorType::BLUE);
+        utils::printAtCoordinate("BLUE: " + std::to_string(m_blue_timer->getRemainingTime()) + "s", { 50, 4 });
+        std::cout << color::to_string(color::ColorType::DEFAULT);
+    }
+
     void TimedMode::switchTimers() {
-        if (m_base_mode->getCurrPlayer().getColor() == color::ColorType::RED) {
+        if (m_curr_player.get().getColor() == color::ColorType::RED) {
             m_red_timer->stop();
             m_blue_timer->reset();
             m_blue_timer->start();
