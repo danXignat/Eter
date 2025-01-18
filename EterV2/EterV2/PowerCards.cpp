@@ -423,13 +423,14 @@ namespace base {
     }
 
     void Gust::apply(Board& board, Player& player) {
-        std::vector<Coord>cardsCoord = getCardsCoord(board);
+        std::vector<Coord> cardsCoord = getCardsCoord(board);
         std::cout << "Choose the card to move:" << std::endl;
-        std::for_each(cardsCoord.begin(), cardsCoord.end(),
-            [](const Coord& coord) {
-                std::cout << "Card at " << coord.first << ", " << coord.second << std::endl;
-            });
-        std::cout << "Enter the coodinates of the card you want to move:";
+
+        for (const Coord& coord : cardsCoord) {
+            std::cout << "Card at " << coord.first << ", " << coord.second << std::endl;
+        }
+
+        std::cout << "Enter the coordinates of the card you want to move: ";
         Coord cardCoord;
         std::cin >> cardCoord.first >> cardCoord.second;
 
@@ -437,44 +438,62 @@ namespace base {
             Logger::log(Level::WARNING, "Invalid card coordinates");
             return;
         }
-        /*CombatCard& card = board.getCombatCards()[cardCoord].back(); //n ai voie sa modifici asa boardul trebuie sa folosesti metode existente musai am facut getCombatCards const ca sa nu mai poti face asta
-        std::vector<Coord>validMoves;
+
+        auto optCard = board.getTopCard(cardCoord);
+        if (!optCard.has_value()) {
+            Logger::log(Level::WARNING, "No card found at the specified coordinates");
+            return;
+        }
+         CombatCard& card = optCard->get();
+
+        std::vector<Coord> validMoves;
         std::vector<Coord> neighbors{
-       {cardCoord.first - 2, cardCoord.second},
-       {cardCoord.first + 2, cardCoord.second},
-       {cardCoord.first, cardCoord.second - 1},
-       {cardCoord.first, cardCoord.second + 1}
+            {cardCoord.first - 4, cardCoord.second},
+            {cardCoord.first + 4, cardCoord.second},
+            {cardCoord.first, cardCoord.second - 2},
+            {cardCoord.first, cardCoord.second + 2}
         };
-        for (const auto& neighbor : neighbors) {
-            if (board.getCombatCards().contains(neighbor) && !board.getCombatCards()[neighbor].back().isIllusion()) {
-                CombatCard& neighborCard = board.getCombatCards()[neighbor].back();
-                if (neighborCard.getType() < card.getType()) {
+     
+        for (const Coord& neighbor : neighbors) {
+            auto optNeighborCard = board.getTopCard(neighbor);
+            if (optNeighborCard.has_value()) {
+                const CombatCard& neighborCard = optNeighborCard->get();
+                if (!neighborCard.isIllusion() && (neighborCard.getType()!=CombatCardType::ETER)&&
+                     neighborCard.getType() < card.getType()&&
+                    (neighborCard.getType() != CombatCardType::HOLE)) {
                     validMoves.push_back(neighbor);
                 }
             }
-        }*/
+        }
 
-        /*if (!validMoves.empty()) {
-            for (const auto& move : validMoves) {
-                std::cout << "Valid moves:" << move.first << ", " << move.second << std::endl;
+        if (!validMoves.empty()) {
+            std::cout << "Valid moves:" << std::endl;
+            for (const Coord& move : validMoves) {
+                std::cout << move.first << ", " << move.second << std::endl;
             }
-            std::cout << "Enter the coodinates where you want to move the card:";
-            Coord new_coord;
-            std::cin >> new_coord.first >> new_coord.second;
-            if (std::find(validMoves.begin(), validMoves.end(), new_coord) == validMoves.end()) {
+
+            std::cout << "Enter the coordinates where you want to move the card: ";
+            Coord newCoord;
+            std::cin >> newCoord.first >> newCoord.second;
+
+            if (std::find(validMoves.begin(), validMoves.end(), newCoord) == validMoves.end()) {
                 Logger::log(Level::WARNING, "Invalid coordinates to move the card");
                 return;
             }
-            if (board.isValidPlaceCard(new_coord, card)) {
-                board.appendMove(new_coord, std::move(card));
+
+            if (board.isValidRemoveStack(cardCoord)&&board.isValidPlaceCard(newCoord, card)) {
+                CombatCard movedCard = std::move(card); 
                 board.removeTopCardAt(cardCoord);
+                board.appendMove(newCoord, std::move(movedCard)); 
                 Logger::log(Level::INFO, "Gust power card was used");
             }
+
         }
         else {
             Logger::log(Level::WARNING, "No valid coordinates to move the card");
-        }*/
+        }
     }
+
 
     std::vector<Coord> Gust::getCardsCoord(const Board& board)const {
         std::vector<Coord>coords;
@@ -485,7 +504,7 @@ namespace base {
         }
         return coords;
     }
-
+  
 
     ////------------------------------------------ Mirrage -------------------------------------------
     Mirrage::Mirrage() {
@@ -678,7 +697,7 @@ namespace base {
 
 
     ////------------------------------------------ Whirlpool -------------------------------------------
-    Whirlpool::Whirlpool() {
+    Whirlpool::Whirlpool() { ////////////////////////////////////////////////////// 
         m_ability = PowerCardType::Whirlpool;
     }
 
@@ -686,69 +705,109 @@ namespace base {
         auto coord_pairs = getPairs(board);
         if (coord_pairs.empty()) {
             Logger::log(Level::WARNING, "No valid row to use power card");
+            return;
         }
 
-        std::cout << "Options:";
+        std::cout << "Options:\n";
         for (const auto& pair : coord_pairs) {
-            std::cout << " Pair: (" << pair.first.first << ", " << pair.second.second << ") and (" << pair.second.first << ", " << pair.second.second << ")" << std::endl;
-            }
-        std::cout << "Choose the coodinate pairs for which you want to use the power card " << std::endl;
+            std::cout << " Pair: (" << pair.first.first << ", " << pair.first.second << ") and ("
+                << pair.second.first << ", " << pair.second.second << ")" << std::endl;
+        }
+
+        std::cout << "Choose the coordinate pairs for which you want to use the power card.\n";
         Coord first_coord, second_coord;
-        std::cout << "First coord:";
+        std::cout << "First coord: ";
         std::cin >> first_coord.first >> first_coord.second;
-        std::cout << "Second coord:";
+        std::cout << "Second coord: ";
         std::cin >> second_coord.first >> second_coord.second;
 
-        std::pair<Coord, Coord>input_coords{first_coord, second_coord};
-        if (std::find(coord_pairs.begin(), coord_pairs.end(), input_coords) != coord_pairs.end()) {
-          /* CombatCard& firstCard = board.getCombatCards()[first_coord].back();
-           CombatCard& secondCard = board.getCombatCards()[second_coord].back();*/
-
-           /*if (firstCard.getType() < secondCard.getType()) { //aceeasi problema ca mai sus
-               board.appendMove({ first_coord.first + 2,first_coord.second }, std::move(firstCard));
-               board.appendMove({ second_coord.first - 2,second_coord.second }, std::move(secondCard));
-           }
-           else if (firstCard.getType() == secondCard.getType()) {
-               std::cout << "Choose the coordinates of the card you want to place on top:";
-               Coord equal_card_cood;
-               std::cin >> equal_card_cood.first>>equal_card_cood.second;
-               if (equal_card_cood != first_coord || equal_card_cood != second_coord) {
-                   Logger::log(Level::WARNING, "Invalid coordinates");
-               }
-               if (equal_card_cood == first_coord) {
-                   board.appendAnyCard({ second_coord.first - 2,second_coord.second }, std::move(secondCard));
-                   board.appendAnyCard({ first_coord.first + 2,first_coord.second }, std::move(firstCard));
-               }
-               else {
-                   board.appendAnyCard({ first_coord.first + 2,first_coord.second }, std::move(firstCard));
-                   board.appendAnyCard({ second_coord.first - 2,second_coord.second }, std::move(secondCard));
-               }
-           }
-           else {
-               board.appendMove({ second_coord.first - 2,second_coord.second }, std::move(secondCard));
-               board.appendMove({ first_coord.first + 2,first_coord.second }, std::move(firstCard));
-           }
-           */
-           board.popTopCardAt(first_coord);
-           board.popTopCardAt(second_coord);
-           Logger::log(Level::INFO, "Whirlpool power card was played");
-        }
-        else {
-            Logger::log(Level::WARNING, "Invalid coords");
+        if (!std::cin) {
+            Logger::log(Level::WARNING, "Invalid input for coordinates");
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            return;
         }
 
-    }
+        std::pair<Coord, Coord> input_coords{ first_coord, second_coord };
+        if (std::find(coord_pairs.begin(), coord_pairs.end(), input_coords) == coord_pairs.end()) {
+            Logger::log(Level::WARNING, "Invalid coordinate pairs");
+            return;
+        }
 
-    std::vector< std::pair<Coord, Coord>>Whirlpool::getPairs(Board& board) {
-        std::vector< std::pair<Coord, Coord>> row_pairs;
+        auto optFirstCard = board.getTopCard(first_coord);
+        auto optSecondCard = board.getTopCard(second_coord);
 
-        for (const auto& [coord, stack] : board) {
-            if (board.hasStack({ coord.first + 4, coord.second }) && !board.hasStack({ coord.first + 2, coord.second })) {
-                row_pairs.emplace_back(std::make_pair(coord, Coord{ coord.first + 4, coord.second }));
+        if (!optFirstCard.has_value() || !optSecondCard.has_value()) {
+            Logger::log(Level::WARNING, "No card found at one or both coordinates");
+            return;
+        }
+
+        CombatCard& firstCard = optFirstCard->get();
+        CombatCard& secondCard = optSecondCard->get();
+
+        if (firstCard.getType() < secondCard.getType()) {
+            board.appendMove({ first_coord.first + 4, first_coord.second }, std::move(firstCard));
+            board.appendMove({ second_coord.first - 4, second_coord.second }, std::move(secondCard));
+        }
+        else if (firstCard.getType() == secondCard.getType()) {
+            std::cout << "Choose the coordinates of the card you want to place on top: ";
+            Coord equal_card_coord;
+            std::cin >> equal_card_coord.first >> equal_card_coord.second;
+
+            if (!std::cin || (equal_card_coord != first_coord && equal_card_coord != second_coord)) {
+                Logger::log(Level::WARNING, "Invalid coordinates for placing card");
+                return;
+            }
+
+            if (equal_card_coord == first_coord) {
+                board.appendMove({ second_coord.first - 4, second_coord.second }, std::move(secondCard));
+                board.appendMove({ first_coord.first + 4, first_coord.second }, std::move(firstCard));
+            }
+            else {
+                board.appendMove({ first_coord.first + 4, first_coord.second }, std::move(firstCard));
+                board.appendMove({ second_coord.first - 4, second_coord.second }, std::move(secondCard));
             }
         }
-        return row_pairs;
+        else {
+            board.appendMove({ second_coord.first - 4, second_coord.second }, std::move(secondCard));
+            board.appendMove({ first_coord.first + 4, first_coord.second }, std::move(firstCard));
+        }
+
+        board.popTopCardAt(first_coord);
+        board.popTopCardAt(second_coord);
+        Logger::log(Level::INFO, "Whirlpool power card was played");
     }
+
+
+    std::vector<std::pair<Coord, Coord>> Whirlpool::getPairs(Board& board) {
+        std::vector<std::pair<Coord, Coord>> valid_pairs;
+
+        for (const auto& [coord, stack] : board) {
+            if (!board.hasStack(coord) || !stack.empty()) { 
+                continue;
+            }
+            Coord neighbor1{ coord.first + 4, coord.second }; 
+            Coord neighbor2{ coord.first + 8, coord.second }; 
+            if (board.hasStack(neighbor1) && board.hasStack(neighbor2)) { 
+                Coord gap{ coord.first + 4, coord.second }; 
+                if (!board.hasStack(gap)) { 
+                    valid_pairs.emplace_back(std::make_pair(neighbor1, neighbor2)); 
+                }
+            }
+
+            Coord verticalNeighbor1{ coord.first, coord.second + 3 };
+            Coord verticalNeighbor2{ coord.first, coord.second + 6 };
+            if (board.hasStack(verticalNeighbor1) && board.hasStack(verticalNeighbor2)) {
+                Coord gap{ coord.first, coord.second + 3 };
+                if (!board.hasStack(gap)) {
+                    valid_pairs.emplace_back(std::make_pair(verticalNeighbor1, verticalNeighbor2));
+                }
+            }
+        }
+
+        return valid_pairs;
+    }
+
 
 
     ////------------------------------------------ Blizzard -------------------------------------------
