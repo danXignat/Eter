@@ -1,3 +1,4 @@
 [ERROR] No arguments
 [INFO] card(1) appended at (10, 5)
-[WARNING] No selection made yet!
+[INFO] card(1) appended at (12, 5)
+[INFO] card(1) appended at (14, 5)

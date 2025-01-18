@@ -620,7 +620,7 @@ namespace base {
 		}
 
 		if (m_available_spaces.contains(to_coord) == false) {
-			Logger::log(Level::WARNING, "not available palce to move stack");
+			Logger::log(Level::WARNING, "not available place to move stack");
 			return false;
 		}
 
@@ -1152,4 +1152,4 @@ namespace base {
 		return m_combat_cards.end();
 	}
 
-}
+}	

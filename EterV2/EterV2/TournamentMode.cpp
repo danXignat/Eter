@@ -27,9 +27,9 @@ namespace base {
     }
 
     void TournamentMode::handleGameEnd() {
-        if (m_board.getWinCoord().has_value()) {
-            color::ColorType winner_color = getCurrPlayer().getColor();
-            m_arena_service.placeMarker(m_board.getWinCoord().value(), m_board, winner_color);
+        if (auto win_coord = m_base_mode->getBoard().getWinCoord()) {
+            color::ColorType winner_color = m_base_mode->getCurrPlayer().getColor();
+            m_arena_service.placeMarker(win_coord.value(), m_base_mode->getBoard(), winner_color);
 
             if (winner_color == color::ColorType::RED) {
                 m_red_wins++;
@@ -89,6 +89,10 @@ namespace base {
                 input.read();
                 bool action_succeded = processGameInput(input);
                 if (action_succeded) {
+
+                    if (m_base_mode->getBoard().getWinCoord().has_value()) {
+                        handleGameEnd();
+                    }
                     m_base_mode->switchPlayer();
 
                 }
@@ -111,7 +115,7 @@ namespace base {
         m_base_mode->getPlayerRed().renderCards();
         m_base_mode->getPlayerBlue().renderCards();
 
-        m_arena_service.renderArena(m_board);
+        m_arena_service.renderArena(board);
 
         if (auto* mageMode = dynamic_cast<MageMode*>(m_base_mode.get())) {
             mageMode->render();
