@@ -2,7 +2,7 @@
 #include "qt_includes.h"
 #include "game.h"
 #include "settings.h"
-
+#include "PauseMenuDialog.h"
 #include "..\EterV2\GameModeFactory.h"
 #include "..\EterV2\InputHandler.h"
 
@@ -83,17 +83,19 @@ public:
 
 protected:
     void keyPressEvent(QKeyEvent* event) override;
-    void showPauseMenu();
 private slots:
     void onNameEntered(const QString& playerBlueName, const QString& playerRedName);
     void onModeSelected(const std::string& mode);
+    void onResumeGame();
+    
 
 private:
     QStackedWidget* stackedWidget;
     RequestNameScene* requestNameScene;
     SelectModeScene* selectModeScene;
-    GameScene* gameScene;
-
+    GameScene* gameScene = nullptr;
+    PauseMenuScene* pauseMenuScene;
+    QWidget* lastScene = nullptr;
     QString playerBlueNameGlobal;
     QString playerRedNameGlobal;
     std::string selectedMode;

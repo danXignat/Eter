@@ -2,14 +2,17 @@
 #ifndef PAUSEMENUDIALOG_H
 #define PAUSEMENUDIALOG_H
 
-#include <QDialog>
+#include <QWidget>
 #include <QPushButton>
 
-class PauseMenuDialog : public QDialog {
+class PauseMenuScene : public QWidget {
     Q_OBJECT
 
 public:
-    explicit PauseMenuDialog(QWidget* parent = nullptr);
+    explicit PauseMenuScene(QWidget* parent = nullptr);
+
+signals:
+    void continueGameRequested();
 
 private slots:
     void onContinueClicked();
