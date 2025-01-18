@@ -70,7 +70,22 @@ SelectModeScene::SelectModeScene(QWidget* parent) : QWidget(parent) {
 GameScene::GameScene(const std::string& mode, const QString& playerBlueName, const QString& playerRedName, QWidget* parent) :
     QWidget(parent),
     controller{ this, mode, playerRedName, playerBlueName }
-{}
+{
+    QVBoxLayout* layout = new QVBoxLayout(this);
+
+    toggleButton = new QPushButton("Toggle Illusion", this);
+      
+
+    toggleButton->setGeometry(50, 50, 200, 50);
+    connect(toggleButton, &QPushButton::clicked, this, &GameScene::toggleIllusion);
+
+    this->setLayout(nullptr);
+}
+
+void GameScene::toggleIllusion() {
+    isIllusionEnabled = !isIllusionEnabled;
+    toggleButton->setText(isIllusionEnabled ? "Illusion Enabled" : "Illusion Disabled");
+}
 
 MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
     setWindowTitle("Eter");
