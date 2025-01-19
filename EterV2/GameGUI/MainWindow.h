@@ -58,25 +58,28 @@ public:
 
 signals:
     void modeSelected(const std::string& mode);
+    void gameModeSelected(const QString& gameMode);
+private slots:
 private:
     QPushButton* trainingButton;
     QPushButton* mageDuelButton;
     QPushButton* elementalBattleButton;
     QPixmap background;
 };
-
+class MainWindow;
 class SpecialPlaysScene : public QWidget {
     Q_OBJECT
 
 public:
-    explicit SpecialPlaysScene(QWidget* parent = nullptr);
+    explicit SpecialPlaysScene(MainWindow* parent = nullptr);
     void paintEvent(QPaintEvent* event) override;
 signals:
-    void continueToGame();
+    void continueToGame(const std::string&);
 private slots:
     void onNextClicked();
-
+    
 private:
+    MainWindow* mainWindow;
     QPushButton* nextButton;
     QCheckBox* illusions;
     QCheckBox* explosions;
@@ -104,15 +107,15 @@ class MainWindow : public QMainWindow {
 
 public:
     MainWindow(QWidget* parent = nullptr);
-
+    std::string getSelectedMode() const;
 protected:
     void keyPressEvent(QKeyEvent* event) override;
 private slots:
     void onNameEntered(const QString& playerBlueName, const QString& playerRedName);
     void onModeSelected(const std::string& mode);
     void onResumeGame();
-    void onSpecialPlaysCompleted();
-
+    void onSpecialPlaysCompleted(const std::string& fullMode);
+    void onGameModeSelected(const QString& gameMode);
 private:
     SpecialPlaysScene* specialPlaysScene;
     QStackedWidget* stackedWidget;
