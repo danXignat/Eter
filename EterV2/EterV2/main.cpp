@@ -24,7 +24,7 @@ void testExplosion() {
 	board.sideViewRender();
 
 	base::ExplosionService service{board, p1, p2};
-	service.renderExplosion();
+	service.render();
 
 	while (true) {
 		service.setting();
@@ -32,7 +32,7 @@ void testExplosion() {
 		system("cls");
 		board.render();
 		board.sideViewRender();
-		service.renderExplosion();
+		service.render();
 		p1.renderCards();
 		p2.renderCards();
 	}
@@ -42,6 +42,9 @@ void testConfig() {
 	using namespace base;
 
 	Config& config = Config::getInstance();		//builder design pattern
+
+	uint16_t x_step{ config.getCardSpacingX() };
+	uint16_t y_step{ config.getCardSpacingY() };
 
 	config.setStartPoint({ 10, 5 })
 		  .setCardSpacingX(100)
@@ -83,9 +86,10 @@ int main() {
 	base::Config::getInstance()
 		.setStartPoint({ 10, 5 })
 		.setCardSpacingX(2)
-		.setCardSpacingY(1);
-	
-    base::GameModePtr game_mode{ base::GameModeFactory::get("2", { "titi", "gigi" }) };
+		.setCardSpacingY(1)
+		.setFetchByID(false);
+
+    base::GameModePtr game_mode{ base::GameModeFactory::get("112", { "titi", "gigi" }) };
 	game_mode->run();
 
 	//testConfig();

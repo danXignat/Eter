@@ -21,11 +21,23 @@ namespace base {
 	//----------------------------MODIFIERS--------------------------------
 
 	void Board::createHole(const Coord& coord) {
-		m_combat_cards[coord].clear();
+		while (m_combat_cards[coord].size()) {
+			CombatCard card{ std::move(m_combat_cards[coord].back()) };
+			m_combat_cards[coord].pop_back();
+
+			if (card.getColor() == color::ColorType::RED) {
+				m_player1.addUsedCard(std::move(card));
+			}
+			else {
+				m_player2.addUsedCard(std::move(card));
+			}
+		}
 
 		m_combat_cards[coord].push_back(
 			CombatCard{ CombatCardType::HOLE, color::ColorType::DEFAULT }
 		);
+
+		_reinitialise();
 
 		Logger::log(Level::INFO, "Hole created at {} {}", coord.first, coord.second);
 	}
@@ -333,6 +345,7 @@ namespace base {
 		}
 
 		CombatCard card = std::move(m_combat_cards[coord].back());
+		logger::Logger::log(logger::Level::INFO, "{}", card.getID());
 		m_combat_cards[coord].pop_back();
 
 		if (m_combat_cards[coord].empty()) {

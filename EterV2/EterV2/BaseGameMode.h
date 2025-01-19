@@ -23,16 +23,14 @@ namespace base {
 		const Player& getPlayerBlue() const override;
 		const Player& getCurrPlayer() const override;
 		const Board&  getBoard() const override;
-		const ExplosionService& getExplosionService();
+		std::optional <ExplosionService> &getExplosionService();
 
 		std::optional<color::ColorType> getWinningColor() const;
 		void switchPlayer();
 
 		bool placeCombatCard(const InputHandler&);
 		bool placeIllusion(const InputHandler&);
-		void rotateExplosionLeft();
-		void rotateExplosionRight();
-		void applyExplosion();
+		void removeExplosion();
 
 	protected:
 		Player m_player_red;

@@ -25,4 +25,5 @@
 #include <QDialog>
 #include <QEnterEvent>
 #include <QCheckBox>
+#include <qtimer.h>
 #endif // GRAPHICS_INCLUDES_H

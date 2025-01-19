@@ -24,7 +24,7 @@ namespace base {
         auto effectCoords = explosionService.getEffectCoords();
 
         if (!effectCoords.empty()) {
-            explosionService.renderExplosion();
+            explosionService.render();
             explosionService.apply();
 
             Logger::log(Level::INFO, "Controller Explosion power card was used succesfully");

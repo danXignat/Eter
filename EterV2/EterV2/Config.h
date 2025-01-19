@@ -18,11 +18,13 @@ namespace base {
         Config& setStartPoint(const Coord&);
         Config& setCardSpacingX(uint16_t);
         Config& setCardSpacingY(uint16_t);
+        Config& setFetchByID(bool);
 
         Coord    getStartPoint() const;
         Coord    getSpacing() const;
         uint16_t getCardSpacingX() const;
         uint16_t getCardSpacingY() const;
+        bool getFetchByID() const;
 
         const std::array<Coord, 8>& getOffsets() const;
     
@@ -47,5 +49,6 @@ namespace base {
         Coord    m_start_point;
         uint16_t m_card_space_x;
         uint16_t m_card_space_y;
+        bool m_fetch_by_ID;
     };
 }

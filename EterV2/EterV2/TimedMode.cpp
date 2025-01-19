@@ -71,7 +71,7 @@ namespace base {
         }
 
         if (m_explosion_service) {
-            m_explosion_service->renderExplosion();
+            m_explosion_service->render();
         }
     }
 

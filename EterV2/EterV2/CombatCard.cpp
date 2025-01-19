@@ -1,12 +1,17 @@
 #include "CombatCard.h"
 
+#include "logger.h"
+
 namespace base {
+	int16_t CombatCard::card_count = 0;
+
 	//----------------------------------------Constructor-----------------------------
 	CombatCard::CombatCard()
 		: m_type{ CombatCardType::NONE },
 		m_color{ color::ColorType::DEFAULT },
-		m_illusion{ false } {
-
+		m_illusion{ false },
+		m_ID{-1} {
+		logger::Logger::log(logger::Level::INFO, "card created ID {}", m_ID);
 	}
 
 	CombatCard::CombatCard(CombatCardType type, color::ColorType color)
@@ -14,12 +19,25 @@ namespace base {
 		m_color{ color },
 		m_illusion{ false } {
 
+		if (type == CombatCardType::ONE ||
+			type == CombatCardType::TWO ||
+			type == CombatCardType::THREE ||
+			type == CombatCardType::FOUR) {
+			m_ID = card_count;
+			card_count++;
+		}
+		else {
+			m_ID = -1;
+		}
+
+		logger::Logger::log(logger::Level::INFO, "card created ID {}", m_ID);
 	}
 
 	CombatCard::CombatCard(CombatCard&& other) noexcept {
 		this->m_type = other.m_type;
 		this->m_color = other.m_color;
 		this->m_illusion = other.m_illusion;
+		this->m_ID = other.m_ID;
 	}
 
 	CombatCard& CombatCard::operator=(CombatCard&& other) noexcept {
@@ -27,6 +45,7 @@ namespace base {
 			this->m_type = other.m_type;
 			this->m_color = other.m_color;
 			this->m_illusion = other.m_illusion;
+			this->m_ID = other.m_ID;
 		}
 
 		return *this;
@@ -42,6 +61,10 @@ namespace base {
 		return m_color;
 	}
 
+	uint16_t CombatCard::getID() const {
+		return m_ID;
+	}
+
 	//-----------------------------------------Illusion-------------------------------------------
 
 	void CombatCard::flip() {
@@ -50,6 +73,10 @@ namespace base {
 	
 	bool CombatCard::isIllusion() const {
 		return m_illusion;
+	}
+
+	bool CombatCard::isCombatCard() const {
+		return (m_ID != -1) ? true : false;
 	}
 
 	//--------------------------------Overloads--------------------------------

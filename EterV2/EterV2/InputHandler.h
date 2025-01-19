@@ -11,6 +11,7 @@ namespace base {
 		void read();
 
 		std::pair<uint16_t, uint16_t> coord;
+		uint16_t ID;
 		CombatCardType card_type;
 		ServiceType service_type;
 		EventType event_type;

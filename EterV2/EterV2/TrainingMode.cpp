@@ -46,12 +46,12 @@ namespace base {
 				break;
 			}
 
-			/*if (isExplosionAvailable()) {
+			if (m_explosion_service->checkAvailability()) {
 				this->render();
-				setExplosion();
-				detonateExplosion();
+				m_explosion_service->setting();
+				m_explosion_service->apply();
 				m_explosion_service.reset();
-			}*/
+			}
 
 			if (action_succed) {
 				switchPlayer();
@@ -91,7 +91,7 @@ namespace base {
 		}
 
 		if (m_explosion_service) {
-			m_explosion_service->renderExplosion();
+			m_explosion_service->render();
 		}
 	}
 	

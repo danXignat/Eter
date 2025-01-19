@@ -21,6 +21,12 @@ namespace base {
         return *m_instance;
     }
 
+    Config& Config::setFetchByID(bool fetched_by_ID) {
+        m_instance->m_fetch_by_ID = fetched_by_ID;
+
+        return *m_instance;
+    }
+
     Config& Config::setCardSpacingX(uint16_t spacing) {
         m_instance->m_card_space_x = spacing;
 
@@ -59,6 +65,10 @@ namespace base {
 
     const std::array<Coord, 8>& Config::getOffsets() const {
         return m_mapped_offsets;
+    }
+
+    bool Config::getFetchByID() const {
+        return m_fetch_by_ID;
     }
 
     std::unordered_map<std::string, std::variant<uint16_t, Coord>> Config::getConfig() const {
