@@ -1,2 +1,2 @@
-[INFO] explosion effect [0, 2] -> 1
-[INFO] explosion effect [2, 2] -> 0
+[INFO] explosion effect [1, 1] -> 1
+[INFO] explosion effect [2, 1] -> 0

@@ -54,14 +54,15 @@ class SelectModeScene : public QWidget {
 
 public:
     explicit SelectModeScene(QWidget* parent = nullptr);
+    void paintEvent(QPaintEvent* event) override;
 
 signals:
     void modeSelected(const std::string& mode);
-
 private:
     QPushButton* trainingButton;
     QPushButton* mageDuelButton;
     QPushButton* elementalBattleButton;
+    QPixmap background;
 };
 
 class SpecialPlaysScene : public QWidget {
@@ -69,7 +70,7 @@ class SpecialPlaysScene : public QWidget {
 
 public:
     explicit SpecialPlaysScene(QWidget* parent = nullptr);
-
+    void paintEvent(QPaintEvent* event) override;
 signals:
     void continueToGame();
 private slots:
@@ -80,6 +81,7 @@ private:
     QCheckBox* illusions;
     QCheckBox* explosions;
     QLabel* infoLabel;
+    QPixmap background;
 };
 
 class GameScene : public QWidget {

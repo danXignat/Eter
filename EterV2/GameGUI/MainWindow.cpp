@@ -61,34 +61,59 @@ SelectModeScene::SelectModeScene(QWidget* parent) : QWidget(parent) {
     elementalBattleButton->setFixedSize(200, 50);
     elementalBattleButton->setStyleSheet("font-size: 18px;");
     layout->addWidget(elementalBattleButton, 0, Qt::AlignCenter);
+    background.load("../pictures/estetics/name_select.png");
 
     connect(trainingButton, &QPushButton::clicked, this, [=]() { emit modeSelected("102"); });
     connect(mageDuelButton, &QPushButton::clicked, this, [=]() { emit modeSelected("202"); });
     connect(elementalBattleButton, &QPushButton::clicked, this, [=]() { emit modeSelected("302"); });
+    
 }
 
-SpecialPlaysScene::SpecialPlaysScene(QWidget* parent) : QWidget(parent) {
-    QVBoxLayout* layout = new QVBoxLayout(this);
+void SelectModeScene::paintEvent(QPaintEvent* event) {
+    QPainter painter(this);
+
+    painter.drawPixmap(0, 0, width(), height(), background);
+
+    QWidget::paintEvent(event);
+}
+
+SpecialPlaysScene::SpecialPlaysScene(QWidget* parent)
+    : QWidget(parent) {
+
+    QVBoxLayout* mainLayout = new QVBoxLayout(this);
 
     infoLabel = new QLabel("Choose your special play options:", this);
     infoLabel->setAlignment(Qt::AlignCenter);
     infoLabel->setStyleSheet("font-size: 24px; font-weight: bold;");
-    layout->addWidget(infoLabel);
+    mainLayout->addWidget(infoLabel, 0, Qt::AlignTop | Qt::AlignCenter);
 
+    QVBoxLayout* checkBoxLayout = new QVBoxLayout();
     illusions = new QCheckBox("Enable illusions", this);
     illusions->setStyleSheet("font-size: 18px;");
-    layout->addWidget(illusions);
+    checkBoxLayout->addWidget(illusions);
 
     explosions = new QCheckBox("Enable explosions", this);
     explosions->setStyleSheet("font-size: 18px;");
-    layout->addWidget(explosions);
+    checkBoxLayout->addWidget(explosions);
 
-    nextButton = new QPushButton("Next", this);
-    nextButton->setStyleSheet("font-size: 18px;");
-    layout->addWidget(nextButton);
+    mainLayout->addLayout(checkBoxLayout, 1); 
 
+    nextButton = new NextButton(this);
+    nextButton->setFixedSize(365, 92);
+    nextButton->move(WINDOW_WIDTH - 385, WINDOW_HEIGHT - 122);
+    background.load("../pictures/estetics/name_select.png");
+    
     connect(nextButton, &QPushButton::clicked, this, &SpecialPlaysScene::onNextClicked);
 }
+
+void SpecialPlaysScene::paintEvent(QPaintEvent* event) {
+    QPainter painter(this);
+
+    painter.drawPixmap(0, 0, width(), height(), background);
+
+    QWidget::paintEvent(event);
+}
+
 void SpecialPlaysScene::onNextClicked() {
 
     bool isOptionOneChecked = illusions->isChecked();
