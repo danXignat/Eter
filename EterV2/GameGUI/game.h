@@ -65,7 +65,6 @@ public:
     GameController(QWidget* parent,
         const std::string& mode,
         const QString& name_red, const QString& name_blue);
-
 private:
     base::GameModePtr model;
     GameView* view;

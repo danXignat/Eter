@@ -11,6 +11,7 @@ constexpr const int WINDOW_WIDTH{ 1200 };
 constexpr const int WINDOW_HEIGHT{ 800 };
 
 constexpr const char* const CARD_PATH{ "../pictures/cards/%1_%2.png" };
+constexpr const char* const BACK_PATH{ "../pictures/cards/%1_%2.png" };
 constexpr const char* const EXPLOSION_3x3_PATH{ "../pictures/explosion/3x3.png" };
 constexpr const char* const EXPLOSION_4x4_PATH{ "../pictures/explosion/4x4.png" };
 constexpr const char* const HAND_PATH{ "../pictures/explosion/hand.png" };
