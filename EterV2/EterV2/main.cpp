@@ -84,7 +84,7 @@ int main() {
 		.setStartPoint({ 10, 5 })
 		.setCardSpacingX(2)
 		.setCardSpacingY(1);
-
+	
     base::GameModePtr game_mode{ base::GameModeFactory::get("2", { "titi", "gigi" }) };
 	game_mode->run();
 

@@ -23,4 +23,10 @@ namespace color {
 			return "\033[0m";
 		}
 	}
+	/*inline ColorType from_string(const std::string& color_str) {
+		if (color_str == "RED") return ColorType::RED;
+		if (color_str == "BLUE") return ColorType::BLUE;
+		if (color_str == "DEFAULT") return ColorType::DEFAULT;
+		throw std::invalid_argument("Invalid color string: " + color_str);
+	}*/
 }

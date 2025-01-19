@@ -3,9 +3,9 @@
 using namespace logger;
 
 namespace base {
-    Config& config = Config::getInstance(); 
+   /* Config& config = Config::getInstance(); 
     uint16_t x_step = config.getCardSpacingX(); 
-    uint16_t y_step = config.getCardSpacingY(); 
+    uint16_t y_step = config.getCardSpacingY(); */
     ////------------------------------------------ ControllerExplosion -------------------------------------------
     ControllerExplosion::ControllerExplosion() {
         m_ability = PowerCardType::ControllerExplosion;
@@ -439,10 +439,10 @@ namespace base {
 
         const CombatCard& card = optCard->get();
         std::vector<Coord> neighbors{
-            {selectedCard.first - x_step, selectedCard.second},
-            {selectedCard.first + x_step, selectedCard.second},
-            {selectedCard.first, selectedCard.second - y_step},
-            {selectedCard.first, selectedCard.second + y_step}
+            {selectedCard.first - 2, selectedCard.second},
+            {selectedCard.first + 2, selectedCard.second},
+            {selectedCard.first, selectedCard.second - 1},
+            {selectedCard.first, selectedCard.second + 1}
         };
 
         for (const Coord& neighbor : neighbors) {
@@ -798,8 +798,8 @@ namespace base {
     std::vector<std::pair<Coord, Coord>> Whirlpool::getPairs(Board& board) {
         m_availablePairs.clear();
         for (const auto& [coord, stack] : board) {
-            Coord neighbor1{ coord.first + x_step, coord.second };
-            Coord neighbor2{ coord.first + (x_step*2), coord.second };
+            Coord neighbor1{ coord.first + 2, coord.second };
+            Coord neighbor2{ coord.first + (2*2), coord.second };
 
             if (!board.hasStack(neighbor1) && board.hasStack(neighbor2)) {
                 m_availablePairs.emplace_back(std::make_pair(coord, neighbor2));
@@ -1343,10 +1343,10 @@ namespace base {
   
         std::vector<std::pair<Orientation, std::pair<Coord, Coord>>> pairs;
         const std::vector<std::pair<Coord, Orientation>> directions = {
-            {{x_step, 0}, Orientation::Row},
-            {{-x_step, 0}, Orientation::Row},
-            {{0, y_step}, Orientation::Column},
-            {{0, -y_step}, Orientation::Column}
+            {{2, 0}, Orientation::Row},
+            {{-2, 0}, Orientation::Row},
+            {{0, 1}, Orientation::Column},
+            {{0, -1}, Orientation::Column}
         };
 
         for (const auto& [coord, stack] : board) {
@@ -1366,8 +1366,8 @@ namespace base {
         std::vector<std::pair<MoveDirection, std::pair<Coord, Coord>>> choices;
 
         const std::unordered_map<Orientation, std::vector<std::pair<Coord, MoveDirection>>> directions = {
-            {Orientation::Row,    {{{x_step, 0}, MoveDirection::Right}, {{-x_step, 0}, MoveDirection::Left}}},
-            {Orientation::Column, {{{0, y_step}, MoveDirection::Up},    {{0, -y_step}, MoveDirection::Down}}}
+            {Orientation::Row,    {{{2, 0}, MoveDirection::Right}, {{-2, 0}, MoveDirection::Left}}},
+            {Orientation::Column, {{{0, 1}, MoveDirection::Up},    {{0, -1}, MoveDirection::Down}}}
         };
 
         for (const auto& [type, pair] : pack) {
