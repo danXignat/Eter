@@ -77,6 +77,9 @@
     <ClCompile Include="TournamentMode.cpp">
       <Filter>GameMode\GameModes</Filter>
     </ClCompile>
+    <ClCompile Include="Data.cpp">
+      <Filter>Storage</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="GameMode">
@@ -111,6 +114,9 @@
     </Filter>
     <Filter Include="Cards\Power">
       <UniqueIdentifier>{09eb7f95-0ce9-4d2d-8f05-fa8e5b6e3f75}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Storage">
+      <UniqueIdentifier>{a1e931bf-1c3e-45b4-b17d-1917fb1a7f9b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -215,6 +221,9 @@
     </ClInclude>
     <ClInclude Include="TournamentMode.h">
       <Filter>GameMode\GameModes</Filter>
+    </ClInclude>
+    <ClInclude Include="Data.h">
+      <Filter>Storage</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -6,7 +6,9 @@ using namespace logger;
 
 namespace base {
 
-
+    Config& config = Config::getInstance();
+    uint16_t x_step = config.getCardSpacingX(); 
+    uint16_t y_step = config.getCardSpacingY(); 
 
     ///----------------------------------------------------MasterOfFire----------------------------------------
     ///---------Burn------------
@@ -493,7 +495,7 @@ namespace base {
         std::vector<Coord> top_border, bottom_border, left_border, right_border;
 
 
-        for (uint16_t x = corner1.first; x <= corner2.first; x += 4) {
+        for (uint16_t x = corner1.first; x <= corner2.first; x += x_step) {
             if (board.hasStack({ x, corner1.second })) {
                 top_border.push_back({ x, corner1.second });
             }
@@ -501,7 +503,7 @@ namespace base {
                 bottom_border.push_back({ x, corner2.second });
             }
         }
-        for (uint16_t y = corner1.second; y <= corner2.second; y+=3) {
+        for (uint16_t y = corner1.second; y <= corner2.second; y+=y_step) {
             if (board.hasStack({ corner1.first, y })) {
                 left_border.push_back({ corner1.first, y });
             }
@@ -559,14 +561,14 @@ namespace base {
 
         auto [corner1, corner2] = board.getBoudingRect();
         if (direction == 'r') {
-            if (m_selectedDestination != corner2.second + 3 && m_selectedDestination != corner1.second - 3) {
+            if (m_selectedDestination != corner2.second + y_step && m_selectedDestination != corner1.second - y_step) {
                 Logger::log(Level::WARNING, "Invalid row destination!");
                 return false;
             }
             board.moveRow(from_move, m_selectedDestination);
         }
         else {
-            if (m_selectedDestination != corner2.first + 4 && m_selectedDestination != corner1.first - 4) {
+            if (m_selectedDestination != corner2.first + x_step && m_selectedDestination != corner1.first - x_step) {
                 Logger::log(Level::WARNING, "Invalid column destination!");
                 return false;
             }

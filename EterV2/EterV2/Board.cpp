@@ -476,7 +476,7 @@ namespace base {
 			_addUsedCard(std::move(stack.back()));
 		}
 	}
-	
+    
 	void Board::removeTopCardAt(const Coord& coord) {	
 		CombatCard card = this->popTopCardAt(coord);
 
@@ -1152,4 +1152,4 @@ namespace base {
 		return m_combat_cards.end();
 	}
 
-}	
+}   

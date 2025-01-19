@@ -33,7 +33,7 @@ namespace base {
 		bool isCardOfColorAt(color::ColorType, const Coord&) const;
 		bool isFixedColumn(int16_t x) const;
 		bool isFixedRow(int16_t y) const;
-		
+        
 		uint16_t getSize() const;
 		Coord getLeftCorner() const;
 		std::pair<Coord, Coord> getBoudingRect() const;
@@ -51,7 +51,7 @@ namespace base {
 		std::vector<Coord> getCoordsOnRow(int16_t row_index) const;
 		std::vector<Coord> getCoordsOnColumn(int16_t col_index) const;
 		std::optional<Coord> getWinCoord() const;
-		
+	    
 		void createHole(const Coord&);
 		void appendMove(const Coord&, CombatCard&&);
 		void moveRow(uint16_t from_y, uint16_t to_y);
@@ -69,7 +69,7 @@ namespace base {
 		void blockColumn(uint16_t column, color::ColorType owner);
 		void clearBlockedRow();
 		void clearBlockedColumn();
-		 
+
 		CombatCard&& popTopCardAt(const Coord& coord);
 		CombatCard&& popCardFromStackAt(const Coord& coord, const CombatCard& card_to_remove);
 		Stack popStack(const Coord& coord);
@@ -91,7 +91,7 @@ namespace base {
 		bool isValidMergeStacks(const std::vector<Coord>& coords, const Coord& final_coord)const;
 		bool isRowBlocked(uint16_t row, color::ColorType player_color) const;
 		bool isColumnBlocked(uint16_t column, color::ColorType player_color) const;
-		
+
 		void render() const;
 		void sideViewRender();
 
@@ -130,9 +130,9 @@ namespace base {
 
 		std::unordered_map<Coord, Stack, utils::CoordFunctor> m_combat_cards;
 		std::unordered_set<Coord, utils::CoordFunctor> m_available_spaces;
-		std::optional<uint16_t> m_blocked_row; 
+		std::optional<uint16_t> m_blocked_row;
 		std::optional<uint16_t> m_blocked_column;
-		color::ColorType m_blocked_row_owner; 
+		color::ColorType m_blocked_row_owner;
 
 	///------------------------------------------------Iterator---------------------------------------------
 
@@ -145,5 +145,5 @@ namespace base {
 
 		const_iterator begin() const;
 		const_iterator end() const;
-	};	
+	};  
 }
