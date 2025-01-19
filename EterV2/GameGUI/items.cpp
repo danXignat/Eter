@@ -2,8 +2,8 @@
 
 #include "settings.h"
 
-Card::Card(color::ColorType color, base::CombatCardType type, const QString& imagePath, QGraphicsItem* parent)
-    : QGraphicsItem(parent), cardImage(imagePath),
+Card::Card(color::ColorType color, base::CombatCardType type, const QString& imagePath,const QString& backPath, QGraphicsItem* parent)
+    : QGraphicsItem(parent), cardImage(imagePath), cardBack(backPath),
     color{ color },
     type{ type },
     placed{ false } {
@@ -27,9 +27,16 @@ QRectF Card::boundingRect() const {
 void Card::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) {
     Q_UNUSED(option);
     Q_UNUSED(widget);
-    QPixmap scaledImage = cardImage.scaled(CARD_SIZE, CARD_SIZE, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+    if (faceUp) {
+        QPixmap scaledImage = cardImage.scaled(CARD_SIZE, CARD_SIZE, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
 
-    painter->drawPixmap(-CARD_SIZE / 2, -CARD_SIZE / 2, scaledImage);
+        painter->drawPixmap(-CARD_SIZE / 2, -CARD_SIZE / 2, scaledImage);
+    }
+    else{
+        QPixmap scaledImage = cardBack.scaled(CARD_SIZE, CARD_SIZE, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+
+        painter->drawPixmap(-CARD_SIZE / 2, -CARD_SIZE / 2, scaledImage);
+    }
 }
 
 void Card::moveCardBack() {
@@ -57,12 +64,24 @@ void Card::setPlaced() {
 bool Card::isPlaced() const {
     return placed;
 }
-
+void Card::flipCard(){
+    faceUp = !faceUp;
+}
+bool Card::isFaceUp() {
+    return faceUp;
+}
 void Card::mousePressEvent(QGraphicsSceneMouseEvent* event) {
-    lastMousePosition = event->scenePos();
-    lastCardPosition = pos();
-    qDebug() << "pressed" << "\n";
-    QGraphicsItem::mousePressEvent(event);
+    if (event->button() == Qt::LeftButton) {
+        lastMousePosition = event->scenePos();
+        lastCardPosition = pos();
+        qDebug() << "Left mouse button pressed on card";
+        QGraphicsItem::mousePressEvent(event); 
+    }
+    else {
+        flipCard();
+        qDebug() << "Non-left mouse button ignored on card";
+        event->ignore();
+    }
 }
 
 void Card::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {

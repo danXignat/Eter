@@ -72,6 +72,11 @@ GameScene::GameScene(const std::string& mode, const QString& playerBlueName, con
     controller{ this, mode, playerRedName, playerBlueName }
 {}
 
+void GameScene::toggleIllusion() {
+    isIllusionEnabled = !isIllusionEnabled;
+    toggleButton->setText(isIllusionEnabled ? "Illusion Enabled" : "Illusion Disabled");
+}
+
 MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
     setWindowTitle("Eter");
     setWindowIcon(QIcon(ICON_PATH));
