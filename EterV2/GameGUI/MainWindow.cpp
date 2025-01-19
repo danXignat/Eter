@@ -105,24 +105,38 @@ SpecialPlaysScene::SpecialPlaysScene(MainWindow* parent)
     illusions = new QCheckBox("Enable illusions", this);
     illusions->setStyleSheet(
         "QCheckBox {"
-        "    background-color: #1b3d50;"   // Light gray background
-        "    border: 1px solid #1b444b;"   // Thinner border
-        "    border-radius: 3px;"          // Smaller rounded corners
-        "    padding: 2px;"                // Smaller padding
-        "    font-size: 14px;"             // Smaller font size
+        "    background-color: #1b3d50;"   
+        "    border: 1px solid #1b444b;"   
+        "    border-radius: 3px;"         
+        "    padding: 2px;"                
+        "    font-size: 14px;"            
         "}"
         "QCheckBox:hover {"
-        "    background-color: #466876;"   // Slightly darker gray on hover
+        "    background-color: #466876;"   
         "}"
         "QCheckBox:checked {"
-        "    background-color: #466876;"   // Light blue when checked
+        "    background-color: #466876;"   
         "}"
     );
     illusions->setGeometry(530, 300, 150, 50);
 
     explosions = new QCheckBox("Enable explosions", this);
-    explosions->setStyleSheet("font-size: 24px;");
-    explosions->setGeometry(530, 400, 400, 150);
+    explosions->setStyleSheet(
+        "QCheckBox {"
+        "    background-color: #1b3d50;"
+        "    border: 1px solid #1b444b;"
+        "    border-radius: 3px;"
+        "    padding: 2px;"
+        "    font-size: 14px;"
+        "}"
+        "QCheckBox:hover {"
+        "    background-color: #466876;"
+        "}"
+        "QCheckBox:checked {"
+        "    background-color: #466876;"
+        "}"
+    );
+    explosions->setGeometry(530, 400, 150, 50);
 
     nextButton = new NextButton(this);
     nextButton->setFixedSize(365, 92);
