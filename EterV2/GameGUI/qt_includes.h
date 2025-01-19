@@ -24,4 +24,5 @@
 #include <QApplication>
 #include <QDialog>
 #include <QEnterEvent>
+#include <QCheckBox>
 #endif // GRAPHICS_INCLUDES_H
