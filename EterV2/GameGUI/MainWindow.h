@@ -64,6 +64,24 @@ private:
     QPushButton* elementalBattleButton;
 };
 
+class SpecialPlaysScene : public QWidget {
+    Q_OBJECT
+
+public:
+    explicit SpecialPlaysScene(QWidget* parent = nullptr);
+
+signals:
+    void continueToGame();
+private slots:
+    void onNextClicked();
+
+private:
+    QPushButton* nextButton;
+    QCheckBox* illusions;
+    QCheckBox* explosions;
+    QLabel* infoLabel;
+};
+
 class GameScene : public QWidget {
     Q_OBJECT
 private:
@@ -91,9 +109,10 @@ private slots:
     void onNameEntered(const QString& playerBlueName, const QString& playerRedName);
     void onModeSelected(const std::string& mode);
     void onResumeGame();
-    
+    void onSpecialPlaysCompleted();
 
 private:
+    SpecialPlaysScene* specialPlaysScene;
     QStackedWidget* stackedWidget;
     RequestNameScene* requestNameScene;
     SelectModeScene* selectModeScene;
