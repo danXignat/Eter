@@ -31,9 +31,8 @@ Card* GameView::_createCardAt(color::ColorType color, base::CombatCardType type,
     QString backPath = QString(BACK_PATH)
         .arg(color == color::ColorType::RED ? "red" : "blue")
         .arg("back");
-    Card* card = new Card(color, type, imagePath, backPath);  
+    Card* card = new Card(color, type, image_path, backPath, pos, id);
     connect(card, &Card::cardAppend, this, &GameView::cardAppend);
-    card->setPos(pos);
     scene->addItem(card);
 
     return card;
@@ -260,6 +259,10 @@ void GameController::onCardAppend(Card* card) {
             ) {
             auto [coord1, coord2]{ model->getBoard().getBoudingRect() };
 
+            for (const auto& [id, card] : view->getAllCards().asKeyValueRange()) {
+                card->setFlag(QGraphicsItem::ItemIsMovable, false);
+            }
+
             view->setExplosionActive(gui::utils::coordToQPointF(coord1), gui::utils::coordToQPointF(coord2));
             change_player = false;
         }
@@ -273,13 +276,17 @@ void GameController::onCardAppend(Card* card) {
 }
 
 void GameController::onExplosionApply() {
-    model->switchPlayer();
     model->getExplosionService()->apply();
-    model->removeExplosion();
     this->_updateBoardView();
+    model->removeExplosion();
+    model->switchPlayer();
     view->drawAvailablePositions(model->getBoard());
     view->eraseExplosion();
     view->switchToPlayer(model->getCurrPlayer());
+
+    for (const auto& [id, card] : view->getAllCards().asKeyValueRange()) {
+        card->setFlag(QGraphicsItem::ItemIsMovable, true);
+    }
 }
 
 void GameController::onExplosionDiscard() {
@@ -287,6 +294,10 @@ void GameController::onExplosionDiscard() {
     model->removeExplosion();
     view->eraseExplosion();
     view->switchToPlayer(model->getCurrPlayer());
+
+    for (const auto& [id, card] : view->getAllCards().asKeyValueRange()) {
+        card->setFlag(QGraphicsItem::ItemIsMovable, true);
+    }
 }
 
 void GameController::onExplosionRotateLeft() {
@@ -351,6 +362,7 @@ void GameController::_updatePlayerCards(const base::Player& player, QHash<uint16
 
         uint16_t ID{ card.getID() };
         card_views[ID]->moveCardBack();
+        card_views[ID]->setFlag(QGraphicsItem::ItemIsMovable);
 
         if (hide) {
             card_views[ID]->setVisible(false);

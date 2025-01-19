@@ -13,8 +13,9 @@ BoardCell::BoardCell(const QPointF& pos)
     setBrush(Qt::NoBrush);
 }
 
-Card::Card(color::ColorType color, base::CombatCardType type, const QString& imagePath, const QPointF& pos, uint16_t ID, QGraphicsItem* parent)
-    : QGraphicsItem(parent), cardImage(imagePath),
+Card::Card(color::ColorType color, base::CombatCardType type, const QString& image_path, const QString& back_path, const QPointF& pos, uint16_t ID, QGraphicsItem* parent)
+    : QGraphicsItem(parent), 
+    cardImage(image_path), cardBack(back_path),
     color{ color },
     type{ type },
     placed{ false },
@@ -22,9 +23,6 @@ Card::Card(color::ColorType color, base::CombatCardType type, const QString& ima
     start_pos{pos},
     m_ID{ID} {
 
-    if (cardImage.isNull()) {
-        qWarning() << "Failed to load card image:" << imagePath;
-    }
     setPos(start_pos);
     setZValue(5);
     setFlags(QGraphicsItem::ItemIsSelectable);
@@ -92,6 +90,8 @@ bool Card::isFaceUp() {
 }
 void Card::mousePressEvent(QGraphicsSceneMouseEvent* event) {
     if (event->button() == Qt::LeftButton) {
+        setFocus();
+
         lastMousePosition = event->scenePos();
         lastCardPosition = pos();
         qDebug() << "Left mouse button pressed on card";

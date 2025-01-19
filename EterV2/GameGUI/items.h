@@ -18,7 +18,7 @@ signals:
     void cardAppend(Card* card);
 
 public:
-    explicit Card(color::ColorType, base::CombatCardType, const QString& imagePath, const QPointF& pos, uint16_t ID, QGraphicsItem* parent = nullptr);
+    explicit Card(color::ColorType, base::CombatCardType, const QString& image_path, const QString& back_path, const QPointF& pos, uint16_t ID, QGraphicsItem* parent = nullptr);
 
     uint16_t getID() const;
     QRectF boundingRect() const override;
@@ -32,8 +32,6 @@ public:
     bool isUsed() const;
     void setUsed(bool used);
     void setPlaced(bool placed);
-
-    void setPlaced();
     void flipCard();
     bool isFaceUp();
 protected:
@@ -43,17 +41,19 @@ protected:
     void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override;
 
 private:
-    uint16_t m_ID;
     QPixmap cardImage;
-    QPointF start_pos;
     QPixmap cardBack;
+
+    QPointF start_pos;
     QPointF lastMousePosition;
     QPointF lastCardPosition;
+
+    uint16_t m_ID;
     color::ColorType color;
     base::CombatCardType type;
+
     bool placed;
     bool used;
-
     bool faceUp;
 };
 

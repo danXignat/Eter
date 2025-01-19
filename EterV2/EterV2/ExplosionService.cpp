@@ -326,7 +326,7 @@ namespace base {
 		for (uint16_t i = 0; i < m_effect_count; i++) {
 			uint16_t random_num = dist(gen);
 
-			if (random_num == 0 || random_num == 1 || random_num == 2 || random_num == 3) {
+			if (random_num == 0) {
 				effects.push_back(Effect::HOLE);
 			}
 			else {
