@@ -324,8 +324,8 @@ void GameController::_updateBoardView() {
     
     bool hide_red{ (curr_player_model.getColor() == color::ColorType::RED) ? false : true };
 
-    _updatePlayerCards(player_red_model, card_views, hide_red);
-    _updatePlayerCards(player_blue_model, card_views, !hide_red);
+    _updatePlayerCards(player_red_model, card_views, !hide_red);
+    _updatePlayerCards(player_blue_model, card_views, hide_red);
     _updateBoardCards(board_model, card_views);
 }
 
@@ -372,6 +372,7 @@ void GameController::_updatePlayerCards(const base::Player& player, QHash<uint16
         card_views[ID]->setFlag(QGraphicsItem::ItemIsMovable);
 
         if (hide) {
+            card_views[ID]->hide();
             card_views[ID]->setVisible(false);
             card_views[ID]->setPlaced(false);
         }
