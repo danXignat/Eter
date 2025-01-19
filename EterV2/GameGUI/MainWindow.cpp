@@ -63,11 +63,25 @@ SelectModeScene::SelectModeScene(QWidget* parent) : QWidget(parent) {
     layout->addWidget(elementalBattleButton, 0, Qt::AlignCenter);
     background.load("../pictures/estetics/name_select.png");
 
-    connect(trainingButton, &QPushButton::clicked, this, [=]() { emit modeSelected("102"); });
-    connect(mageDuelButton, &QPushButton::clicked, this, [=]() { emit modeSelected("202"); });
-    connect(elementalBattleButton, &QPushButton::clicked, this, [=]() { emit modeSelected("302"); });
+    connect(trainingButton, &QPushButton::clicked, this, [=]() { emit gameModeSelected("1"); });
+    connect(mageDuelButton, &QPushButton::clicked, this, [=]() { emit gameModeSelected("2"); });
+    connect(elementalBattleButton, &QPushButton::clicked, this, [=]() { emit gameModeSelected("3"); });
     
 }
+void MainWindow::onGameModeSelected(const QString& gameMode) {
+    selectedMode = gameMode.toStdString();
+
+    if (stackedWidget->indexOf(specialPlaysScene) == -1) {
+        stackedWidget->addWidget(specialPlaysScene);
+    }
+
+    stackedWidget->setCurrentWidget(specialPlaysScene);
+
+    qDebug() << "Game mode selected:" << gameMode;
+    qDebug() << "Switched to SpecialPlaysScene.";
+}
+
+
 
 void SelectModeScene::paintEvent(QPaintEvent* event) {
     QPainter painter(this);
@@ -77,26 +91,24 @@ void SelectModeScene::paintEvent(QPaintEvent* event) {
     QWidget::paintEvent(event);
 }
 
-SpecialPlaysScene::SpecialPlaysScene(QWidget* parent)
-    : QWidget(parent) {
+SpecialPlaysScene::SpecialPlaysScene(MainWindow* parent)
+    : QWidget(parent), mainWindow(parent) {
 
     QVBoxLayout* mainLayout = new QVBoxLayout(this);
 
     infoLabel = new QLabel("Choose your special play options:", this);
     infoLabel->setAlignment(Qt::AlignCenter);
-    infoLabel->setStyleSheet("font-size: 24px; font-weight: bold;");
+    infoLabel->setStyleSheet("font-size: 48px; font-weight: bold;");
     mainLayout->addWidget(infoLabel, 0, Qt::AlignTop | Qt::AlignCenter);
 
     QVBoxLayout* checkBoxLayout = new QVBoxLayout();
     illusions = new QCheckBox("Enable illusions", this);
-    illusions->setStyleSheet("font-size: 18px;");
-    checkBoxLayout->addWidget(illusions);
+    illusions->setStyleSheet("font-size: 24px;");
+    illusions->setGeometry(530, 300, 400, 150);
 
     explosions = new QCheckBox("Enable explosions", this);
-    explosions->setStyleSheet("font-size: 18px;");
-    checkBoxLayout->addWidget(explosions);
-
-    mainLayout->addLayout(checkBoxLayout, 1); 
+    explosions->setStyleSheet("font-size: 24px;");
+    explosions->setGeometry(530, 400, 400, 150);
 
     nextButton = new NextButton(this);
     nextButton->setFixedSize(365, 92);
@@ -115,14 +127,15 @@ void SpecialPlaysScene::paintEvent(QPaintEvent* event) {
 }
 
 void SpecialPlaysScene::onNextClicked() {
+   
+    QString fullMode = QString::fromStdString(mainWindow->MainWindow::getSelectedMode());
+    fullMode += illusions->isChecked() ? '1' : '0';
+    
+    fullMode += explosions->isChecked() ? '2' : '0';
 
-    bool isOptionOneChecked = illusions->isChecked();
-    bool isOptionTwoChecked = explosions->isChecked();
+    qDebug() << "Full mode selected:" << fullMode;
 
-    qDebug() << "Option 1 checked:" << isOptionOneChecked;
-    qDebug() << "Option 2 checked:" << isOptionTwoChecked;
-
-    emit continueToGame();
+    emit continueToGame(fullMode.toStdString()); 
 }
 
 GameScene::GameScene(const std::string& mode, const QString& playerBlueName, const QString& playerRedName, QWidget* parent) :
@@ -134,7 +147,9 @@ void GameScene::toggleIllusion() {
     isIllusionEnabled = !isIllusionEnabled;
     toggleButton->setText(isIllusionEnabled ? "Illusion Enabled" : "Illusion Disabled");
 }
-
+std::string MainWindow::getSelectedMode() const{
+    return selectedMode;
+}
 MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
     setWindowTitle("Eter");
     setWindowIcon(QIcon(ICON_PATH));
@@ -160,7 +175,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
     setCentralWidget(stackedWidget);
 
     connect(requestNameScene, &RequestNameScene::nameEntered, this, &MainWindow::onNameEntered);
-    connect(selectModeScene, &SelectModeScene::modeSelected, this, &MainWindow::onModeSelected);
+    connect(selectModeScene, &SelectModeScene::gameModeSelected, this, &MainWindow::onGameModeSelected);
     connect(pauseMenuScene, &PauseMenuScene::continueGameRequested, this, &MainWindow::onResumeGame);
     connect(specialPlaysScene, &SpecialPlaysScene::continueToGame, this, &MainWindow::onSpecialPlaysCompleted);
 }
@@ -187,16 +202,16 @@ void MainWindow::onModeSelected(const std::string& mode) {
     qDebug() << "Switched to GameScene with mode:" << QString::fromStdString(mode);
 }
 
-void MainWindow::onSpecialPlaysCompleted() {
+void MainWindow::onSpecialPlaysCompleted(const std::string& fullMode) {
     if (gameScene != nullptr) {
         stackedWidget->removeWidget(gameScene);
         delete gameScene;
         gameScene = nullptr;
     }
 
-    gameScene = new GameScene(selectedMode, playerRedNameGlobal, playerBlueNameGlobal);
+    gameScene = new GameScene(fullMode, playerRedNameGlobal, playerBlueNameGlobal);
     stackedWidget->addWidget(gameScene);
-    stackedWidget->setCurrentWidget(gameScene);
+    stackedWidget->setCurrentWidget(gameScene); // Switch to the new GameScene
 }
 //void MainWindow::showPauseMenu() {
 //    QDialog pauseDialog(this);
