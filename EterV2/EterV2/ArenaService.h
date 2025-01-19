@@ -19,7 +19,6 @@ namespace base {
         std::optional<Coord>getWinPosition() const;
 
         void placeMarker(const Coord& coord, const Board& board, color::ColorType winnerColor);
-        void checkAndPlaceWinMarker(const Board& board);
         uint16_t countMarkers(color::ColorType color) const;
         bool hasWinner() const;
 

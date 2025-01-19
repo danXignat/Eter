@@ -38,12 +38,47 @@ namespace base {
                 m_blue_wins++;
             }
             m_games_played++;
+
+            if (m_arena_service.hasWinner()) {
+                m_tournament_ended = true;
+                std::string winner = (winner_color == color::ColorType::RED) ? m_player_names.first : m_player_names.second;
+                std::cout << "Tournament won by " << winner << " by creating a line in arena!\n";
+                return;
+            }
+
+            if (m_games_played >= MAX_GAMES) {
+                m_tournament_ended = true;
+                determineWinner();
+            }
+        }
+    }
+
+    void TournamentMode::determineWinner() {
+        uint16_t red_markers = m_arena_service.countMarkers(color::ColorType::RED);
+        uint16_t blue_markers = m_arena_service.countMarkers(color::ColorType::BLUE);
+        std::cout << "Final arena markers count:\n";
+        std::cout << m_player_names.first << " (Red): " << red_markers << "\n";
+        std::cout << m_player_names.second << " (Blue): " << blue_markers << "\n";
+
+        if (red_markers > blue_markers) {
+            std::cout << m_player_names.first << " wins the tournament!\n";
+        }
+        else if (blue_markers > red_markers) {
+            std::cout << m_player_names.second << " wins the tournament!\n";
+        }
+        else {
+            std::cout << "Tournament ended in a draw!\n";
         }
     }
 
     void TournamentMode::updateScores() {
-        system("cls");
+        std::cout << "Games played: " << m_games_played << "/" << MAX_GAMES << "\n";
+        std::cout << m_player_names.first << " (Red) wins: " << m_red_wins << "\n";
+        std::cout << m_player_names.second << " (Blue) wins: " << m_blue_wins << "\n";
 
+        uint16_t red_markers = m_arena_service.countMarkers(color::ColorType::RED);
+        uint16_t blue_markers = m_arena_service.countMarkers(color::ColorType::BLUE);
+        std::cout << "Arena markers - Red: " << red_markers << ", Blue: " << blue_markers << "\n";
     }
 
     void TournamentMode::run() {
@@ -64,8 +99,8 @@ namespace base {
                 m_base_mode = std::make_unique<ElementalMode>(services, m_player_names);
                 break;
             case 4:
-            //m_mage_mode = MageMode(services, m_player_names);
-            //m_elemental_mode = ElementalMode(services, m_player_names);
+                m_base_mode = std::make_unique<MageMode>(services, m_player_names);
+                m_elemental_mode = std::make_unique<ElementalMode>(services, m_player_names);
                 break;
             default:
                 std::cout << "Invalid choice, defaulting to Training Mode.\n";
@@ -78,36 +113,25 @@ namespace base {
             system("cls");
             render();
 
-
-            if (m_games_played >= MAX_GAMES) {
-                m_tournament_ended = true;
-                std::cout << "Tournament is over ";
-            }
-
             InputHandler input;
             try {
                 input.read();
-                bool action_succeded = processGameInput(input);
-                if (action_succeded) {
-
+                bool action_succeeded = processGameInput(input);
+                if (action_succeeded) {
                     if (m_base_mode->getBoard().getWinCoord().has_value()) {
                         handleGameEnd();
+                        updateScores();
                     }
                     m_base_mode->switchPlayer();
-
                 }
             }
             catch (const std::runtime_error& err) {
                 Logger::log(Level::ERROR, err.what());
             }
-            if (m_tournament_ended) {
-                break;
-            }
         }
     }
 
     void TournamentMode::render() {
-
         Board& board = const_cast<Board&>(m_base_mode->getBoard());
         board.render();
         board.sideViewRender();
@@ -119,9 +143,11 @@ namespace base {
 
         if (auto* mageMode = dynamic_cast<MageMode*>(m_base_mode.get())) {
             mageMode->render();
+            m_arena_service.renderArena(board);
         }
         else if (auto* elementalMode = dynamic_cast<ElementalMode*>(m_base_mode.get())) {
             elementalMode->render();
+            m_arena_service.renderArena(board);
         }
 
         if (m_explosion_service) {
@@ -131,31 +157,30 @@ namespace base {
 
     bool TournamentMode::processGameInput(const InputHandler& input) {
         bool success = false;
-            switch (input.event_type) {
-            case EventType::PlaceCombatCard: {
-               success = m_base_mode->placeCombatCard(input);
-                break;
+        switch (input.event_type) {
+        case EventType::PlaceCombatCard: {
+            success = m_base_mode->placeCombatCard(input);
+            break;
+        }
+        case EventType::PlaceIllusion: {
+            success = m_base_mode->placeIllusion(input);
+            break;
+        }
+        case EventType::UseMage: {
+            if (auto* mageMode = dynamic_cast<MageMode*>(m_base_mode.get())) {
+                success = mageMode->useMage();
             }
-
-            case EventType::PlaceIllusion: {
-               success = m_base_mode->placeIllusion(input);
-                break;
+            break;
+        }
+        case EventType::UsePower: {
+            if (auto* elementalMode = dynamic_cast<ElementalMode*>(m_base_mode.get())) {
+                success = elementalMode->usePower();
             }
-            case EventType::UseMage: {
-                if (auto* mageMode = dynamic_cast<MageMode*>(m_base_mode.get())) {
-                    success= mageMode->useMage();
-                }
-                break;
-            }
-            case EventType::UsePower: {
-                if (auto* elementalMode = dynamic_cast<ElementalMode*>(m_base_mode.get())) {
-                    success= elementalMode->usePower();
-                }
-                break;
-            }
-            default:
-                break;
-            }
+            break;
+        }
+        default:
+            break;
+        }
         return success;
     }
 }

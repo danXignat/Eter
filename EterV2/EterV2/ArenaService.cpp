@@ -9,7 +9,7 @@ using namespace logger;
 namespace base {
 
     ArenaService::ArenaService(GameSizeType size, Player& player1, Player& player2)
-        : m_size{ static_cast<uint16_t>(size) },
+        : m_size{ static_cast<uint16_t>((size ==  GameSizeType::SMALL) ? 3 : 4) },
         m_player1{ player1 },
         m_player2{ player2 },
         m_marker{} {
@@ -108,7 +108,7 @@ namespace base {
 
         for (const auto& [markerCoord, markerColor] : m_marker) {
             auto [x, y] {markerCoord};
-            int16_t incr{ (markerColor == color::ColorType::RED) ? -1 : 1 };
+            int16_t incr{ (markerColor == color::ColorType::RED) ? 1 : -1 };
             x_count[x] += incr;
             y_count[y] += incr;
 
@@ -116,7 +116,7 @@ namespace base {
                 diag1 += incr;
             }
             if (x + y == m_size - 1) {
-                diag2 == incr;
+                diag2 += incr;
             }
         }
 
