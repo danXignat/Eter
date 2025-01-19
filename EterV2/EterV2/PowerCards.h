@@ -35,6 +35,15 @@ namespace base {
 		Flame();
 
 		void apply(Board& board, Player& player) override;
+		void setSelectedMove(const Coord& coord, CombatCardType cardType);
+		const std::vector<std::pair<Coord, CombatCardType>>& getAvailableChoices() const;
+
+
+	private:
+		bool m_hasUserSelected;
+		Coord m_selectedCoord;
+		CombatCardType m_selectedCardType;
+		std::vector<std::pair<Coord, CombatCardType>> m_availableChoices;
 
 	};
 
@@ -58,6 +67,12 @@ namespace base {
 		Ash();
 
 		void apply(Board& board, Player& player) override;
+		void setSelectedMove(const Coord& coord, CombatCardType cardType);
+
+	private:
+		bool m_hasUserSelected;
+		Coord m_selectedCoord;
+		CombatCardType m_selectedCardType;
 
 	};
 
@@ -67,16 +82,29 @@ namespace base {
 
 		void apply(Board& board, Player& player) override;
 		std::vector<std::pair<Coord, CombatCardType>> coverCards(const Board& board, const Player& player);
+		void setSelectedMove(const Coord& from, const Coord& to, CombatCardType cardType);
+		const std::vector<std::pair<Coord, CombatCardType>>& getAvailableChoices() const;
 
+	private:
+		bool m_hasUserSelected;
+		Coord m_coordFrom;
+		Coord m_coordTo;
+		CombatCardType m_selectedCardType;
+		std::vector<std::pair<Coord, CombatCardType>> m_availableChoices;
 	};
 
 	class Squall :public PowerCard {
 	public:
-		Squall();
-		std::vector<std::pair<Coord, CombatCard>>opponentCards( Board& board,const Player& player) const;
 
+		Squall() = default;
+		Squall(Player& red_player, Player& blue_player);
 		void apply(Board& board, Player& player) override;
+		void setSelectedMove(const Coord& coord);
 
+	private:
+		bool m_hasUserSelected;
+		Coord m_selectedCoord;
+		Player& m_red_player, & m_blue_player;
 	};
 
 	class Gale :public PowerCard {
@@ -96,10 +124,18 @@ namespace base {
 	public:
 		Hurricane();
 		
-
 		void apply(Board& board, Player& player) override;
-		std::unordered_map<Orientation, std::vector<uint16_t>> getOptions(Board& board);  
-		std::tuple<Orientation, uint16_t, MoveDirection>  input(Board&board);
+		const std::unordered_map<Orientation, std::vector<uint16_t>>& getOptions(Board& board);
+		void setSelectedMove(Orientation orientation, uint16_t index, MoveDirection direction);
+
+
+	private:
+		bool m_hasUserSelected;
+		Orientation m_selectedOrientation;
+		uint16_t m_selectedIndex;
+		MoveDirection m_selectedDirection;
+		std::unordered_map<Orientation, std::vector<uint16_t>> m_options;
+
 
 	};
 
@@ -109,6 +145,18 @@ namespace base {
 
 		void apply(Board& board, Player& player) override;
 		std::vector<Coord>getCardsCoord(const Board& board)const;
+		void setSelectedMove(const Coord& fromCoord, const Coord& toCoord);
+		const std::vector<Coord>& getAvailableCards() const;
+		const std::vector<Coord>& getValidMoves(const Coord& selectedCard, Board& board);
+		std::vector<Coord> getCardsCoord(const Board& board);
+
+
+	private:
+		bool m_hasUserSelected;
+		Coord m_selectedFromCoord;
+		Coord m_selectedToCoord;
+		std::vector<Coord> m_availableCards;
+		std::vector<Coord> m_validMoves;
 
 	};
 
@@ -118,7 +166,12 @@ namespace base {
 
 		void apply(Board& board, Player& player) override;
 		bool getIllusion(Board& board, Player& player);
+		void setSelectedMove(const Coord& coord, CombatCardType cardType);
 
+	private:
+		bool m_hasUserSelected;
+		Coord m_selectedCoord;
+		CombatCardType m_selectedCardType;
 	};
 
 	class Storm :public PowerCard {

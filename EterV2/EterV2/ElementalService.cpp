@@ -23,8 +23,8 @@ namespace base {
 		/*type_p1 = static_cast<PowerCardType>(choices[0]);
 		type_p2 = static_cast<PowerCardType>(choices[1]);*/
 
-		type_card1 = PowerCardType::Whirlpool;
-		type_card2 = PowerCardType::Whirlpool;
+		type_card1 = PowerCardType::Spark;
+		type_card2 = PowerCardType::Spark;
 
 		card1 = _factory(type_card1);
 		card2 = _factory(type_card2);
@@ -90,7 +90,7 @@ namespace base {
 			return std::make_unique<Spark>();
 
 		case PowerCardType::Squall:
-			return std::make_unique<Squall>();
+			return std::make_unique<Squall>(m_red_player, m_blue_player);
 
 		case PowerCardType::Gale:
 			return std::make_unique<Gale>(m_red_player, m_blue_player);
