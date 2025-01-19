@@ -1,6 +1,7 @@
 #include "BaseGameMode.h"
 
 #include "logger.h"
+#include "Config.h"
 
 namespace base {
 	BaseGameMode::BaseGameMode(
@@ -74,9 +75,14 @@ namespace base {
 		}
 
 		if (m_board.isValidPlaceCard(coord, card_view)) {
-			CombatCard card = m_curr_player.get().getCard(card_type);
-
-			m_board.appendMove(coord, std::move(card));
+			if (Config::getInstance().getFetchByID()) {
+				CombatCard card = m_curr_player.get().getCardByID(input.ID);
+				m_board.appendMove(coord, std::move(card));
+			}
+			else {
+				CombatCard card = m_curr_player.get().getCard(card_type);
+				m_board.appendMove(coord, std::move(card));
+			}
 
 			return true;
 		}
@@ -111,20 +117,11 @@ namespace base {
 		}
 	}
 
-	const ExplosionService& BaseGameMode::getExplosionService() {
-		return *m_explosion_service;
+	std::optional <ExplosionService>& BaseGameMode::getExplosionService() {
+		return m_explosion_service;
 	}
 
-	void BaseGameMode::rotateExplosionLeft() {
-		m_explosion_service->card.rotateLeft();
+	void BaseGameMode::removeExplosion() {
+		m_explosion_service.reset();
 	}
-
-	void BaseGameMode::rotateExplosionRight() {
-		m_explosion_service->card.rotateRight();
-	}
-
-	void BaseGameMode::applyExplosion() {
-		m_explosion_service->card.apply();
-	}
-
 }

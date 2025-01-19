@@ -25,6 +25,7 @@ namespace base {
         color::ColorType getColor() const;
         void setName(std::string_view name);
         const std::unordered_multimap<CombatCardType, CombatCard>& getCards() const;
+        const std::unordered_multimap<CombatCardType, CombatCard>& getUsedCards() const;
 
         bool hasCards() const;
         bool hasCard(CombatCardType) const;
@@ -32,6 +33,7 @@ namespace base {
         bool hasUsedCards() const;
 
         CombatCard&& getCard(CombatCardType);
+        CombatCard&& getCardByID(uint16_t);
         CombatCard&& getUsedCard(CombatCardType);
         const CombatCard& viewCard(CombatCardType);
         void addCard(CombatCard&&);

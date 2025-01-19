@@ -108,6 +108,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="GameController.cpp" />
+    <ClCompile Include="GameView.cpp" />
     <ClCompile Include="items.cpp" />
     <ClCompile Include="MainWindow.cpp">
       <DynamicSource Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">input</DynamicSource>
@@ -129,6 +131,9 @@
     <QtMoc Include="game.h" />
     <QtMoc Include="items.h" />
     <QtMoc Include="PauseMenuDialog.h" />
+    <ClInclude Include="CardTypes.h" />
+    <ClInclude Include="GameController.h" />
+    <ClInclude Include="GameView.h" />
     <ClInclude Include="utils.h" />
     <QtMoc Include="MainWindow.h" />
     <ClInclude Include="qt_includes.h" />

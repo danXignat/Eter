@@ -1,5 +1,5 @@
 #pragma once
-//#include "qwebengineview.h"
+#include <ranges>
 #include "qt_includes.h"
 #include "..\EterV2\GameModeFactory.h"
 #include "items.h"
@@ -10,6 +10,10 @@ class GameView : public QGraphicsView {
 
 signals:
     void cardAppend(Card* card);
+    void explosionDiscard();
+    void explosionApply();
+    void explosionRotateLeft();
+    void explosionRotateRight();
 
 public:
 	GameView(const QString& name_red, const QString& name_blue, QWidget* parent = nullptr);
@@ -17,18 +21,20 @@ public:
     void drawPlayerCards(const base::Player& player, QPointF start_point);
     void drawAvailablePositions(const base::Board& board);
     void drawExplosion(const base::ExplosionService& effect, uint16_t, QPointF start_point);
-    void setDeckVisible(color::ColorType color, bool visible);
+    void drawHole(const QPointF& pos);
+    void cardAppendBoard(Card* card);
+    void switchToPlayer(const base::Player& player);
     void showWin(color::ColorType color);
-    void setExplosionViewActive(const QPointF& p1, const QPointF& p2);
-
-    void _initWebView();
+    void setExplosionActive(const QPointF& p1, const QPointF& p2);
+    void eraseExplosion();
+    QHash<uint16_t, Card*>& getAllCards();
+    void keyPressEvent(QKeyEvent* event);
 private:
     void _drawSquareAt(QPointF pos);
     void _initLabels(const QString& name_red, const QString& name_blue);
-    Card* _createCardAt(color::ColorType color, base::CombatCardType type, QPointF pos);
+    Card* _createCardAt(color::ColorType color, base::CombatCardType type, QPointF pos, uint16_t id);
     
 private:
-    //QWebEngineView* webView;
     QVBoxLayout* layout;
     QLabel* infoLabel;
     QLabel* red_name_label;
@@ -36,26 +42,16 @@ private:
     QLabel* won_label;
 
     QGraphicsScene* scene;
-    ExplosionView* explosion;
+    Explosion*      explosion;
+    TargetZone*     explosion_target_zone;
+    Vortex*         vortex;
 
     QList<Card*> red_deck;
     QList<Card*> blue_deck;
-    QHash<QPointF, QGraphicsRectItem*> m_available_cells;
-};
+    QHash<QPointF, BoardCell*> m_available_cells;
 
-class ExplosionController : public QObject {
-    Q_OBJECT
-
-public:
-    ExplosionController(QObject* parent, base::ExplosionService& service);
-    void checkUpdate();
-
-private:
-    base::ExplosionService& model;
-    ExplosionView* view;
-
-public slots:
-    
+    QHash<QPointF, QList<Card*>> board_cards;
+    QHash<uint16_t, Card*> all_cards;
 };
 
 class GameController : public QObject{
@@ -66,10 +62,20 @@ public:
         const std::string& mode,
         const QString& name_red, const QString& name_blue);
 private:
+    void _updateBoardView();
+    void _updatePlayerCards(const base::Player& player, QHash<uint16_t, Card*>& card_views, bool hide);
+    void _updateBoardCards(const base::Board& board, QHash<uint16_t, Card*>& card_views);
+    void _initVisuals();
+    void _initConections();
+
+private:
     base::GameModePtr model;
     GameView* view;
 
 public slots:
     void onCardAppend(Card* card);
+    void onExplosionApply();
+    void onExplosionDiscard();
+    void onExplosionRotateLeft();
+    void onExplosionRotateRight();
 };
-

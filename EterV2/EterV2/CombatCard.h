@@ -17,8 +17,10 @@ namespace base {
 		CombatCard(CombatCard&& other) noexcept;
 		CombatCard& operator=(CombatCard&& other) noexcept;
 
+		bool isCombatCard() const;
 		CombatCardType getType() const;
 		color::ColorType getColor() const;
+		uint16_t getID() const;
 
 		void flip();
 		bool isIllusion() const;
@@ -30,6 +32,9 @@ namespace base {
 		friend std::ostream& operator<<(std::ostream& out, const CombatCard& other);
 
 	private:
+		static int16_t card_count;
+
+		int16_t m_ID;
 		CombatCardType m_type;
 		color::ColorType m_color;
 		bool m_illusion;

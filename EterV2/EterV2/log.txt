@@ -1,0 +1,50 @@
+[INFO] card created ID 0
+[INFO] card created ID 1
+[INFO] card created ID 2
+[INFO] card created ID 3
+[INFO] card created ID 4
+[INFO] card created ID 5
+[INFO] card created ID 6
+[INFO] card created ID 7
+[INFO] card created ID 8
+[INFO] card created ID 9
+[INFO] card created ID 10
+[INFO] card created ID 11
+[INFO] card created ID 12
+[INFO] card created ID 13
+[INFO] explosion effect [0, 1] -> 1
+[INFO] explosion effect [1, 1] -> 0
+[INFO] explosion effect [2, 1] -> 2
+[INFO] card(1) appended at (10, 5)
+[INFO] card(1) appended at (12, 5)
+[INFO] card(2) appended at (12, 6)
+[INFO] card(2) appended at (10, 6)
+[INFO] card(3) appended at (10, 7)
+[INFO] card(3) appended at (12, 7)
+[INFO] board 10 5 explosion card 1 0
+[INFO] 7
+[INFO] popped card at (12, 5)
+[INFO] board 10 5 explosion card 2 0
+[INFO] board 10 5 explosion card 2 -1
+[INFO] board 10 5 explosion card 1 -1
+[INFO] board 10 5 explosion card 0 -1
+[INFO] board 10 5 explosion card 0 0
+[INFO] board 10 5 explosion card 0 1
+[INFO] board 10 5 explosion card 1 1
+[INFO] 2
+[INFO] popped card at (12, 6)
+[INFO] card in explosion 2
+[INFO] board 10 5 explosion card 2 1
+[INFO] board 10 5 explosion card 2 0
+[INFO] board 10 5 explosion card 1 0
+[INFO] board 10 5 explosion card 0 0
+[INFO] board 10 5 explosion card 0 1
+[INFO] board 10 5 explosion card 0 2
+[INFO] board 10 5 explosion card 1 2
+[INFO] card created ID -1
+[INFO] Hole created at 12 7
+[INFO] board 10 5 explosion card 2 2
+[INFO] board 10 5 explosion card 2 1
+[INFO] board 10 5 explosion card 1 2
+[INFO] card created ID -1
+[INFO] Hole created at 12 7

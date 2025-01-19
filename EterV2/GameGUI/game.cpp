@@ -4,7 +4,10 @@
 
 GameView::GameView(const QString& name_red, const QString& name_blue, QWidget* parent) :
     QGraphicsView{ parent },
-    scene{ new QGraphicsScene(this) } {
+    scene{ new QGraphicsScene(this) },
+    explosion{nullptr},
+    explosion_target_zone{nullptr},
+    vortex{nullptr} {
 
     setScene(scene);
     scene->setSceneRect(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
@@ -19,11 +22,10 @@ GameView::GameView(const QString& name_red, const QString& name_blue, QWidget* p
     setRenderHint(QPainter::Antialiasing);
     setInteractive(true);
     _initLabels(name_red, name_blue);
-    //_initWebView();
 }
 
-Card* GameView::_createCardAt(color::ColorType color, base::CombatCardType type, QPointF pos) {
-    QString imagePath = QString(CARD_PATH)
+Card* GameView::_createCardAt(color::ColorType color, base::CombatCardType type, QPointF pos, uint16_t id) {
+    QString image_path = QString(CARD_PATH)
         .arg(color == color::ColorType::RED ? "red" : "blue")
         .arg(combatCardToChar(type));
     QString backPath = QString(BACK_PATH)
@@ -37,35 +39,7 @@ Card* GameView::_createCardAt(color::ColorType color, base::CombatCardType type,
     return card;
 }
 
-void GameView::drawPlayerCards(const base::Player& player, QPointF start_point) {
-    QPointF curr_point{ start_point };
-
-    const auto& cards = player.getCards();
-
-    for (const auto& [type, _] : cards) {
-        Card* card{ _createCardAt(player.getColor(), type, curr_point) };
-
-        if (player.getColor() == color::ColorType::RED) {
-            red_deck.push_back(card);
-        }
-        else {
-            blue_deck.push_back(card);
-        }
-
-        curr_point += QPointF{ CARD_SIZE, 0 };
-    }
-
-}
-
-void GameView::drawExplosion(const base::ExplosionService& service, uint16_t board_size, QPointF start_point) {
-    explosion = new ExplosionView(service.getEffectCoords(), board_size);
-    explosion->setPos(start_point);
-    scene->addItem(explosion);
-
-}
-
 void GameView::_initLabels(const QString& name_red, const QString& name_blue) {
-
     red_name_label = new QLabel(this);
     red_name_label->setText(name_red + "'s cards:");
     red_name_label->setStyleSheet("font-size: 18px; font-weight: bold;");
@@ -80,65 +54,65 @@ void GameView::_initLabels(const QString& name_red, const QString& name_blue) {
 
     won_label = new QLabel(this);
     won_label->setStyleSheet("font-size: 28px; font-weight: bold;");
-    won_label->move(WINDOW_WIDTH/2, WINDOW_HEIGHT/2);
+    won_label->move(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);
     won_label->resize(200, 30);
     won_label->setVisible(false);
 }
 
-//void GameView::showWin(color::ColorType color) {
-//    QString playerName = (color == color::ColorType::RED) ?
-//        red_name_label->text() : blue_name_label->text();
-//
-//    // Escape playerName to prevent injection attacks
-//    playerName = playerName.toHtmlEscaped();
-//
-//    QString simpleHtml = QString(R"(
-//    <!DOCTYPE html>
-//    <html>
-//    <head>
-//        <title>Test</title>
-//    </head>
-//    <body>
-//        <h1>Hello, World!</h1>
-//    </body>
-//    </html>
-//    )");
-//
-//    webView->setHtml(simpleHtml);
-//    webView->setVisible(true);
-//}
-//
-//void GameView::_initWebView() {
-//    webView = new QWebEngineView(this);
-//
-//    connect(webView, &QWebEngineView::loadFinished, this, [this](bool success) {
-//        if (!success) {
-//            qWarning("Failed to load the web view.");
-//        }
-//        });
-//
-//    // Dynamically size and position
-//    const int width = 400;
-//    const int height = 200;
-//    webView->resize(width, height);
-//    webView->move((WINDOW_WIDTH - width) / 2, (WINDOW_HEIGHT - height) / 2);
-//
-//    webView->setVisible(false);
-//}
-
 void GameView::_drawSquareAt(QPointF pos) {
-    int squareX = pos.x() - CARD_SIZE / 2;
-    int squareY = pos.y() - CARD_SIZE / 2;
-    QGraphicsRectItem* cell = new QGraphicsRectItem(squareX, squareY,
-        CARD_SIZE, CARD_SIZE
-    );
+    int square_x = pos.x() - CARD_SIZE / 2;
+    int square_y = pos.y() - CARD_SIZE / 2;
 
-    QPen pen;
-    pen.setColor(QColor(57, 255, 20));
-    cell->setPen(pen);
-    cell->setBrush(Qt::transparent);
+    BoardCell* cell{ new BoardCell{ {double(square_x), double(square_y)} } };
     m_available_cells.emplace(QPointF{ pos }, cell);
     scene->addItem(cell);
+}
+
+void GameView::cardAppendBoard(Card* card) {
+    QPointF card_pos{ card->pos() };
+    qDebug() << card->pos() << "\n";
+
+    if (board_cards.contains(card_pos)) {
+        board_cards[card_pos].push_back(card);
+    }
+    else {
+        QList<Card*> stack;
+        stack.push_back(card);
+        board_cards.emplace(card->pos(), stack);
+    }
+
+    emit cardAppend(card);
+}
+
+void GameView::drawPlayerCards(const base::Player& player, QPointF start_point) {
+    QPointF curr_point{ start_point };
+
+    const auto& cards = player.getCards();
+
+    for (const auto& [type, card] : cards) {
+        Card* card_view{ _createCardAt(player.getColor(), type, curr_point, card.getID()) };
+
+        all_cards.emplace(card.getID(), card_view);
+        if (player.getColor() == color::ColorType::RED) {
+            red_deck.push_back(card_view);
+        }
+        else {
+            blue_deck.push_back(card_view);
+        }
+
+        curr_point += QPointF{ CARD_SIZE, 0 };
+    }
+
+}
+
+void GameView::drawExplosion(const base::ExplosionService& service, uint16_t board_size, QPointF start_point) {
+    explosion = new Explosion(service.getEffectCoords(), board_size);
+
+    connect(explosion, &Explosion::apply, this, &GameView::explosionApply);
+    connect(explosion, &Explosion::discard, this, &GameView::explosionDiscard);
+
+    scene->addItem(explosion);
+    explosion->setPos(start_point);
 }
 
 void GameView::drawAvailablePositions(const base::Board& board) {
@@ -159,31 +133,67 @@ void GameView::drawAvailablePositions(const base::Board& board) {
     }
 }
 
-void GameView::setDeckVisible(color::ColorType color, bool visible) {
-    if (color == color::ColorType::RED) {
-        red_name_label->setVisible(visible);
-        for (auto card : red_deck) {
-            if (card->isPlaced() == false) {
-                card->setVisible(visible);
-            }
-        }
+void GameView::keyPressEvent(QKeyEvent* event) {
+    if (event->key() == Qt::Key_Left) {
+        explosion->setRotation(explosion->rotation() - 90);
+        emit explosionRotateLeft();
+    }
+    else if (event->key() == Qt::Key_Right) {
+        explosion->setRotation(explosion->rotation() + 90);
+        emit explosionRotateRight();
     }
     else {
-        blue_name_label->setVisible(visible);
-        for (auto card : blue_deck) {
-            if (card->isPlaced() == false) {
-                card->setVisible(visible);
-            }
-        }
+        QGraphicsView::keyPressEvent(event);
     }
 }
 
-void GameView::setExplosionViewActive(const QPointF& p1, const QPointF& p2) {
-    TargetZone* zone{ new TargetZone(p1 - QPointF{CARD_SIZE, CARD_SIZE}, p2 + QPointF{CARD_SIZE, CARD_SIZE}) };
-    scene->addItem(zone);
+void GameView::switchToPlayer(const base::Player& player) {
+    color::ColorType color = player.getColor();
+
+    auto change_visibility = [&](bool visible) {
+        red_name_label->setVisible(visible);
+        for (auto card : red_deck) {
+            if (card->isPlaced() == false && card->isUsed() == false) {
+                card->setVisible(visible);
+            }
+        }
+
+        blue_name_label->setVisible(!visible);
+        for (auto card : blue_deck) {
+            if (card->isPlaced() == false && card->isUsed() == false) {
+                card->setVisible(!visible);
+            }
+        }
+        };
+
+    if (color == color::ColorType::RED) {
+        change_visibility(true);
+    }
+    else {
+        change_visibility(false);
+    }
+}
+
+void GameView::setExplosionActive(const QPointF& p1, const QPointF& p2) {
+    explosion_target_zone = new TargetZone(p1 - QPointF{CARD_SIZE, CARD_SIZE}, p2 + QPointF{CARD_SIZE, CARD_SIZE});
+    scene->addItem(explosion_target_zone);
+    
+    vortex = new Vortex() ;
+    scene->addItem(vortex);
 
     explosion->setActive();
-    explosion->setTargetZone(zone);
+    explosion->setTargetZone(explosion_target_zone);
+}
+
+void GameView::eraseExplosion() {
+    explosion->hide();
+    explosion_target_zone->hide();
+    vortex->hide();
+}
+
+void GameView::drawHole(const QPointF& pos) {
+    Hole* hole{ new Hole(pos) };
+    scene->addItem(hole);
 }
 
 void GameView::showWin(color::ColorType color) {
@@ -207,6 +217,10 @@ void GameView::showWin(color::ColorType color) {
     won_label->setVisible(true);
 }
 
+QHash<uint16_t, Card*>& GameView::getAllCards() {
+    return all_cards;
+}
+
 GameController::GameController(
     QWidget* parent, 
     const std::string& mode, 
@@ -215,85 +229,156 @@ GameController::GameController(
     model{ base::GameModeFactory::get(mode, {name_red.toStdString(), name_blue.toStdString()}) },
     view{ new GameView(name_red, name_blue, parent) } {
 
-    qreal cardStartPos;
-    if (mode.front() == '1') {
-        cardStartPos = 360;
-    }
-    else {
-        cardStartPos = 240;
-    }
-
-    connect(view, &GameView::cardAppend, this, &GameController::onCardAppend);
-    view->drawPlayerCards(model->getPlayerRed(), { cardStartPos, 700 });
-    view->drawPlayerCards(model->getPlayerBlue(), { cardStartPos, 700 });
-    view->drawAvailablePositions(model->getBoard());
-    view->drawExplosion(model->getExplosionService(), model->getBoard().size(), {1000,555});
-
-    using enum color::ColorType;
-    color::ColorType color{ model->getCurrPlayer().getColor() };
-    color::ColorType other_color{ (color == RED) ? BLUE : RED };
-
-    view->setDeckVisible(color, true);
-    view->setDeckVisible(other_color, false);
+    _initConections();
+    _initVisuals();
 }
+
+///--------------------------------------------------------------------------SIGNALS------------------------------------------------------
 
 void GameController::onCardAppend(Card* card) {
     base::InputHandler input;
     input.event_type = base::EventType::PlaceCombatCard;
     input.card_type = card->getType();
     input.coord = gui::utils::qPointFToCoord(card->pos());
-    if (card->isFaceUp()) {
-        if (!model->placeCombatCard(input)) {
-            card->moveCardBack();
-        }
-        else {
-            card->setPlaced();
-            model->switchPlayer();
-            view->drawAvailablePositions(model->getBoard());
+    input.ID = card->getID();
 
-            using enum color::ColorType;
-            color::ColorType color{ model->getCurrPlayer().getColor() };
-            color::ColorType other_color{ (color == RED) ? BLUE : RED };
-
-            view->setDeckVisible(color, true);
-            view->setDeckVisible(other_color, false);
-
-            if (auto win_color = model->getWinningColor(); win_color.has_value()) {
-                view->showWin(win_color.value());
-            }
-
-            if (model->getExplosionService().checkAvailability()) {
-                auto [coord1, coord2] { model->getBoard().getBoudingRect() };
-
-                view->setExplosionViewActive(gui::utils::coordToQPointF(coord1), gui::utils::coordToQPointF(coord2));
-            }
-        }
+    if (!model->placeCombatCard(input)) {
+        card->moveCardBack();
     }
     else {
-        if (!model->placeCombatCard(input)) {
-            card->moveCardBack();
+        bool change_player = true;
+
+        card->setPlaced(true);
+        view->drawAvailablePositions(model->getBoard());
+
+        if (auto win_color = model->getWinningColor(); win_color.has_value()) {
+            //view->showWin(win_color.value());
         }
-        else {
-            card->setPlaced();
+
+        if (model->getExplosionService().has_value() &&
+            model->getExplosionService()->checkAvailability()
+            ) {
+            auto [coord1, coord2]{ model->getBoard().getBoudingRect() };
+
+            view->setExplosionActive(gui::utils::coordToQPointF(coord1), gui::utils::coordToQPointF(coord2));
+            change_player = false;
+        }
+
+        if (change_player) {
             model->switchPlayer();
-            view->drawAvailablePositions(model->getBoard());
+            view->switchToPlayer(model->getCurrPlayer());
+        }
+    }
 
-            using enum color::ColorType;
-            color::ColorType color{ model->getCurrPlayer().getColor() };
-            color::ColorType other_color{ (color == RED) ? BLUE : RED };
+}
 
-            view->setDeckVisible(color, true);
-            view->setDeckVisible(other_color, false);
+void GameController::onExplosionApply() {
+    model->switchPlayer();
+    model->getExplosionService()->apply();
+    model->removeExplosion();
+    this->_updateBoardView();
+    view->drawAvailablePositions(model->getBoard());
+    view->eraseExplosion();
+    view->switchToPlayer(model->getCurrPlayer());
+}
 
-            if (auto win_color = model->getWinningColor(); win_color.has_value()) {
-                view->showWin(win_color.value());
-            }
+void GameController::onExplosionDiscard() {
+    model->switchPlayer();
+    model->removeExplosion();
+    view->eraseExplosion();
+    view->switchToPlayer(model->getCurrPlayer());
+}
 
-            if (model->getExplosionService().checkAvailability()) {
-                auto [coord1, coord2] { model->getBoard().getBoudingRect() };
+void GameController::onExplosionRotateLeft() {
+    model->getExplosionService()->rotateLeft();
+}
 
-                view->setExplosionViewActive(gui::utils::coordToQPointF(coord1), gui::utils::coordToQPointF(coord2));
-            }
+void GameController::onExplosionRotateRight() {
+    model->getExplosionService()->rotateRight();
+}
+
+void GameController::_updateBoardView() {
+    auto& card_views = view->getAllCards();
+    const auto& curr_player_model = model->getCurrPlayer();
+    const auto& player_red_model = model->getPlayerRed();
+    const auto& player_blue_model= model->getPlayerBlue();
+    const auto& board_model = model->getBoard();
+    
+    bool hide_red{ (curr_player_model.getColor() == color::ColorType::RED) ? false : true };
+
+    _updatePlayerCards(player_red_model, card_views, hide_red);
+    _updatePlayerCards(player_blue_model, card_views, !hide_red);
+    _updateBoardCards(board_model, card_views);
+}
+
+///--------------------------------------------------------INIT-------------------------------------------------
+
+void GameController::_initConections() {
+    connect(view, &GameView::cardAppend          , this, &GameController::onCardAppend);
+    connect(view, &GameView::explosionApply      , this, &GameController::onExplosionApply);
+    connect(view, &GameView::explosionDiscard    , this, &GameController::onExplosionDiscard);
+    connect(view, &GameView::explosionRotateLeft , this, &GameController::onExplosionRotateLeft);
+    connect(view, &GameView::explosionRotateRight, this, &GameController::onExplosionRotateRight);
+}
+
+void GameController::_initVisuals() {
+    qreal cardStartPos;
+    if (dynamic_cast<base::TrainingMode*>(model.get())) {
+        cardStartPos = 360;
+    }
+    else {
+        cardStartPos = 240;
+    }
+
+    view->drawPlayerCards(model->getPlayerRed(), { cardStartPos, 700 });
+    view->drawPlayerCards(model->getPlayerBlue(), { cardStartPos, 700 });
+    view->drawAvailablePositions(model->getBoard());
+
+    if (model->getExplosionService().has_value()) {
+        view->drawExplosion(*model->getExplosionService(), model->getBoard().size(), { 1000,555 });
+    }
+
+    view->switchToPlayer(model->getCurrPlayer());
+}
+
+///----------------------------------------------------------UPDATE-------------------------------------------------
+
+void GameController::_updatePlayerCards(const base::Player& player, QHash<uint16_t, Card*>& card_views, bool hide) {
+    for (const auto& [type, card] : player.getCards()) {
+        if (card.isCombatCard() == false) {
+            continue;
+        }
+
+        uint16_t ID{ card.getID() };
+        card_views[ID]->moveCardBack();
+
+        if (hide) {
+            card_views[ID]->setVisible(false);
+            card_views[ID]->setPlaced(false);
+        }
+    }
+
+    for (const auto& [type, card] : player.getUsedCards()) {
+        if (card.isCombatCard() == false) {
+            continue;
+        }
+
+        uint16_t ID{ card.getID() };
+        
+        card_views[ID]->moveCardBack();
+
+        if (hide) {
+            card_views[ID]->hide();
+            card_views[ID]->setPlaced(false);
+            card_views[ID]->setUsed(true);
+        }
+    }
+}
+
+void GameController::_updateBoardCards(const base::Board& board, QHash<uint16_t, Card*>& card_views) {
+    for (const auto& [coord, stack] : board) {
+        if (stack[0].getType() == base::CombatCardType::HOLE) {
+            view->drawHole(gui::utils::coordToQPointF(coord));
         }
     }
 }
