@@ -258,7 +258,7 @@ void GameController::onCardAppend(Card* card) {
         view->drawAvailablePositions(model->getBoard());
 
         if (auto win_color = model->getWinningColor(); win_color.has_value()) {
-            //view->showWin(win_color.value());
+            view->showWin(win_color.value());
         }
 
         if (model->getExplosionService().has_value() &&
@@ -386,11 +386,10 @@ void GameController::_updatePlayerCards(const base::Player& player, QHash<uint16
         
         card_views[ID]->moveCardBack();
 
-        if (hide) {
-            card_views[ID]->hide();
-            card_views[ID]->setPlaced(false);
-            card_views[ID]->setUsed(true);
-        }
+        
+        card_views[ID]->hide();
+        card_views[ID]->setPlaced(false);
+        card_views[ID]->setUsed(true);
     }
 }
 
