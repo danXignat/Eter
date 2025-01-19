@@ -20,11 +20,8 @@ namespace base {
 		std::iota(choices.begin(), choices.end(), 0);
 		std::shuffle(choices.begin(), choices.end(), gen);
 
-		/*type_p1 = static_cast<PowerCardType>(choices[0]);
-		type_p2 = static_cast<PowerCardType>(choices[1]);*/
-
-		type_card1 = PowerCardType::Spark;
-		type_card2 = PowerCardType::Spark;
+		type_card1 = static_cast<PowerCardType>(choices[0]);
+		type_card2 = static_cast<PowerCardType>(choices[1]);
 
 		card1 = _factory(type_card1);
 		card2 = _factory(type_card2);

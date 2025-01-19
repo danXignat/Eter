@@ -85,7 +85,7 @@ int main() {
 		.setCardSpacingX(2)
 		.setCardSpacingY(1);
 
-    base::GameModePtr game_mode{ base::GameModeFactory::get("3", { "titi", "gigi" }) };
+    base::GameModePtr game_mode{ base::GameModeFactory::get("4", { "titi", "gigi" }) };
 	game_mode->run();
 
 	//testConfig();
