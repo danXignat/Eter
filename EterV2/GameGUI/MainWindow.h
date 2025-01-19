@@ -66,12 +66,16 @@ private:
 
 class GameScene : public QWidget {
     Q_OBJECT
-
+private:
+    bool isIllusionEnabled = false;
+    QPushButton* toggleButton;
 public:
     explicit GameScene(const std::string& mode, const QString& playerBlueName, const QString& playerRedName, QWidget* parent = nullptr);
 
 private:
     GameController controller;
+private slots:
+    void toggleIllusion();
 };
 
 
@@ -95,6 +99,7 @@ private:
     SelectModeScene* selectModeScene;
     GameScene* gameScene = nullptr;
     PauseMenuScene* pauseMenuScene;
+    QGraphicsRectItem* overlay = nullptr;
     QWidget* lastScene = nullptr;
     QString playerBlueNameGlobal;
     QString playerRedNameGlobal;

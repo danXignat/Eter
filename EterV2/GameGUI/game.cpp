@@ -26,8 +26,10 @@ Card* GameView::_createCardAt(color::ColorType color, base::CombatCardType type,
     QString imagePath = QString(CARD_PATH)
         .arg(color == color::ColorType::RED ? "red" : "blue")
         .arg(combatCardToChar(type));
-
-    Card* card = new Card(color, type, imagePath);  
+    QString backPath = QString(BACK_PATH)
+        .arg(color == color::ColorType::RED ? "red" : "blue")
+        .arg("back");
+    Card* card = new Card(color, type, imagePath, backPath);  
     connect(card, &Card::cardAppend, this, &GameView::cardAppend);
     card->setPos(pos);
     scene->addItem(card);
@@ -240,30 +242,58 @@ void GameController::onCardAppend(Card* card) {
     input.event_type = base::EventType::PlaceCombatCard;
     input.card_type = card->getType();
     input.coord = gui::utils::qPointFToCoord(card->pos());
+    if (card->isFaceUp()) {
+        if (!model->placeCombatCard(input)) {
+            card->moveCardBack();
+        }
+        else {
+            card->setPlaced();
+            model->switchPlayer();
+            view->drawAvailablePositions(model->getBoard());
 
-    if (!model->placeCombatCard(input)) {
-        card->moveCardBack();
+            using enum color::ColorType;
+            color::ColorType color{ model->getCurrPlayer().getColor() };
+            color::ColorType other_color{ (color == RED) ? BLUE : RED };
+
+            view->setDeckVisible(color, true);
+            view->setDeckVisible(other_color, false);
+
+            if (auto win_color = model->getWinningColor(); win_color.has_value()) {
+                view->showWin(win_color.value());
+            }
+
+            if (model->getExplosionService().checkAvailability()) {
+                auto [coord1, coord2] { model->getBoard().getBoudingRect() };
+
+                view->setExplosionViewActive(gui::utils::coordToQPointF(coord1), gui::utils::coordToQPointF(coord2));
+            }
+        }
     }
     else {
-        card->setPlaced();
-        model->switchPlayer();
-        view->drawAvailablePositions(model->getBoard());
-
-        using enum color::ColorType;
-        color::ColorType color{ model->getCurrPlayer().getColor() };
-        color::ColorType other_color{ (color == RED) ? BLUE : RED };
-
-        view->setDeckVisible(color, true);
-        view->setDeckVisible(other_color, false);
-
-        if (auto win_color = model->getWinningColor(); win_color.has_value()) {
-            view->showWin(win_color.value());
+        if (!model->placeCombatCard(input)) {
+            card->moveCardBack();
         }
+        else {
+            card->setPlaced();
+            model->switchPlayer();
+            view->drawAvailablePositions(model->getBoard());
 
-        if (model->getExplosionService().checkAvailability()) {
-            auto [coord1, coord2]{ model->getBoard().getBoudingRect() };
+            using enum color::ColorType;
+            color::ColorType color{ model->getCurrPlayer().getColor() };
+            color::ColorType other_color{ (color == RED) ? BLUE : RED };
 
-            view->setExplosionViewActive(gui::utils::coordToQPointF(coord1), gui::utils::coordToQPointF(coord2));
+            view->setDeckVisible(color, true);
+            view->setDeckVisible(other_color, false);
+
+            if (auto win_color = model->getWinningColor(); win_color.has_value()) {
+                view->showWin(win_color.value());
+            }
+
+            if (model->getExplosionService().checkAvailability()) {
+                auto [coord1, coord2] { model->getBoard().getBoudingRect() };
+
+                view->setExplosionViewActive(gui::utils::coordToQPointF(coord1), gui::utils::coordToQPointF(coord2));
+            }
         }
     }
 }

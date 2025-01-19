@@ -10,7 +10,7 @@ signals:
     void cardAppend(Card* card);
 
 public:
-    explicit Card(color::ColorType, base::CombatCardType, const QString& imagePath, QGraphicsItem* parent = nullptr);
+    explicit Card(color::ColorType, base::CombatCardType, const QString& imagePath, const QString& backPath, QGraphicsItem* parent = nullptr);
 
     QRectF boundingRect() const override;
     void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = nullptr) override;
@@ -21,7 +21,8 @@ public:
     color::ColorType getColor() const;
     bool isPlaced() const;
     void setPlaced();
-
+    void flipCard();
+    bool isFaceUp();
 protected:
     void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
     void mouseMoveEvent(QGraphicsSceneMouseEvent* event) override;
@@ -29,12 +30,13 @@ protected:
 
 private:
     QPixmap cardImage;
+    QPixmap cardBack;
     QPointF lastMousePosition;
     QPointF lastCardPosition;
     color::ColorType color;
     base::CombatCardType type;
     bool placed;
-
+    bool faceUp;
 };
 
 class TargetZone : public QGraphicsRectItem {

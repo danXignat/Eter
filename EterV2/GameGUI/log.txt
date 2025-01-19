@@ -1,2 +1,6 @@
-[INFO] explosion effect [0, 1] -> 0
+[INFO] explosion effect [0, 1] -> 1
 [INFO] explosion effect [0, 2] -> 0
+[INFO] explosion effect [2, 2] -> 1
+[INFO] card(3) appended at (600, 400)
+[WARNING] Card too small
+[WARNING] Card too small
