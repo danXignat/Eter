@@ -439,8 +439,8 @@ namespace base {
         std::vector<Coord> neighbors{
             {selectedCard.first - 4, selectedCard.second},
             {selectedCard.first + 4, selectedCard.second},
-            {selectedCard.first, selectedCard.second - 2},
-            {selectedCard.first, selectedCard.second + 2}
+            {selectedCard.first, selectedCard.second - 3},
+            {selectedCard.first, selectedCard.second + 3}
         };
 
         for (const Coord& neighbor : neighbors) {
