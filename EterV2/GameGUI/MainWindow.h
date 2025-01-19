@@ -108,6 +108,7 @@ class MainWindow : public QMainWindow {
 public:
     MainWindow(QWidget* parent = nullptr);
     std::string getSelectedMode() const;
+    void paintEvent(QPaintEvent* event) override;
 protected:
     void keyPressEvent(QKeyEvent* event) override;
 private slots:
@@ -128,5 +129,6 @@ private:
     QString playerBlueNameGlobal;
     QString playerRedNameGlobal;
     std::string selectedMode;
+    QPixmap background;
 };
 

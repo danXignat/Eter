@@ -103,12 +103,40 @@ SpecialPlaysScene::SpecialPlaysScene(MainWindow* parent)
 
     QVBoxLayout* checkBoxLayout = new QVBoxLayout();
     illusions = new QCheckBox("Enable illusions", this);
-    illusions->setStyleSheet("font-size: 24px;");
-    illusions->setGeometry(530, 300, 400, 150);
+    illusions->setStyleSheet(
+        "QCheckBox {"
+        "    background-color: #1b3d50;"   
+        "    border: 1px solid #1b444b;"   
+        "    border-radius: 3px;"         
+        "    padding: 2px;"                
+        "    font-size: 14px;"            
+        "}"
+        "QCheckBox:hover {"
+        "    background-color: #466876;"   
+        "}"
+        "QCheckBox:checked {"
+        "    background-color: #466876;"   
+        "}"
+    );
+    illusions->setGeometry(530, 300, 150, 50);
 
     explosions = new QCheckBox("Enable explosions", this);
-    explosions->setStyleSheet("font-size: 24px;");
-    explosions->setGeometry(530, 400, 400, 150);
+    explosions->setStyleSheet(
+        "QCheckBox {"
+        "    background-color: #1b3d50;"
+        "    border: 1px solid #1b444b;"
+        "    border-radius: 3px;"
+        "    padding: 2px;"
+        "    font-size: 14px;"
+        "}"
+        "QCheckBox:hover {"
+        "    background-color: #466876;"
+        "}"
+        "QCheckBox:checked {"
+        "    background-color: #466876;"
+        "}"
+    );
+    explosions->setGeometry(530, 400, 150, 50);
 
     nextButton = new NextButton(this);
     nextButton->setFixedSize(365, 92);
@@ -170,7 +198,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
     stackedWidget->addWidget(selectModeScene);// Index 1
     stackedWidget->addWidget(specialPlaysScene);
     //stackedWidget->addWidget(gameScene);// Index 2
-            
+    //background.load("../pictures/estetics/name_select.png");
 
     setCentralWidget(stackedWidget);
 
@@ -178,6 +206,14 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
     connect(selectModeScene, &SelectModeScene::gameModeSelected, this, &MainWindow::onGameModeSelected);
     connect(pauseMenuScene, &PauseMenuScene::continueGameRequested, this, &MainWindow::onResumeGame);
     connect(specialPlaysScene, &SpecialPlaysScene::continueToGame, this, &MainWindow::onSpecialPlaysCompleted);
+}
+
+void MainWindow::paintEvent(QPaintEvent* event) {
+    QPainter painter(this);
+
+    painter.drawPixmap(0, 0, width(), height(), background);
+
+    QWidget::paintEvent(event);
 }
 
 void MainWindow::onNameEntered(const QString& playerBlueName, const QString& playerRedName) {
