@@ -7,7 +7,7 @@
 BoardCell::BoardCell(const QPointF& pos)
     : QGraphicsRectItem(pos.x(), pos.y(), CARD_SIZE, CARD_SIZE) {
     QPen pen(QColor(57, 255, 20));
-    pen.setWidth(2);
+    pen.setWidth(5);
     setPen(pen);
 
     setBrush(Qt::NoBrush);

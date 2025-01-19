@@ -5,23 +5,30 @@
 GameView::GameView(const QString& name_red, const QString& name_blue, QWidget* parent) :
     QGraphicsView{ parent },
     scene{ new QGraphicsScene(this) },
-    explosion{nullptr},
-    explosion_target_zone{nullptr},
-    vortex{nullptr} {
-
+    explosion{ nullptr },
+    explosion_target_zone{ nullptr },
+    vortex{ nullptr } {
     setScene(scene);
+
+    // Set fixed size first
+    setFixedSize(WINDOW_WIDTH, WINDOW_HEIGHT);
+
+    // Set scene rect to match window size
     scene->setSceneRect(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+
+    // Scale background to match the WINDOW size, not viewport size
+    QPixmap backgroundPixmap("../pictures/arena.png");
+    QPixmap scaledPixmap = backgroundPixmap.scaled(WINDOW_WIDTH, WINDOW_HEIGHT,
+        Qt::IgnoreAspectRatio,
+        Qt::SmoothTransformation);
+    scene->setBackgroundBrush(QBrush(scaledPixmap));
 
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-
-    setFixedSize(WINDOW_WIDTH, WINDOW_HEIGHT);
-
     setSceneRect(scene->sceneRect());
-
     setRenderHint(QPainter::Antialiasing);
     setInteractive(true);
-    _initLabels(name_red, name_blue);
+    _initLabels(name_red, name_blue);  // Removed asterisks that looked like a typo
 }
 
 Card* GameView::_createCardAt(color::ColorType color, base::CombatCardType type, QPointF pos, uint16_t id) {
