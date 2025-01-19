@@ -103,8 +103,22 @@ SpecialPlaysScene::SpecialPlaysScene(MainWindow* parent)
 
     QVBoxLayout* checkBoxLayout = new QVBoxLayout();
     illusions = new QCheckBox("Enable illusions", this);
-    illusions->setStyleSheet("font-size: 24px;");
-    illusions->setGeometry(530, 300, 400, 150);
+    illusions->setStyleSheet(
+        "QCheckBox {"
+        "    background-color: #1b3d50;"   // Light gray background
+        "    border: 1px solid #1b444b;"   // Thinner border
+        "    border-radius: 3px;"          // Smaller rounded corners
+        "    padding: 2px;"                // Smaller padding
+        "    font-size: 14px;"             // Smaller font size
+        "}"
+        "QCheckBox:hover {"
+        "    background-color: #466876;"   // Slightly darker gray on hover
+        "}"
+        "QCheckBox:checked {"
+        "    background-color: #466876;"   // Light blue when checked
+        "}"
+    );
+    illusions->setGeometry(530, 300, 150, 50);
 
     explosions = new QCheckBox("Enable explosions", this);
     explosions->setStyleSheet("font-size: 24px;");
@@ -170,7 +184,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
     stackedWidget->addWidget(selectModeScene);// Index 1
     stackedWidget->addWidget(specialPlaysScene);
     //stackedWidget->addWidget(gameScene);// Index 2
-            
+    //background.load("../pictures/estetics/name_select.png");
 
     setCentralWidget(stackedWidget);
 
@@ -178,6 +192,14 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
     connect(selectModeScene, &SelectModeScene::gameModeSelected, this, &MainWindow::onGameModeSelected);
     connect(pauseMenuScene, &PauseMenuScene::continueGameRequested, this, &MainWindow::onResumeGame);
     connect(specialPlaysScene, &SpecialPlaysScene::continueToGame, this, &MainWindow::onSpecialPlaysCompleted);
+}
+
+void MainWindow::paintEvent(QPaintEvent* event) {
+    QPainter painter(this);
+
+    painter.drawPixmap(0, 0, width(), height(), background);
+
+    QWidget::paintEvent(event);
 }
 
 void MainWindow::onNameEntered(const QString& playerBlueName, const QString& playerRedName) {
