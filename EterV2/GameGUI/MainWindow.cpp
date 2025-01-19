@@ -49,17 +49,65 @@ SelectModeScene::SelectModeScene(QWidget* parent) : QWidget(parent) {
 
     trainingButton = new QPushButton("Training", this);
     trainingButton->setFixedSize(200, 50); 
-    trainingButton->setStyleSheet("font-size: 18px;"); 
+    trainingButton->setObjectName("myCustomButton");
+    trainingButton->setStyleSheet(
+        "QPushButton#myCustomButton {"
+        "    background-image: url('../pictures/estetics/button.png');"
+        "    background-repeat: no-repeat;"
+        "    background-position: center;"
+        "    border: 2px solid #5a5a5a;"
+        "    border-radius: 10px;"
+        "    font-size: 18px;"
+        "}"
+        "QPushButton#myCustomButton:hover {"
+        "    background-image: url('../pictures/estetics/button_hover.png');"
+        "}"
+        "QPushButton#myCustomButton:pressed {"
+        "    background-image: url('../pictures/estetics/button_clicked.png');"
+        "}"
+    );
     layout->addWidget(trainingButton, 0, Qt::AlignCenter);
 
     mageDuelButton = new QPushButton("Mage-Duel", this);
     mageDuelButton->setFixedSize(200, 50); 
-    mageDuelButton->setStyleSheet("font-size: 18px;"); 
+    mageDuelButton->setObjectName("myCustomButton");
+    mageDuelButton->setStyleSheet(
+        "QPushButton#myCustomButton {"
+        "    background-image: url('../pictures/estetics/button.png');"
+        "    background-repeat: no-repeat;"
+        "    background-position: center;"
+        "    border: 2px solid #5a5a5a;"
+        "    border-radius: 10px;"
+        "    font-size: 18px;"
+        "}"
+        "QPushButton#myCustomButton:hover {"
+        "    background-image: url('../pictures/estetics/button_hover.png');"
+        "}"
+        "QPushButton#myCustomButton:pressed {"
+        "    background-image: url('../pictures/estetics/button_clicked.png');"
+        "}"
+    );
     layout->addWidget(mageDuelButton, 0, Qt::AlignCenter); 
 
     elementalBattleButton = new QPushButton("Elemental Battle", this);
     elementalBattleButton->setFixedSize(200, 50);
-    elementalBattleButton->setStyleSheet("font-size: 18px;");
+    elementalBattleButton->setObjectName("myCustomButton");
+    elementalBattleButton->setStyleSheet(
+        "QPushButton#myCustomButton {"
+        "    background-image: url('../pictures/estetics/button.png');"
+        "    background-repeat: no-repeat;"
+        "    background-position: center;"
+        "    border: 2px solid #5a5a5a;"
+        "    border-radius: 10px;"
+        "    font-size: 18px;"
+        "}"
+        "QPushButton#myCustomButton:hover {"
+        "    background-image: url('../pictures/estetics/button_hover.png');"
+        "}"
+        "QPushButton#myCustomButton:pressed {"
+        "    background-image: url('../pictures/estetics/button_clicked.png');"
+        "}"
+    );
     layout->addWidget(elementalBattleButton, 0, Qt::AlignCenter);
     background.load("../pictures/estetics/name_select.png");
 
