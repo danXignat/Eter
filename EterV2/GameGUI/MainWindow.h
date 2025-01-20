@@ -64,6 +64,8 @@ private:
     QPushButton* trainingButton;
     QPushButton* mageDuelButton;
     QPushButton* elementalBattleButton;
+    QPushButton* tournamentModeButton;
+    QPushButton* timedModeButton;
     QPixmap background;
 };
 class MainWindow;
@@ -117,12 +119,16 @@ private slots:
     void onResumeGame();
     void onSpecialPlaysCompleted(const std::string& fullMode);
     void onGameModeSelected(const QString& gameMode);
+    void onGameRematch();
+    void onMainMenuSwitch();
+
 private:
     SpecialPlaysScene* specialPlaysScene;
     QStackedWidget* stackedWidget;
     RequestNameScene* requestNameScene;
     SelectModeScene* selectModeScene;
     GameScene* gameScene = nullptr;
+
     PauseMenuScene* pauseMenuScene;
     QGraphicsRectItem* overlay = nullptr;
     QWidget* lastScene = nullptr;

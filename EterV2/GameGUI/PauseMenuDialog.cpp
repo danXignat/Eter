@@ -11,20 +11,27 @@ PauseMenuScene::PauseMenuScene(QWidget* parent)
     setStyleSheet("background-color: rgba(0, 0, 0, 180);"); 
 
     // Buttons
-   continueButton = new QPushButton("Continue Playing", this);
+    continueButton = new QPushButton("Continue Playing", this);
     exitButton = new QPushButton("Exit", this);
+    rematchButton = new QPushButton("Rematch", this);
+    mainMenuButton = new QPushButton("Main menu", this);
 
     // Set custom positions and sizes
-    continueButton->setGeometry(500, 300, 200, 50); // Adjust x, y, width, height
-    exitButton->setGeometry(500, 450, 200, 50);
+    continueButton->setGeometry(500, 200, 200, 50); // Adjust x, y, width, height
+    exitButton->setGeometry(500, 350, 200, 50);
+    rematchButton->setGeometry(500, 500, 200, 50);
+    mainMenuButton->setGeometry(500, 650, 200, 50);
 
     // Optional: Set font and alignment styles
     continueButton->setStyleSheet("font-size: 18px; text-align: center;");
     exitButton->setStyleSheet("font-size: 18px; text-align: center;");
-
+    rematchButton->setStyleSheet("font-size: 18px; text-align: center;");
+    mainMenuButton->setStyleSheet("font-size: 18px; text-align: center;");
 
     connect(continueButton, &QPushButton::clicked, this, &PauseMenuScene::onContinueClicked);
     connect(exitButton, &QPushButton::clicked, this, &PauseMenuScene::onExitClicked);
+    connect(rematchButton, &QPushButton::clicked, this, &PauseMenuScene::gameRematch);
+    connect(mainMenuButton, &QPushButton::clicked, this, &PauseMenuScene::mainMenu);
 }
 
 void PauseMenuScene::paintEvent(QPaintEvent* event) {

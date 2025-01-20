@@ -11,8 +11,11 @@ class PauseMenuScene : public QWidget {
 public:
     explicit PauseMenuScene(QWidget* parent = nullptr);
     void paintEvent(QPaintEvent* event);
+
 signals:
     void continueGameRequested();
+    void gameRematch();
+    void mainMenu();
 
 private slots:
     void onContinueClicked();
@@ -21,6 +24,8 @@ private slots:
 private:
     QPushButton* continueButton;
     QPushButton* exitButton;
+    QPushButton* rematchButton;
+    QPushButton* mainMenuButton;
 };
 
 #endif

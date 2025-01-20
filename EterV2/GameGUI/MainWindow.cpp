@@ -109,6 +109,48 @@ SelectModeScene::SelectModeScene(QWidget* parent) : QWidget(parent) {
         "}"
     );
     layout->addWidget(elementalBattleButton, 0, Qt::AlignCenter);
+
+    tournamentModeButton = new QPushButton("Tournament Battle", this);
+    tournamentModeButton->setFixedSize(200, 50);
+    tournamentModeButton->setObjectName("myCustomButton");
+    tournamentModeButton->setStyleSheet(
+        "QPushButton#myCustomButton {"
+        "    background-image: url('../pictures/estetics/button.png');"
+        "    background-repeat: no-repeat;"
+        "    background-position: center;"
+        "    border: 2px solid #5a5a5a;"
+        "    border-radius: 10px;"
+        "    font-size: 18px;"
+        "}"
+        "QPushButton#myCustomButton:hover {"
+        "    background-image: url('../pictures/estetics/button_hover.png');"
+        "}"
+        "QPushButton#myCustomButton:pressed {"
+        "    background-image: url('../pictures/estetics/button_clicked.png');"
+        "}"
+    );
+    layout->addWidget(tournamentModeButton, 0, Qt::AlignCenter);
+
+    timedModeButton = new QPushButton("Timed Battle", this);
+    timedModeButton->setFixedSize(200, 50);
+    timedModeButton->setObjectName("myCustomButton");
+    timedModeButton->setStyleSheet(
+        "QPushButton#myCustomButton {"
+        "    background-image: url('../pictures/estetics/button.png');"
+        "    background-repeat: no-repeat;"
+        "    background-position: center;"
+        "    border: 2px solid #5a5a5a;"
+        "    border-radius: 10px;"
+        "    font-size: 18px;"
+        "}"
+        "QPushButton#myCustomButton:hover {"
+        "    background-image: url('../pictures/estetics/button_hover.png');"
+        "}"
+        "QPushButton#myCustomButton:pressed {"
+        "    background-image: url('../pictures/estetics/button_clicked.png');"
+        "}"
+    );
+    layout->addWidget(timedModeButton, 0, Qt::AlignCenter);
     background.load("../pictures/estetics/name_select.png");
 
     connect(trainingButton, &QPushButton::clicked, this, [=]() { emit gameModeSelected("1"); });
@@ -116,6 +158,7 @@ SelectModeScene::SelectModeScene(QWidget* parent) : QWidget(parent) {
     connect(elementalBattleButton, &QPushButton::clicked, this, [=]() { emit gameModeSelected("3"); });
     
 }
+
 void MainWindow::onGameModeSelected(const QString& gameMode) {
     selectedMode = gameMode.toStdString();
 
@@ -128,8 +171,6 @@ void MainWindow::onGameModeSelected(const QString& gameMode) {
     qDebug() << "Game mode selected:" << gameMode;
     qDebug() << "Switched to SpecialPlaysScene.";
 }
-
-
 
 void SelectModeScene::paintEvent(QPaintEvent* event) {
     QPainter painter(this);
@@ -223,9 +264,11 @@ void GameScene::toggleIllusion() {
     isIllusionEnabled = !isIllusionEnabled;
     toggleButton->setText(isIllusionEnabled ? "Illusion Enabled" : "Illusion Disabled");
 }
+
 std::string MainWindow::getSelectedMode() const{
     return selectedMode;
 }
+
 MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
     setWindowTitle("Eter");
     setWindowIcon(QIcon(ICON_PATH));
@@ -250,10 +293,36 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
 
     setCentralWidget(stackedWidget);
 
-    connect(requestNameScene, &RequestNameScene::nameEntered, this, &MainWindow::onNameEntered);
-    connect(selectModeScene, &SelectModeScene::gameModeSelected, this, &MainWindow::onGameModeSelected);
-    connect(pauseMenuScene, &PauseMenuScene::continueGameRequested, this, &MainWindow::onResumeGame);
-    connect(specialPlaysScene, &SpecialPlaysScene::continueToGame, this, &MainWindow::onSpecialPlaysCompleted);
+    connect(requestNameScene,   &RequestNameScene::nameEntered,         this, &MainWindow::onNameEntered);
+    connect(selectModeScene,    &SelectModeScene::gameModeSelected,     this, &MainWindow::onGameModeSelected);
+    connect(pauseMenuScene,     &PauseMenuScene::continueGameRequested, this, &MainWindow::onResumeGame);
+    connect(pauseMenuScene,     &PauseMenuScene::gameRematch,           this, &MainWindow::onGameRematch);
+    connect(pauseMenuScene,     &PauseMenuScene::mainMenu,              this, &MainWindow::onMainMenuSwitch);
+    connect(specialPlaysScene,  &SpecialPlaysScene::continueToGame,     this, &MainWindow::onSpecialPlaysCompleted);
+}
+
+void MainWindow::onMainMenuSwitch() {
+    if (gameScene != nullptr) {
+        stackedWidget->removeWidget(gameScene);
+        delete gameScene;
+        gameScene = nullptr;
+    }
+    
+    pauseMenuScene->hide();
+    stackedWidget->setCurrentWidget(requestNameScene);
+}
+
+void MainWindow::onGameRematch() {
+    if (gameScene != nullptr) {
+        stackedWidget->removeWidget(gameScene);
+        delete gameScene;
+        gameScene = nullptr;
+    }
+
+    pauseMenuScene->hide();
+    gameScene = new GameScene(selectedMode, playerBlueNameGlobal, playerRedNameGlobal);
+    stackedWidget->addWidget(gameScene);
+    stackedWidget->setCurrentWidget(gameScene);
 }
 
 void MainWindow::paintEvent(QPaintEvent* event) {
@@ -292,34 +361,11 @@ void MainWindow::onSpecialPlaysCompleted(const std::string& fullMode) {
         delete gameScene;
         gameScene = nullptr;
     }
-
+    selectedMode = fullMode;
     gameScene = new GameScene(fullMode, playerRedNameGlobal, playerBlueNameGlobal);
     stackedWidget->addWidget(gameScene);
-    stackedWidget->setCurrentWidget(gameScene); // Switch to the new GameScene
+    stackedWidget->setCurrentWidget(gameScene);
 }
-//void MainWindow::showPauseMenu() {
-//    QDialog pauseDialog(this);
-//    pauseDialog.setWindowTitle("Pause Menu");
-//    pauseDialog.resize(300, 200);
-//
-//    QPushButton* continueButton = new QPushButton("Continue Playing", &pauseDialog);
-//    QPushButton* exitButton = new QPushButton("Exit", &pauseDialog);
-//
-//    QVBoxLayout* layout = new QVBoxLayout(&pauseDialog);
-//    layout->addWidget(continueButton);
-//    layout->addWidget(exitButton);
-//
-//    exitButton->setDefault(true);
-//    exitButton->setFocus();
-//
-//    continueButton->setMinimumSize(100, 50);
-//    exitButton->setMinimumSize(150, 50);
-//
-//    connect(continueButton, &QPushButton::clicked, &pauseDialog, &QDialog::accept);
-//    connect(exitButton, &QPushButton::clicked, qApp, &QApplication::quit);
-//
-//    pauseDialog.exec();
-//}
 
 void MainWindow::keyPressEvent(QKeyEvent* event) {
     if (event->key() == Qt::Key_Escape) {
@@ -334,7 +380,7 @@ void MainWindow::keyPressEvent(QKeyEvent* event) {
             pauseMenuScene->show();
         }
         else {
-            onResumeGame(); // Hide the pause menu and resume
+            onResumeGame();
         }
     }
     else {
@@ -342,21 +388,17 @@ void MainWindow::keyPressEvent(QKeyEvent* event) {
     }
 }
 
-
-
-
-
 void MainWindow::onResumeGame() {
     if (pauseMenuScene->isVisible()) {
-        pauseMenuScene->hide(); // Hide the overlay
+        pauseMenuScene->hide();
     }
 
     if (lastScene != nullptr) {
-        stackedWidget->setCurrentWidget(lastScene); // Return to the last scene
+        stackedWidget->setCurrentWidget(lastScene);
         qDebug() << "Resumed to the last scene.";
     }
     else {
-        stackedWidget->setCurrentWidget(selectModeScene); // Fallback to a default scene
+        stackedWidget->setCurrentWidget(selectModeScene); 
         qDebug() << "No last scene found. Resumed to SelectModeScene.";
     }
 }
