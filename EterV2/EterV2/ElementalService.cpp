@@ -78,7 +78,7 @@ namespace base {
 			return std::make_unique<Flame>();
 
 		case PowerCardType::Fire:
-			return std::make_unique<Fire>(m_red_player, m_blue_player);
+			return std::make_unique<Fire>();
 
 		case PowerCardType::Ash:
 			return std::make_unique<Ash>();
@@ -87,7 +87,7 @@ namespace base {
 			return std::make_unique<Spark>();
 
 		case PowerCardType::Squall:
-			return std::make_unique<Squall>(m_red_player, m_blue_player);
+			return std::make_unique<Squall>();
 
 		case PowerCardType::Gale:
 			return std::make_unique<Gale>(m_red_player, m_blue_player);

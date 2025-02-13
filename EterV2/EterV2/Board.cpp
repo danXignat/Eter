@@ -20,6 +20,28 @@ namespace base {
 
 	//----------------------------MODIFIERS--------------------------------
 
+	void Board::returnUsedCardToHand(CombatCardType card) {
+
+		if (m_player1.hasUsedCard(card)) {
+			CombatCard to_return = m_player1.getUsedCard(card);
+			m_player1.addCard(std::move(to_return));
+		}
+		if (m_player2.hasUsedCard(card)) {
+			CombatCard to_return = m_player2.getUsedCard(card);
+			m_player2.addCard(std::move(to_return));
+		}
+
+	}
+
+	void Board::returnCardToHand(CombatCard&& card, color::ColorType owner) {
+		if (m_player1.getColor() == owner) {
+			m_player1.addCard(std::move(card));
+		}
+		if (m_player2.getColor() == owner) {
+			m_player2.addCard(std::move(card));
+		}
+	}
+
 	void Board::createHole(const Coord& coord) {
 		while (m_combat_cards[coord].size()) {
 			CombatCard card{ std::move(m_combat_cards[coord].back()) };
@@ -48,6 +70,14 @@ namespace base {
 		}
 
 		m_bounding_rect.add(coord);
+		setLastPlayedCard(card, coord);
+
+		if (m_incremented_card.has_value() && m_incremented_card->first == coord) {
+			resetIncrementCardValue();
+		}
+		if (m_decremented_card.has_value() && m_decremented_card->first == coord) {
+			resetDecrementedCard();
+		}
 
 		m_combat_cards[coord].emplace_back(std::move(card));
 
@@ -61,7 +91,7 @@ namespace base {
 			combatCardToChar(m_combat_cards[coord].back().getType()), coord.first, coord.second
 		);
 	}
-	
+
 	void Board::moveStack(const Coord& from_coord, const Coord& to_coord) {
 		if (m_combat_cards.contains(to_coord)) {
 			throw std::runtime_error("Destination must be an empty space!");
@@ -105,7 +135,7 @@ namespace base {
 
 		for (auto it = row_coords.rbegin(); it != row_coords.rend(); ++it) {
 			Coord from = *it;
-			Coord to = { from.first+2, from.second };
+			Coord to = { from.first + 2, from.second };
 			moves.emplace_back(from, to);
 		}
 
@@ -126,7 +156,7 @@ namespace base {
 
 		for (auto it = col_coords.rbegin(); it != col_coords.rend(); ++it) {
 			Coord from = *it;
-			Coord to = { from.first , from.second+1 };
+			Coord to = { from.first , from.second + 1 };
 			moves.emplace_back(from, to);
 		}
 		moveStacks(moves);
@@ -136,7 +166,7 @@ namespace base {
 
 		for (auto it = col_coords.begin(); it != col_coords.end(); ++it) {
 			Coord from = *it;
-			Coord to = { from.first, from.second-1 };
+			Coord to = { from.first, from.second - 1 };
 			moves.emplace_back(from, to);
 		}
 		moveStacks(moves);
@@ -177,30 +207,172 @@ namespace base {
 		_reinitialise();
 	}
 
-	void Board::appendSpecialCard(const Coord& coord,  CombatCard&& card) {
-		if (!m_combat_cards.contains(coord)) {
+	void Board::appendSpecialCard(const Coord& coord, CombatCard&& card) {
+		/*if (!m_combat_cards.contains(coord)) {
 			throw std::runtime_error("Stack does not exist at this position");
-		}
+		}*/
 		m_combat_cards[coord].push_back(std::move(card));
 	}
 
-	void Board::blockRow(uint16_t row, color::ColorType owner){
-		m_blocked_row = row; 
-		m_blocked_row_owner = owner; 
+	void Board::blockRow(uint16_t row, color::ColorType owner) {
+		m_blocked_row = row;
+		m_blocked_row_owner = owner;
 	}
 
-	void Board::blockColumn(uint16_t column, color::ColorType owner){
+	void Board::blockColumn(uint16_t column, color::ColorType owner) {
 		m_blocked_column = column;
 		m_blocked_row_owner = owner;
 	}
 
-	void Board::clearBlockedRow(){
+	void Board::clearBlockedRow() {
 		m_blocked_row.reset();
 	}
 
-	void Board::clearBlockedColumn(){
+	void Board::clearBlockedColumn() {
 		m_blocked_column.reset();
 	}
+	void Board::setLastPlayedCard(const CombatCard& card, const Coord& position) {
+		m_last_card_type = card.getType();
+		m_last_player_color = card.getColor();
+		m_last_card_position = position;
+		m_has_last_card = true;
+	}
+
+	void Board::incrementCardValue(const Coord& coord) {
+		if (!m_combat_cards.contains(coord)) return;
+
+		auto& stack = m_combat_cards[coord];
+		if (stack.empty()) return;
+
+		m_incremented_card = std::make_pair(coord, stack.back().getType());
+
+		CombatCardType currentType = stack.back().getType();
+		CombatCardType newType;
+
+		switch (currentType) {
+		case CombatCardType::ONE:
+			newType = CombatCardType::TWO;
+			break;
+		case CombatCardType::TWO:
+			newType = CombatCardType::THREE;
+			break;
+		case CombatCardType::THREE:
+			newType = CombatCardType::FOUR;
+			break;
+		default:
+			return;
+		}
+
+		color::ColorType cardColor = stack.back().getColor();
+		stack.back() = CombatCard(newType, cardColor);
+
+		Logger::log(Level::INFO, "Card at ({}, {}) incremented from {} to {}",
+			coord.first, coord.second,
+			combatCardToChar(currentType),
+			combatCardToChar(newType));
+	}
+
+	void Board::resetIncrementCardValue() {
+		if (!m_incremented_card.has_value()) return;
+
+		const auto& [coord, originalType] = *m_incremented_card;
+		if (!m_combat_cards.contains(coord)) {
+			m_incremented_card.reset();
+			return;
+		}
+
+		auto& stack = m_combat_cards[coord];
+		if (stack.empty()) {
+			m_incremented_card.reset();
+			return;
+		}
+
+		color::ColorType cardColor = stack.back().getColor();
+		stack.back() = CombatCard(originalType, cardColor);
+
+		Logger::log(Level::INFO, "Card at ({}, {}) restored to original value {}",
+			coord.first, coord.second,
+			combatCardToChar(originalType));
+
+		m_incremented_card.reset();
+	}
+
+	void Board::decrementCard(const Coord& coord) {
+		if (!m_combat_cards.contains(coord)) return;
+
+		auto& stack = m_combat_cards[coord];
+		if (stack.empty()) return;
+
+		m_decremented_card = std::make_pair(coord, stack.back().getType());
+
+		CombatCardType currentType = stack.back().getType();
+		CombatCardType newType;
+
+		switch (currentType) {
+		case CombatCardType::TWO:
+			newType = CombatCardType::ONE;
+			break;
+		case CombatCardType::THREE:
+			newType = CombatCardType::TWO;
+			break;
+		case CombatCardType::FOUR:
+			newType = CombatCardType::THREE;
+			break;
+		default:
+			return;
+		}
+
+		color::ColorType cardColor = stack.back().getColor();
+		stack.back() = CombatCard(newType, cardColor);
+
+		Logger::log(Level::INFO, "Opponent's card at ({}, {}) decreased from {} to {}",
+			coord.first, coord.second,
+			combatCardToChar(currentType),
+			combatCardToChar(newType));
+	}
+
+	void Board::resetDecrementedCard() {
+		if (!m_decremented_card.has_value()) return;
+
+		const auto& [coord, originalType] = *m_decremented_card;
+		if (!m_combat_cards.contains(coord)) {
+			m_decremented_card.reset();
+			return;
+		}
+
+		auto& stack = m_combat_cards[coord];
+		if (stack.empty()) {
+			m_decremented_card.reset();
+			return;
+		}
+
+		color::ColorType cardColor = stack.back().getColor();
+		stack.back() = CombatCard(originalType, cardColor);
+
+		Logger::log(Level::INFO, "Opponent's card at ({}, {}) restored to original value {}",
+			coord.first, coord.second,
+			combatCardToChar(originalType));
+
+		m_decremented_card.reset();
+	}
+
+	bool Board::hasLastPlayedCard() const {
+		return m_has_last_card;
+	}
+
+	CombatCardType Board::getLastCardType() const {
+		return m_last_card_type;
+	}
+
+	color::ColorType Board::getLastPlayerColor() const {
+		return m_last_player_color;
+	}
+
+	Coord Board::getLastCardPosition() const {
+		return m_last_card_position;
+	}
+
+
 
 
 	/*void Board::moveRow(uint16_t from_y, uint16_t to_y) {
@@ -343,6 +515,12 @@ namespace base {
 		if (m_combat_cards[coord].size() == 1 && this->isValidRemoveStack(coord) == false) {
 			throw std::runtime_error("breaks adjacency");
 		}
+		if (m_incremented_card.has_value() && m_incremented_card->first == coord) {
+			resetIncrementCardValue();
+		}
+		if (m_decremented_card.has_value() && m_decremented_card->first == coord) {
+			resetDecrementedCard();
+		}
 
 		CombatCard card = std::move(m_combat_cards[coord].back());
 		logger::Logger::log(logger::Level::INFO, "{}", card.getID());
@@ -417,7 +595,12 @@ namespace base {
 		if (!this->isValidRemoveStack(coord)) {
 			throw std::runtime_error("not conex anymore");
 		}
-
+		if (isIncrementedCard(coord)) {
+			resetIncrementCardValue();
+		}
+		if (isDecrementedCard(coord)) {
+			resetDecrementedCard();
+		}
 		Stack stack = std::move(m_combat_cards[coord]);
 		m_combat_cards.erase(coord);
 
@@ -485,12 +668,12 @@ namespace base {
 	}
 
 	void Board::_addUsedStack(Stack&& stack) {
-		for (;  stack.empty() == false; stack.pop_back()) {
+		for (; stack.empty() == false; stack.pop_back()) {
 			_addUsedCard(std::move(stack.back()));
 		}
 	}
-    
-	void Board::removeTopCardAt(const Coord& coord) {	
+
+	void Board::removeTopCardAt(const Coord& coord) {
 		CombatCard card = this->popTopCardAt(coord);
 
 		_addUsedCard(std::move(card));
@@ -515,7 +698,7 @@ namespace base {
 		}
 		std::vector<Stack> row_stacks = std::move(popRow(y));
 
-		for (;  row_stacks.empty() == false; row_stacks.pop_back()) {
+		for (; row_stacks.empty() == false; row_stacks.pop_back()) {
 			_addUsedStack(std::move(row_stacks.back()));
 		}
 	}
@@ -545,13 +728,17 @@ namespace base {
 
 	bool Board::isValidPlaceCard(const Coord& coord, const CombatCard& card) {
 
+
 		if (m_combat_cards.contains(coord)) {
 			if (card.getType() == CombatCardType::ETER) {
 				Logger::log(Level::WARNING, "This card must be played on an empty space");
 				return false;
 			}
 
-			if (this->getTopCard(coord)->get() >= card ) {
+
+			if (this->getTopCard(coord)->get() >= card &&
+				this->getTopCard(coord)->get().getType() != CombatCardType::BORDER) {
+
 				Logger::log(Level::WARNING, "Card too small");
 				return false;
 			}
@@ -583,7 +770,7 @@ namespace base {
 	bool Board::isValidRemoveRow(const uint16_t row_index) const
 	{
 		if (row_index < m_bounding_rect.corner1.second || row_index > m_bounding_rect.corner2.second) {
-			Logger::log(Level::WARNING, "Row {} is out of bounds.", row_index); 
+			Logger::log(Level::WARNING, "Row {} is out of bounds.", row_index);
 			return false;
 		}
 
@@ -655,8 +842,8 @@ namespace base {
 
 	bool Board::_isConex(const std::unordered_set<Coord, utils::CoordFunctor>& board_coords) const { // bfs 
 		if (board_coords.size() == 0 ||
-			board_coords.size() == 1 ||
-			board_coords.size() == 2
+			board_coords.size() == 1 // ||
+			//board_coords.size() == 2
 			) {
 			return true;
 		}
@@ -745,10 +932,10 @@ namespace base {
 		return _isConex(simulated_config);
 	}
 
-	bool Board::isRowBlocked(uint16_t row, color::ColorType player_color) const{
-		return m_blocked_row.has_value() && 
-			*m_blocked_row == row && 
-			m_blocked_row_owner != player_color; 
+	bool Board::isRowBlocked(uint16_t row, color::ColorType player_color) const {
+		return m_blocked_row.has_value() &&
+			*m_blocked_row == row &&
+			m_blocked_row_owner != player_color;
 	}
 
 	bool Board::isColumnBlocked(uint16_t column, color::ColorType player_color) const
@@ -758,6 +945,13 @@ namespace base {
 			m_blocked_row_owner != player_color;
 	}
 
+	bool Board::isIncrementedCard(const Coord& coord) const {
+		return m_incremented_card.has_value() && m_incremented_card->first == coord;
+	}
+
+	bool Board::isDecrementedCard(const Coord& coord) const {
+		return m_decremented_card.has_value() && m_decremented_card->first == coord;
+	}
 
 	///------------------------------Setter Getter------------------------------------
 
@@ -797,20 +991,20 @@ namespace base {
 
 	bool Board::isFixedColumn(int16_t x) const
 	{
-		
+
 		int16_t count_elements = 0;
 		for (const auto& [coord, stack] : m_combat_cards) {
 			if (coord.first == x) {
 				count_elements++;
 			}
-			
+
 		}
-		return count_elements==m_size;
+		return count_elements == m_size;
 	}
 
 	bool Board::isFixedRow(int16_t y) const
 	{
-	
+
 		int16_t count_elements = 0;
 		for (const auto& [coord, stack] : m_combat_cards) {
 			if (coord.second == y) {
@@ -823,10 +1017,10 @@ namespace base {
 	std::unordered_set<int16_t> Board::getFixedRows()const {
 
 		std::unordered_set<int16_t> fixed_rows;
-		std::unordered_set<int16_t> rows; 
+		std::unordered_set<int16_t> rows;
 
 		for (const auto& [coord, stack] : m_combat_cards) {
-			rows.insert(coord.second); 
+			rows.insert(coord.second);
 		}
 		for (const auto& y : rows) {
 			if (isFixedRow(y)) {
@@ -835,16 +1029,16 @@ namespace base {
 		}
 		return fixed_rows;
 
-	 }
+	}
 
 
 	std::unordered_set<int16_t> Board::getFixedColumns() const {
 
 		std::unordered_set<int16_t> fixed_columns;
-		std::unordered_set<int16_t> columns; 
+		std::unordered_set<int16_t> columns;
 
 		for (const auto& [coord, stack] : m_combat_cards) {
-			columns.insert(coord.first); 
+			columns.insert(coord.first);
 		}
 		for (const auto& x : columns) {
 			if (isFixedColumn(x)) {
@@ -852,6 +1046,38 @@ namespace base {
 			}
 		}
 		return  fixed_columns;
+	}
+
+	std::unordered_set<int16_t> Board::getUnfixedRows() const
+	{
+		std::unordered_set<int16_t> unfixed_rows;
+		std::unordered_set<int16_t> rows;
+
+		for (const auto& [coord, stack] : m_combat_cards) {
+			rows.insert(coord.second);
+		}
+		for (const auto& y : rows) {
+			if (!isFixedRow(y)) {
+				unfixed_rows.insert(y);
+			}
+		}
+		return unfixed_rows;
+	}
+
+	std::unordered_set<int16_t> Board::getUnfixedColumns() const
+	{
+		std::unordered_set<int16_t> unfixed_columns;
+		std::unordered_set<int16_t> columns;
+
+		for (const auto& [coord, stack] : m_combat_cards) {
+			columns.insert(coord.first);
+		}
+		for (const auto& x : columns) {
+			if (!isFixedColumn(x)) {
+				unfixed_columns.insert(x);
+			}
+		}
+		return  unfixed_columns;
 	}
 
 	Coord Board::getRightMostOnRow(int16_t y) const {
@@ -876,7 +1102,7 @@ namespace base {
 
 		return leftmost;
 	}
-	Coord Board::getTopMostOnColumn(int16_t x) const {	
+	Coord Board::getTopMostOnColumn(int16_t x) const {
 		Coord topmost = { x, std::numeric_limits<int16_t>::max() };
 
 		for (const auto& [coord, stack] : m_combat_cards) {
@@ -907,7 +1133,7 @@ namespace base {
 			}
 		}
 		std::sort(coords.begin(), coords.end(), [](const Coord& a, const Coord& b) { ///
-			return a.first < b.first; 
+			return a.first < b.first;
 			});
 		return coords;
 	}
@@ -920,7 +1146,7 @@ namespace base {
 			}
 		}
 		std::sort(coords.begin(), coords.end(), [](const Coord& a, const Coord& b) { /// 
-			return a.second < b.second; 
+			return a.second < b.second;
 			});
 		return coords;
 	}
@@ -975,7 +1201,7 @@ namespace base {
 			y_count[y] += incr;
 
 			if (this->isFixed()) {
-				Coord mapped{ utils::mapCoordToMatrix(this->getLeftCorner(), coord)};
+				Coord mapped{ utils::mapCoordToMatrix(this->getLeftCorner(), coord) };
 
 				if (mapped.first == mapped.second) {
 					diag1 += incr;
@@ -1131,7 +1357,7 @@ namespace base {
 		uint16_t offset_x = Config::getInstance().getCardSpacingX();
 		uint16_t offset_y = Config::getInstance().getCardSpacingY();
 
-		fixed_width  = ((corner2.first - corner1.first) / offset_x + 1 == size) ? true : false;
+		fixed_width = ((corner2.first - corner1.first) / offset_x + 1 == size) ? true : false;
 		fixed_height = ((corner2.second - corner1.second) / offset_y + 1 == size) ? true : false;
 	}
 
@@ -1165,4 +1391,4 @@ namespace base {
 		return m_combat_cards.end();
 	}
 
-}   
+}

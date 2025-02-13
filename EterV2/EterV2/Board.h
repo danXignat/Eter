@@ -33,7 +33,8 @@ namespace base {
 		bool isCardOfColorAt(color::ColorType, const Coord&) const;
 		bool isFixedColumn(int16_t x) const;
 		bool isFixedRow(int16_t y) const;
-        
+		bool hasLastPlayedCard() const;
+
 		uint16_t getSize() const;
 		Coord getLeftCorner() const;
 		std::pair<Coord, Coord> getBoudingRect() const;
@@ -43,7 +44,9 @@ namespace base {
 		std::optional<CombatCardRef> getTopCard(const Coord& coord);
 		const std::vector<CombatCard>& operator[](const Coord& coord) const;
 		std::unordered_set<int16_t> getFixedRows() const;
-		std::unordered_set<int16_t> getFixedColumns() const; 
+		std::unordered_set<int16_t> getFixedColumns() const;
+		std::unordered_set<int16_t> getUnfixedRows() const;
+		std::unordered_set<int16_t> getUnfixedColumns() const;
 		Coord getRightMostOnRow(int16_t y) const;
 		Coord getLeftMostOnRow(int16_t y) const;
 		Coord getTopMostOnColumn(int16_t x) const;
@@ -51,7 +54,10 @@ namespace base {
 		std::vector<Coord> getCoordsOnRow(int16_t row_index) const;
 		std::vector<Coord> getCoordsOnColumn(int16_t col_index) const;
 		std::optional<Coord> getWinCoord() const;
-	    
+
+
+		void returnUsedCardToHand(CombatCardType card);
+		void returnCardToHand(CombatCard&& card, color::ColorType owner);
 		void createHole(const Coord&);
 		void appendMove(const Coord&, CombatCard&&);
 		void moveRow(uint16_t from_y, uint16_t to_y);
@@ -69,6 +75,17 @@ namespace base {
 		void blockColumn(uint16_t column, color::ColorType owner);
 		void clearBlockedRow();
 		void clearBlockedColumn();
+		void setLastPlayedCard(const CombatCard& card, const Coord& position);
+		void incrementCardValue(const Coord& coord);
+		void resetIncrementCardValue();
+		void decrementCard(const Coord& coord);
+		void resetDecrementedCard();
+
+
+		CombatCardType getLastCardType() const;
+		color::ColorType getLastPlayerColor() const;
+		Coord getLastCardPosition() const;
+
 
 		CombatCard&& popTopCardAt(const Coord& coord);
 		CombatCard&& popCardFromStackAt(const Coord& coord, const CombatCard& card_to_remove);
@@ -91,6 +108,8 @@ namespace base {
 		bool isValidMergeStacks(const std::vector<Coord>& coords, const Coord& final_coord)const;
 		bool isRowBlocked(uint16_t row, color::ColorType player_color) const;
 		bool isColumnBlocked(uint16_t column, color::ColorType player_color) const;
+		bool isIncrementedCard(const Coord& coord) const;
+		bool isDecrementedCard(const Coord& coord) const;
 
 		void render() const;
 		void sideViewRender();
@@ -133,8 +152,14 @@ namespace base {
 		std::optional<uint16_t> m_blocked_row;
 		std::optional<uint16_t> m_blocked_column;
 		color::ColorType m_blocked_row_owner;
+		CombatCardType m_last_card_type;
+		color::ColorType m_last_player_color;
+		Coord m_last_card_position;
+		bool m_has_last_card = false;
+		std::optional<std::pair<Coord, CombatCardType>> m_incremented_card;
+		std::optional<std::pair<Coord, CombatCardType>> m_decremented_card;
 
-	///------------------------------------------------Iterator---------------------------------------------
+		///------------------------------------------------Iterator---------------------------------------------
 
 	public:
 		using KeyType = Coord;
@@ -145,5 +170,5 @@ namespace base {
 
 		const_iterator begin() const;
 		const_iterator end() const;
-	};  
+	};
 }

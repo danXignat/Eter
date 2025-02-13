@@ -25,7 +25,11 @@ namespace base {
 	class Destruction :public PowerCard {
 	public:
 		Destruction();
-		void apply( Board& board, Player& player) override;
+
+		bool canUseAbility(const Board& board, const Player& player) const;
+		std::optional<Coord> getTargetPosition(const Board& board) const;
+		void apply(Board& board, Player& player) override;
+		std::string getErrorMessage(const Board& board, const Player& player) const;
 
 	};
 
@@ -34,76 +38,94 @@ namespace base {
 		Flame();
 
 		void apply(Board& board, Player& player) override;
-		void setSelectedMove(const Coord& coord, CombatCardType cardType);
-		const std::vector<std::pair<Coord, CombatCardType>>& getAvailableChoices() const;
-
-
-	private:
-		bool m_hasUserSelected;
-		Coord m_selectedCoord;
-		CombatCardType m_selectedCardType;
-		std::vector<std::pair<Coord, CombatCardType>> m_availableChoices;
 
 	};
 
 	class Fire :public PowerCard {
 	public:
-		Fire()=default;
+		Fire();
 
-		Fire(Player& red_player, Player& blue_player);
+		bool canUseAbility(const Board& board) const;
+		std::vector<std::pair<Coord, CombatCardType>> getVisibleCards(const Board& board) const;
+		std::vector<CombatCardType> getValidChoices(const Board& board) const;
+		bool isValidChoice(CombatCardType chosen_type, const std::vector<CombatCardType>& valid_choices) const;
+		void applyEffect(Board& board, CombatCardType chosen_type);
+		std::string getErrorMessage(const Board& board) const;
 
 		void apply(Board& board, Player& player) override;
-		std::vector<Coord>getDuplicateCards(Board& board, const Player& player);
-
+		void setChosenCard(CombatCardType card_type);
 	private:
-		Player& m_red_player;
-		Player& m_blue_player;
+		CombatCardType m_chosen_card;
+		bool m_has_choice{ false };
+
 
 	};
 
 	class Ash :public PowerCard {
 	public:
 		Ash();
+		struct UsedCardInfo {
+			CombatCardType type;
+			color::ColorType color;
+		};
 
+		bool canUseAbility(const Player& player) const;
+		std::vector<UsedCardInfo> getUsedCardsInfo(const Player& player) const;
+
+
+		std::string getErrorMessage(const Player& player) const;
+		void setSelection(const Coord& coordinates, CombatCardType card_type);
 		void apply(Board& board, Player& player) override;
-		void setSelectedMove(const Coord& coord, CombatCardType cardType);
 
 	private:
-		bool m_hasUserSelected;
-		Coord m_selectedCoord;
-		CombatCardType m_selectedCardType;
-
+		Coord m_selected_coord;
+		CombatCardType m_selected_card;
+		bool m_has_selection{ false };
 	};
 
-	class Spark:public PowerCard {
+	class Spark :public PowerCard {
 	public:
 		Spark();
-
 		void apply(Board& board, Player& player) override;
 		std::vector<std::pair<Coord, CombatCardType>> coverCards(const Board& board, const Player& player);
-		void setSelectedMove(const Coord& from, const Coord& to, CombatCardType cardType);
-		const std::vector<std::pair<Coord, CombatCardType>>& getAvailableChoices() const;
+
+		void setAvailableChoices(const std::vector<std::pair<Coord, CombatCardType>>& choices);
+		std::optional<Coord> getSelectedFromCoord() const;
+		void setSelectedFromCoord(Coord coord);
+
+		void setSelectedCardType(CombatCardType type);
+		std::optional<CombatCardType> getSelectedCardType() const;
+
+		void setMoveDestination(Coord coord);
+		std::optional<Coord> getMoveDestination() const;
 
 	private:
-		bool m_hasUserSelected;
-		Coord m_coordFrom;
-		Coord m_coordTo;
-		CombatCardType m_selectedCardType;
-		std::vector<std::pair<Coord, CombatCardType>> m_availableChoices;
+		std::vector<std::pair<Coord, CombatCardType>> availableChoices;
+		std::optional<Coord> selectedFromCoord;
+		std::optional<CombatCardType> selectedCardType;
+		std::optional<Coord> moveDestination;
 	};
+
+
 
 	class Squall :public PowerCard {
 	public:
 
-		Squall() = default;
-		Squall(Player& red_player, Player& blue_player);
+
+		Squall();
+
 		void apply(Board& board, Player& player) override;
-		void setSelectedMove(const Coord& coord);
+		std::vector<std::pair<Coord, CombatCardType>> getVisibleCards(const Board& board, const Player& player);
+
+		void setVisibleCards(const std::vector<std::pair<Coord, CombatCardType>>& cards);
+		std::optional<Coord> getSelectedCardCoord() const;
+		void setSelectedCardCoord(Coord coord);
 
 	private:
-		bool m_hasUserSelected;
-		Coord m_selectedCoord;
-		Player& m_red_player, & m_blue_player;
+		std::vector<std::pair<Coord, CombatCardType>> visibleCards;
+		std::optional<Coord> selectedCardCoord;
+
+
 	};
 
 	class Gale :public PowerCard {
