@@ -14,10 +14,10 @@ namespace base {
 		std::vector<Coord> getChoices(const Board& board, const Player& player);
 		void setSelectedCoord(const Coord& coord);
 		const std::vector<Coord>& getAvailableChoices()const;
-	private: 
-		std::vector<Coord>m_availableChoices; 
-		bool m_hasUserSelected = false; 
-		Coord m_selectedCoord;  
+	private:
+		std::vector<Coord>m_availableChoices;
+		bool m_hasUserSelected = false;
+		Coord m_selectedCoord;
 	};
 
 	class MasterOfFireBack : public MageCard {
@@ -46,7 +46,7 @@ namespace base {
 
 		bool apply(Board& board, Player& player) override;
 		bool validPosition(const Coord& coord, Board& board, const Player& player)const;
-		std::vector<Coord> getChoices(Board& board, const Player& player) ;
+		std::vector<Coord> getChoices(Board& board, const Player& player);
 		void setSelectedCoord(const Coord& coord);
 		void setSelectedCardType(CombatCardType cardType);
 
@@ -54,7 +54,7 @@ namespace base {
 		std::vector<Coord>m_availableChoices;
 		Coord m_selectedCoord;
 		CombatCardType m_selectedCardType;
-	
+
 		bool m_hasUserSelected = false; // pt coordonata
 		bool m_hasCardTypeSelected = false; // pt tip card 
 	};
@@ -69,7 +69,7 @@ namespace base {
 	private:
 		mutable std::vector<Coord> m_availableChoices;
 		Coord m_selectedCoord;
-		bool m_hasUserSelected = false; 
+		bool m_hasUserSelected = false;
 	};
 
 	class MasterOfAirFront : public MageCard {
@@ -117,7 +117,7 @@ namespace base {
 		bool m_hasUserSelectedFrom = false;
 		bool m_hasUserSelectedTo = false;
 	};
-	
+
 	class MasterOfWaterBack : public MageCard {
 	public:
 		MasterOfWaterBack();
@@ -125,7 +125,7 @@ namespace base {
 		//std::pair<uint16_t,char> selectBorders(const std::optional<std::unordered_map<BorderType, std::vector<Coord>>>& borders,Board&board)const ;
 		void setSelectedBorder(uint16_t index);
 		void setSelectedDestination(int destination);
-	    bool apply(Board& board, Player& player) override;
+		bool apply(Board& board, Player& player) override;
 	private:
 		uint16_t m_selectedBorderIndex = 0;
 		int m_selectedDestination = 0;

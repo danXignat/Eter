@@ -7,12 +7,14 @@
 [INFO] card created ID 6
 [INFO] card created ID 7
 [INFO] card created ID 8
+[INFO] card created ID -1
 [INFO] card created ID 9
 [INFO] card created ID 10
 [INFO] card created ID 11
 [INFO] card created ID 12
 [INFO] card created ID 13
-[INFO] explosion effect [0, 0] -> 2
-[INFO] explosion effect [0, 2] -> 1
-[INFO] explosion effect [1, 2] -> 1
-[INFO] explosion effect [2, 2] -> 1
+[INFO] card created ID 14
+[INFO] card created ID 15
+[INFO] card created ID 16
+[INFO] card created ID 17
+[INFO] card created ID -1

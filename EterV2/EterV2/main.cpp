@@ -89,7 +89,7 @@ int main() {
 		.setCardSpacingY(1)
 		.setFetchByID(false);
 
-    base::GameModePtr game_mode{ base::GameModeFactory::get("112", { "titi", "gigi" }) };
+    base::GameModePtr game_mode{ base::GameModeFactory::get("3", { "titi", "gigi" }) };
 	game_mode->run();
 
 	//testConfig();

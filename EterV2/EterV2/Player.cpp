@@ -12,8 +12,8 @@ namespace base {
         _initializeCards(game_size);
     }
 
-    Player::Player(Player&& other) noexcept 
-        : m_color{other.m_color},
+    Player::Player(Player&& other) noexcept
+        : m_color{ other.m_color },
         m_name{ std::move(other.m_name) },
         m_cards{ std::move(other.m_cards) } {
 
@@ -70,7 +70,7 @@ namespace base {
         return !m_cards.empty();
     }
 
-    bool Player::hasCard(CombatCardType type) const { 
+    bool Player::hasCard(CombatCardType type) const {
         return m_cards.contains(type);
     }
 
@@ -107,7 +107,7 @@ namespace base {
         return std::move(card);
     }
 
-    const std::unordered_multimap<CombatCardType, CombatCard>& Player::getCards() const{
+    const std::unordered_multimap<CombatCardType, CombatCard>& Player::getCards() const {
         return m_cards;
     }
 
@@ -145,7 +145,7 @@ namespace base {
     void Player::addUsedCard(CombatCard&& card) {
         m_used_cards.emplace(card.getType(), std::move(card));
     }
-  
+
 
     //---------------------------------------------------------------------
 
@@ -154,7 +154,7 @@ namespace base {
             utils::printAtCoordinate("Player RED cards: ", 1, 14);
 
             int i = 0;
-            for (const auto&[type, card] : m_cards) {
+            for (const auto& [type, card] : m_cards) {
                 utils::printAtCoordinate(card, 1 + i, 15);
                 i += 2;
             }

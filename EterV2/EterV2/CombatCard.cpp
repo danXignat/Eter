@@ -121,6 +121,9 @@ namespace base {
 			case HOLE:
 				out << "H";
 				break;
+			case BORDER:
+				out << "B";
+				break;
 			default:
 				break;
 			}

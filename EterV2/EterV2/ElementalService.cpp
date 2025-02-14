@@ -20,11 +20,11 @@ namespace base {
 		std::iota(choices.begin(), choices.end(), 0);
 		std::shuffle(choices.begin(), choices.end(), gen);
 
-		type_card1 = static_cast<PowerCardType>(choices[0]);
-		type_card2 = static_cast<PowerCardType>(choices[1]);
+		//type_card1 = static_cast<PowerCardType>(choices[0]);
+		//type_card2 = static_cast<PowerCardType>(choices[1]);
 
-		card1 = _factory(type_card1);
-		card2 = _factory(type_card2);
+		card1 = _factory(PowerCardType::Ash);
+		card2 = _factory(PowerCardType::Storm);
 	}
 
 	void ElementalService::apply(char choice, Player& player) {
@@ -47,7 +47,7 @@ namespace base {
 		}
 
 		}
-		
+
 	}
 
 	void ElementalService::renderCards() const {
@@ -90,7 +90,7 @@ namespace base {
 			return std::make_unique<Squall>();
 
 		case PowerCardType::Gale:
-			return std::make_unique<Gale>(m_red_player, m_blue_player);
+			return std::make_unique<Gale>();
 
 		case PowerCardType::Hurricane:
 			return std::make_unique<Hurricane>();

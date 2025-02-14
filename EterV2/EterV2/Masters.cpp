@@ -7,8 +7,8 @@ using namespace logger;
 namespace base {
 
     Config& config = Config::getInstance();
-    uint16_t x_step = config.getCardSpacingX(); 
-    uint16_t y_step = config.getCardSpacingY(); 
+    uint16_t x_step = config.getCardSpacingX();
+    uint16_t y_step = config.getCardSpacingY();
 
     ///----------------------------------------------------MasterOfFire----------------------------------------
     ///---------Burn------------
@@ -503,7 +503,7 @@ namespace base {
                 bottom_border.push_back({ x, corner2.second });
             }
         }
-        for (uint16_t y = corner1.second; y <= corner2.second; y+=y_step) {
+        for (uint16_t y = corner1.second; y <= corner2.second; y += y_step) {
             if (board.hasStack({ corner1.first, y })) {
                 left_border.push_back({ corner1.first, y });
             }
@@ -581,23 +581,23 @@ namespace base {
         return true;
     }
 }
-    /*static std::string_view borderToString(BorderType border) {
+/*static std::string_view borderToString(BorderType border) {
 
-       switch (border) {
-       case BorderType::Top:
-           return "Top";
+   switch (border) {
+   case BorderType::Top:
+       return "Top";
 
-       case BorderType::Bottom:
-           return "Bottom";
+   case BorderType::Bottom:
+       return "Bottom";
 
-       case BorderType::Left:
-           return "Left";
+   case BorderType::Left:
+       return "Left";
 
-       case BorderType::Right:
-           return "Right";
+   case BorderType::Right:
+       return "Right";
 
-       default:
-           return "Unknown";
-       }
+   default:
+       return "Unknown";
+   }
 
-   }*/
+}*/
