@@ -26,11 +26,13 @@ namespace base {
 	public:
 		Destruction(Board& board, Player& red, Player& blue);
 
-		bool canUseAbility(const Board& board, const Player& player) const;
-		std::optional<Coord> getTargetPosition(const Board& board) const;
+		bool canUseAbility( color::ColorType color) const;
+		std::optional<Coord> getTargetPosition() const;
 		void apply() override;
-		std::string getErrorMessage(const Board& board, const Player& player) const;
-
+		std::string getErrorMessage(color::ColorType colorPlayer) const;
+		void setColor(color::ColorType colorPlayer);
+	private:
+		color::ColorType m_color=color::ColorType::DEFAULT;
 	};
 
 	class Flame :public PowerCard {
@@ -45,19 +47,20 @@ namespace base {
 	public:
 		Fire(Board& board, Player& red, Player& blue);
 
-		bool canUseAbility(const Board& board) const;
-		std::vector<std::pair<Coord, CombatCardType>> getVisibleCards(const Board& board) const;
-		std::vector<CombatCardType> getValidChoices(const Board& board) const;
+		bool canUseAbility() const;
+		std::vector<std::pair<Coord, CombatCardType>> getVisibleCards() const;
+		std::vector<CombatCardType> getValidChoices() const;
 		bool isValidChoice(CombatCardType chosen_type, const std::vector<CombatCardType>& valid_choices) const;
-		void applyEffect(Board& board, CombatCardType chosen_type);
-		std::string getErrorMessage(const Board& board) const;
+		void applyEffect( CombatCardType chosen_type);
+		std::string getErrorMessage() const;
 
 		void apply() override;
 		void setChosenCard(CombatCardType card_type);
+		
 	private:
 		CombatCardType m_chosen_card;
 		bool m_has_choice{ false };
-
+		
 
 	};
 
@@ -69,13 +72,16 @@ namespace base {
 			color::ColorType color;
 		};
 
-		bool canUseAbility(const Player& player) const;
-		std::vector<UsedCardInfo> getUsedCardsInfo(const Player& player) const;
+		bool canUseAbility(color::ColorType colorPlayer) const;
+		std::vector<UsedCardInfo> getUsedCardsInfo(color::ColorType colorPlayer) const;
 
 
-		std::string getErrorMessage(const Player& player) const;
+		std::string getErrorMessage(color::ColorType color) const;
 		void setSelection(const Coord& coordinates, CombatCardType card_type);
 		void apply() override;
+		void setColor(color::ColorType colorPlayer);
+	private:
+		color::ColorType m_color = color::ColorType::DEFAULT;
 
 	private:
 		Coord m_selected_coord;
@@ -87,7 +93,7 @@ namespace base {
 	public:
 		Spark(Board& board, Player& red, Player& blue);
 		void apply() override;
-		std::vector<std::pair<Coord, CombatCardType>> coverCards(const Board& board, const Player& player);
+		std::vector<std::pair<Coord, CombatCardType>> coverCards();
 
 		void setAvailableChoices(const std::vector<std::pair<Coord, CombatCardType>>& choices);
 		std::optional<Coord> getSelectedFromCoord() const;
@@ -98,8 +104,11 @@ namespace base {
 
 		void setMoveDestination(Coord coord);
 		std::optional<Coord> getMoveDestination() const;
+		void setColor(color::ColorType colorPlayer);
 
 	private:
+		color::ColorType m_color = color::ColorType::DEFAULT;
+
 		std::vector<std::pair<Coord, CombatCardType>> availableChoices;
 		std::optional<Coord> selectedFromCoord;
 		std::optional<CombatCardType> selectedCardType;
@@ -115,13 +124,16 @@ namespace base {
 		Squall(Board& board, Player& red, Player& blue);
 
 		void apply() override;
-		std::vector<std::pair<Coord, CombatCardType>> getVisibleCards(const Board& board, const Player& player);
+		std::vector<std::pair<Coord, CombatCardType>> getVisibleCards();
 
 		void setVisibleCards(const std::vector<std::pair<Coord, CombatCardType>>& cards);
 		std::optional<Coord> getSelectedCardCoord() const;
 		void setSelectedCardCoord(Coord coord);
 
+		void setColor(color::ColorType colorPlayer);
+
 	private:
+		color::ColorType m_color = color::ColorType::DEFAULT;
 		std::vector<std::pair<Coord, CombatCardType>> visibleCards;
 		std::optional<Coord> selectedCardCoord;
 
@@ -133,12 +145,16 @@ namespace base {
 
 		Gale(Board& board, Player& red, Player& blue);
 		void apply() override;
+		void setColor(color::ColorType colorPlayer);
+
+	private:
+		color::ColorType m_color = color::ColorType::DEFAULT;
 
 	};
 
 	class Hurricane :public PowerCard {
 	public:
-		Hurricane();
+		Hurricane(Board& board, Player& red, Player& blue);
 		void apply() override;
 
 		void setOptions(const std::unordered_map<Orientation, std::vector<uint16_t>>& opts);
@@ -149,7 +165,6 @@ namespace base {
 
 		void setUserDirection(MoveDirection dir);
 		std::optional<MoveDirection> getUserDirection() const;
-
 	private:
 		std::unordered_map<Orientation, std::vector<uint16_t>> options;
 		std::optional<std::tuple<Orientation, uint16_t>> userSelection;
@@ -220,7 +235,7 @@ namespace base {
 		std::vector<Coord> availableStacks;
 		std::optional<std::pair<Coord, Coord>> selectedStacks;
 
-		std::vector<Coord> getStacks(const Board& board);
+		std::vector<Coord> getStacks();
 
 	};
 
@@ -250,13 +265,16 @@ namespace base {
 		void setSelectedCard(char card);
 		std::optional<char> getSelectedCard() const;
 
+		void setColor(color::ColorType colorPlayer);
+
 	private:
+		color::ColorType m_color = color::ColorType::DEFAULT;
 		std::vector<Coord> availableStacks;
 		std::optional<Coord> selectedStack;
 		std::optional<Coord> destination;
 		std::optional<char> selectedCard;
 
-		std::vector<Coord> validStacks(const Board& board) const;
+		std::vector<Coord> validStacks() const;
 	};
 
 
@@ -288,8 +306,8 @@ namespace base {
 		char userChoice;
 		Coord firstCoord, secondCoord, equalCardCoord;
 
-		std::vector<std::pair<Coord, Coord>> getPairsOnRow(Board& board);
-		std::vector<std::pair<Coord, Coord>> getPairsOnColumn(Board& board);
+		std::vector<std::pair<Coord, Coord>> getPairsOnRow();
+		std::vector<std::pair<Coord, Coord>> getPairsOnColumn();
 	};
 
 
@@ -305,7 +323,10 @@ namespace base {
 		void setChosenColumn(uint16_t column);
 		std::optional<uint16_t> getChosenColumn() const;
 		void apply() override;
+		void setColor(color::ColorType colorPlayer);
+
 	private:
+		color::ColorType m_color = color::ColorType::DEFAULT;
 		std::optional<char> blockChoice;
 		std::optional<uint16_t> chosenRow;
 		std::optional<uint16_t> chosenColumn;
@@ -325,8 +346,8 @@ namespace base {
 		void setMoveDirection(MoveDirection direction);
 		std::optional<MoveDirection> getMoveDirection() const;
 
-		std::unordered_map<Orientation, std::vector<int16_t>> getOptions(Board& board);
-		std::tuple<Orientation, int16_t, MoveDirection> input(Board& board);
+		std::unordered_map<Orientation, std::vector<int16_t>> getOptions();
+		std::tuple<Orientation, int16_t, MoveDirection> input();
 		void apply() override;
 
 	private:
@@ -369,7 +390,7 @@ namespace base {
 		void apply() override;
 		void setValidCards(const std::vector<Coord>& cards);
 		std::vector<Coord> getValidCards() const;
-		std::vector<Coord> findValidCards(const Board& board, const Player& player) const;
+		//std::vector<Coord> findValidCards(const Board& board, const Player& player) const;
 		void setSelectedCard(const Coord& coord);
 		std::optional<Coord> getSelectedCard() const;
 	private:
@@ -393,7 +414,7 @@ namespace base {
 		std::optional<CombatCardType> getSelectedCardType() const;
 
 	private:
-		bool applyNeutralCard(Player& player, Board& board);
+		//bool applyNeutralCard(Player& player, Board& board);
 
 		std::set<int> validRows;
 		std::set<int> validCols;
@@ -407,9 +428,9 @@ namespace base {
 		Avalanche(Board& board, Player& red, Player& blue);
 
 		void apply() override;
-		std::vector<std::pair<Orientation, std::pair<Coord, Coord>>> getPairs(Board& board);
+		std::vector<std::pair<Orientation, std::pair<Coord, Coord>>> getPairs();
 		std::vector<std::pair<MoveDirection, std::pair<Coord, Coord>>> checkShifting(
-			const std::vector<std::pair<Orientation, std::pair<Coord, Coord>>>& pack, Board& board);
+			const std::vector<std::pair<Orientation, std::pair<Coord, Coord>>>& pack);
 
 		void setSelectedMove(const std::pair<MoveDirection, std::pair<Coord, Coord>>& move);
 		std::optional<std::pair<MoveDirection, std::pair<Coord, Coord>>> getSelectedMove() const;
