@@ -74,6 +74,16 @@ namespace base {
         return m_cards.contains(type);
     }
 
+    bool Player::hasCard(uint16_t id) const {
+        for (auto& [type, card] : m_cards) {
+            if (card.getID() == id) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     bool Player::hasUsedCards()const {
         return !m_used_cards.empty();
     }
@@ -210,4 +220,6 @@ namespace base {
         }
     }
     };
+
+    uint16_t Player::card_id_counter = 0;
 }

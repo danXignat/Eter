@@ -12,19 +12,107 @@
 [INFO] card created ID 11
 [INFO] card created ID 12
 [INFO] card created ID 13
+[INFO] card created ID 14
+[INFO] card created ID 15
+[INFO] card created ID 16
+[INFO] card created ID 17
+[INFO] card created ID 18
+[INFO] card created ID 19
+[INFO] explosion effect [0, 1] -> 0
+[INFO] explosion effect [1, 2] -> 0
+[INFO] explosion effect [2, 1] -> 0
+[INFO] explosion effect [3, 1] -> 2
+[INFO] card(3) appended at (650, 450)
+[INFO] card(3) appended at (650, 540)
+[INFO] card(3) appended at (650, 360)
+[INFO] Mage fire ability remove top card used
+[INFO] card created ID 20
+[INFO] card created ID 21
+[INFO] card created ID 22
+[INFO] card created ID 23
+[INFO] card created ID 24
+[INFO] card created ID 25
+[INFO] card created ID 26
+[INFO] card created ID 27
+[INFO] card created ID 28
+[INFO] card created ID 29
+[INFO] card created ID 30
+[INFO] card created ID 31
+[INFO] card created ID 32
+[INFO] card created ID 33
+[INFO] card created ID 34
+[INFO] card created ID 35
+[INFO] card created ID 36
+[INFO] card created ID 37
+[INFO] card created ID 38
+[INFO] card created ID 39
+[INFO] explosion effect [0, 0] -> 1
+[INFO] explosion effect [1, 3] -> 2
+[INFO] explosion effect [2, 2] -> 1
+[INFO] explosion effect [3, 2] -> 0
+[INFO] card(3) appended at (650, 450)
+[INFO] card(3) appended at (650, 360)
+[INFO] card(3) appended at (650, 540)
+[INFO] Moved column 650 to 740
+[INFO] card created ID 40
+[INFO] card(H) appended at (650, 450)
+[INFO] Mage Earth Hole ability card used
+[INFO] card created ID 41
+[INFO] card created ID 42
+[INFO] card created ID 43
+[INFO] card created ID 44
+[INFO] card created ID 45
+[INFO] card created ID 46
+[INFO] card created ID 47
+[INFO] card created ID 48
+[INFO] card created ID 49
+[INFO] card created ID 50
+[INFO] card created ID 51
+[INFO] card created ID 52
+[INFO] card created ID 53
+[INFO] card created ID 54
+[INFO] card created ID 55
+[INFO] card created ID 56
+[INFO] card created ID 57
+[INFO] card created ID 58
+[INFO] card created ID 59
+[INFO] card created ID 60
+[INFO] explosion effect [0, 2] -> 0
+[INFO] explosion effect [0, 3] -> 0
+[INFO] explosion effect [2, 2] -> 1
+[INFO] explosion effect [2, 3] -> 1
+[INFO] card(3) appended at (650, 450)
+[INFO] card(E) appended at (740, 360)
+[INFO] card created ID 61
+[INFO] card(H) appended at (560, 360)
+[INFO] Mage Earth Hole ability card used
+[INFO] card(3) appended at (740, 450)
+[INFO] card(3) appended at (740, 540)
+[INFO] Mage fire ability remove top card used
 [WARNING] not available place
-[INFO] card(1) appended at (600, 400)
-[WARNING] not available place
-[INFO] card(2) appended at (510, 490)
-[INFO] card(2) appended at (510, 580)
-[WARNING] Card too small
-[WARNING] Card too small
-[WARNING] Card too small
-[INFO] card(2) appended at (600, 400)
-[WARNING] not available place
-[WARNING] not available place
-[WARNING] Card too small
-[INFO] card(3) appended at (510, 490)
-[WARNING] not available place
-[INFO] card(1) appended at (510, 400)
-[INFO] card(2) appended at (510, 400)
+[INFO] card created ID 62
+[INFO] card created ID 63
+[INFO] card created ID 64
+[INFO] card created ID 65
+[INFO] card created ID 66
+[INFO] card created ID 67
+[INFO] card created ID 68
+[INFO] card created ID 69
+[INFO] card created ID 70
+[INFO] card created ID 71
+[INFO] card created ID 72
+[INFO] card created ID 73
+[INFO] card created ID 74
+[INFO] card created ID 75
+[INFO] card created ID 76
+[INFO] card created ID 77
+[INFO] card created ID 78
+[INFO] card created ID 79
+[INFO] card created ID 80
+[INFO] card created ID 81
+[INFO] explosion effect [0, 0] -> 0
+[INFO] explosion effect [1, 0] -> 0
+[INFO] explosion effect [2, 0] -> 1
+[INFO] explosion effect [3, 1] -> 0
+[INFO] card(3) appended at (650, 450)
+[INFO] card(3) appended at (740, 450)

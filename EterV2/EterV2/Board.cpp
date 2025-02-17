@@ -212,6 +212,10 @@ namespace base {
 			throw std::runtime_error("Stack does not exist at this position");
 		}*/
 		m_combat_cards[coord].push_back(std::move(card));
+
+		_updateAvailableSpaces(coord);
+
+		_setWinPosition(coord);
 	}
 
 	void Board::blockRow(uint16_t row, color::ColorType owner) {
@@ -751,6 +755,35 @@ namespace base {
 		return true;
 	}
 
+	bool Board::isValidPlaceCard(const InputHandler& input) {
+		if (m_combat_cards.contains(input.coord)) {
+			if (input.card_type == CombatCardType::ETER) {
+				return false;
+			}
+
+			if (this->getTopCard(input.coord)->get().isIllusion() && input.event_type == EventType::PlaceIllusion) {
+				return false;
+			}
+
+			if (this->getTopCard(input.coord)->get().isIllusion() && this->getTopCard(input.coord)->get().getColor() != input.color) {
+				return true;
+			}
+
+			if (this->getTopCard(input.coord)->get().isIllusion() && this->getTopCard(input.coord)->get().getColor() == input.color) {
+				return false;
+			}
+
+			if (this->getTopCard(input.coord)->get().getType() >= input.card_type) {
+				return false;
+			}
+		}
+		else if (m_available_spaces.contains(input.coord) == false) {
+			return false;
+		}
+
+		return true;
+	}
+
 	bool Board::isValidRemoveStack(const Coord& remove_coord) const {
 		if (m_combat_cards.contains(remove_coord) == false) {
 			Logger::log(Level::WARNING, "not available place to remove");
@@ -1160,6 +1193,10 @@ namespace base {
 		return m_combat_cards.at(coord);
 	}
 
+	std::vector<CombatCard>& Board::operator[](const Coord& coord) {
+		return m_combat_cards.at(coord);
+	}
+
 	std::optional<CombatCardRef> Board::getTopCard(const Coord& pos) {
 		if (m_combat_cards.contains(pos)) {
 			return std::ref(m_combat_cards[pos].back());
@@ -1186,6 +1223,22 @@ namespace base {
 		return m_win_pos;
 	}
 
+	void Board::shift(const Coord& offset) {
+		std::unordered_map<Coord, Stack, utils::CoordFunctor> temp;
+
+		for (auto& [coord, stack] : m_combat_cards) {
+			Coord new_coord {
+				coord.first + offset.first,
+				coord.second + offset.second
+			};
+			
+			temp.emplace(new_coord, std::move(stack));
+		}
+
+		m_combat_cards = std::move(temp);
+	}
+
+	///----------------------------Private Methods--------------------------------
 	void Board::_setWinPosition(const Coord& coord) {
 		std::unordered_map<uint16_t, int16_t> x_count, y_count;
 		x_count.reserve(m_size);
@@ -1222,8 +1275,6 @@ namespace base {
 			m_win_pos.emplace(coord);
 		}
 	}
-
-	///----------------------------Private Methods--------------------------------
 
 
 	void Board::_updateAvailableSpaces(const Coord& coord) {

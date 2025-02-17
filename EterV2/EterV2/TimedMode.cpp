@@ -29,10 +29,10 @@ namespace base {
     
         for (const auto& service : services) {
             if (service == ServiceType::MAGE) {
-                m_mage_service = std::make_unique<MageService>(m_board);
+                //m_mage_service = std::make_unique<MageService>(m_board);
             }
             else if (service == ServiceType::ELEMENTAL) {
-                m_elemental_service = std::make_unique<ElementalService>(m_board, m_player_red, m_player_blue);
+                //m_elemental_service = std::make_unique<ElementalService>(m_board, m_player_red, m_player_blue);
             }
         }
     }
@@ -94,7 +94,7 @@ namespace base {
             switch (input.event_type) {
             case EventType::UseMage:
                 if (m_mage_service) {
-                    action_succeeded = m_mage_service->apply(m_curr_player.get());
+                    //action_succeeded = m_mage_service->apply(m_curr_player.get());
                 }
                 break;
 
@@ -112,7 +112,7 @@ namespace base {
                 break;
 
             case EventType::PlaceIllusion:
-                action_succeeded = placeIllusion(input);
+                //action_succeeded = placeIllusion(input);
                 break;
 
             default:

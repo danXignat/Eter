@@ -18,11 +18,13 @@ namespace base {
 			switch (service) {
 				using enum ServiceType;
 			case ILLUSION:
-				//m_illusion_service.emplace(m_board, m_win_manager);
+				m_illusion_service.emplace(m_board, m_player_red, m_player_blue);
 				break;
+
 			case EXPLOSION:
 				m_explosion_service.emplace(m_board, m_player_red, m_player_blue);
 				break;
+
 			default:
 				break;
 			}
@@ -63,25 +65,21 @@ namespace base {
 	}
 
 	bool BaseGameMode::placeCombatCard(const InputHandler& input) {
-		CombatCardType card_type = input.card_type;
-		Coord coord = input.coord;
-		const CombatCard& card_view = m_curr_player.get().viewCard(card_type);
-
-		auto board_card = m_board.getTopCard(coord);
-		bool is_illusion = board_card && board_card->get().isIllusion();
-		if (is_illusion && IllusionService::hasIllusionWon(board_card.value(), card_view)) {
-			logger::Logger::log(logger::Level::INFO, "illusion has won");
+		/// pentru chestia asta ca sa fie mega clean cred ca mergea un observer design pattern
+		bool is_illusion{ m_board.getTopCard(input.coord).has_value() &&  m_board.getTopCard(input.coord)->get().isIllusion() };
+		if (is_illusion && m_illusion_service.has_value()) {
+			m_illusion_service->handleIllusionAttack(input);
 			return true;
 		}
 
-		if (m_board.isValidPlaceCard(coord, card_view)) {
+		if (m_board.isValidPlaceCard(input.coord, m_curr_player.get().viewCard(input.card_type))) {
 			if (Config::getInstance().getFetchByID()) {
 				CombatCard card = m_curr_player.get().getCardByID(input.ID);
-				m_board.appendMove(coord, std::move(card));
+				m_board.appendMove(input.coord, std::move(card));
 			}
 			else {
-				CombatCard card = m_curr_player.get().getCard(card_type);
-				m_board.appendMove(coord, std::move(card));
+				CombatCard card = m_curr_player.get().getCard(input.card_type);
+				m_board.appendMove(input.coord, std::move(card));
 			}
 
 			return true;
@@ -90,38 +88,48 @@ namespace base {
 		return false;
 	}
 
-	bool BaseGameMode::placeIllusion(const InputHandler& input) {
-		if (m_illusion_service) {
-			Coord coord = input.coord;
-			CombatCardType card_type = input.card_type;
-
-			CombatCard card = m_curr_player.get().getCard(card_type);
-			card.flip();
-
-			bool has_illusion = m_illusion_service->hasIllusion(m_curr_player.get());
-			bool valid_move = m_illusion_service->isValidPlaceCard(coord, card);
-
-			if (has_illusion && valid_move) {
-				m_illusion_service->placeIllusion(coord, std::move(card));
-
-				return true;
-			}
-			else {
-				card.flip();
-
-				m_curr_player.get().addCard(std::move(card));
-			}
-		}
-		else {
-			return false;
-		}
-	}
-
 	std::optional <ExplosionService>& BaseGameMode::getExplosionService() {
 		return m_explosion_service;
+	}
+
+	std::optional <IllusionService>& BaseGameMode::getIllusionService() {
+		return m_illusion_service;
 	}
 
 	void BaseGameMode::removeExplosion() {
 		m_explosion_service.reset();
 	}
+
+	std::unordered_set<uint16_t> BaseGameMode::getAvailableIds(InputHandler& input) {
+		std::unordered_set<uint16_t> ids;
+
+		for (const Coord& coord : m_board | std::views::keys) {
+			input.coord = coord;
+
+			if (m_board.isValidPlaceCard(input)) {
+				ids.insert(m_board[coord].back().getID());
+			}
+		}
+
+		return ids;
+	}
+
+	std::unordered_set<uint16_t> BaseGameMode::getRestrictedIds(InputHandler& input) {
+		std::unordered_set<uint16_t> ids;
+
+		for (const Coord& coord : m_board | std::views::keys) {
+			input.coord = coord;
+
+			if (!m_board.isValidPlaceCard(input)) {
+				ids.insert(m_board[coord].back().getID());
+			}
+		}
+
+		return ids;
+	}
+
+	void BaseGameMode::tryShiftBoard() {
+
+	}
+
 }

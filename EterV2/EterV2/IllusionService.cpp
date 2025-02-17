@@ -3,11 +3,12 @@
 using namespace logger;
 
 namespace base {
-	IllusionService::IllusionService(Board& board, WinManager& win_manager) 
+	IllusionService::IllusionService(Board& board, Player& player_red, Player& player_blue)
 		: m_p1_has_illusion{ true },
 		m_p2_has_illusion{ true },
-		board{ board },
-		win_manager{ win_manager } {
+		m_board{ board },
+		m_player_red{player_red},
+		m_player_blue{player_blue} {
 	}
 
 	bool IllusionService::hasIllusion(Player& player) {
@@ -19,64 +20,60 @@ namespace base {
 		}
 	}
 
-	void IllusionService::placeIllusion(const Coord& coord, CombatCard&& card) {
-		if (card.getColor() == color::ColorType::RED) {
-			if (!m_p1_has_illusion) {
-				Logger::log(
-					Level::WARNING,
-					"no more illusions for player RED"
-				);
-			}
-			else {
-				board.appendMove(coord, std::move(card));
-				win_manager.addCard(coord);
-				m_p1_illusion_coord.emplace(coord);
-				m_p1_has_illusion = false;
-			}
+	bool IllusionService::hasIllusion(color::ColorType color) {
+		if (color == color::ColorType::RED) {
+			return m_p1_has_illusion;
 		}
 		else {
-			if (!m_p2_has_illusion) {
-				Logger::log(
-					Level::WARNING,
-					"no more illusions for player BLUE"
-				);
-			}
-			else {
-				board.appendMove(coord, std::move(card));
-				win_manager.addCard(coord);
-				m_p2_illusion_coord.emplace(coord);
-				m_p2_has_illusion = false;
-			}
+			return m_p2_has_illusion;
 		}
 	}
 
-	bool IllusionService::isValidPlaceCard(const Coord& coord, const CombatCard& card) {
-		if (card.isIllusion() && board.hasStack(coord) == false) {
-			return true;
+	bool IllusionService::placeIllusion(const InputHandler& input) {
+		if (input.event_type != EventType::PlaceIllusion) {
+			throw std::runtime_error("not an illusion");
 		}
-		
-		return false;
-	}
 
-	bool IllusionService::hasIllusionWon(CombatCard& illusion, const CombatCard& other) {
-		illusion.flip();
-
-		if (other < illusion) {
-			return true;
-			Logger::log(Level::INFO, "Illusion wins and reveal");
-		}
-		else {
+		if (m_board.availableSpaces().contains(input.coord) == false) {
 			return false;
-			Logger::log(Level::INFO, "Attacker defeats illusion");
 		}
+
+		Player& curr_player{ m_player_red.hasCard(input.ID) ? m_player_red : m_player_blue };
+
+		CombatCard card = curr_player.getCardByID(input.ID);
+
+		card.flip();
+
+		m_board.appendMove(input.coord, std::move(card));
+
+		return true;
 	}
-	void IllusionService::getNewIllusion(CombatCard&& card) {
+
+	void IllusionService::handleIllusionAttack(const InputHandler& input) {
+		auto& illusion{ m_board.getTopCard(input.coord)->get() };
+		if (illusion.isIllusion() == false) {
+			throw std::runtime_error("not an illusion");
+		}
+
+		Player& curr_player{ (m_player_red.hasCard(input.ID)) ? m_player_red : m_player_blue };
+		CombatCard card = curr_player.getCardByID(input.ID);
+
+		if (illusion < card) {
+			m_board.appendMove(input.coord, std::move(card));
+		}
+		else {
+			curr_player.addUsedCard(std::move(card));
+		}
+
+		m_board[input.coord].front().flip();
+	}
+
+	void IllusionService::getNewIllusion(const CombatCard& card) {
 		if (card.getColor() == color::ColorType::RED) {
 			m_p1_has_illusion = true;
 		}
 		else {
 			m_p2_has_illusion = true;
 		}
-
 	}
 }

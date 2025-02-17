@@ -830,7 +830,7 @@ namespace base {
         std::cin >> card_type;
         auto card = player.getCard(charToCombatCard(card_type));
 
-        illusionService.placeIllusion(coord, std::move(card));
+        //illusionService.placeIllusion(coord, std::move(card));
         //  }
         return true;
     }

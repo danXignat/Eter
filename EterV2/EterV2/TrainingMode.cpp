@@ -39,7 +39,7 @@ namespace base {
 				break;
 
 			case PlaceIllusion:
-				action_succed = placeIllusion(input);
+				//action_succed = placeIllusion(input);
 				break;
 
 			default:

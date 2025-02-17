@@ -6,173 +6,212 @@ using namespace logger;
 
 namespace base {
 
-    Config& config = Config::getInstance();
-    uint16_t x_step = config.getCardSpacingX();
-    uint16_t y_step = config.getCardSpacingY();
+    /*    Config& config = Config::getInstance();
+        uint16_t x_step = config.getCardSpacingX();
+        uint16_t y_step = config.getCardSpacingY();*/
 
-    ///----------------------------------------------------MasterOfFire----------------------------------------
-    ///---------Burn------------
+        ///----------------------------------------------------MasterOfFire----------------------------------------
+        ///---------Burn------------
 
-    MasterOfFireFront::MasterOfFireFront() {
+    MasterOfFireFront::MasterOfFireFront(Board& board, Player& player_red, Player& player_blue, color::ColorType color)
+        : MageCard(board, player_red, player_blue, color) {
         m_type = MageType::Fire;
         m_ability = MageTypeAbility::Burn;
-        m_hasUserSelected = false;
     }
 
     void MasterOfFireFront::setSelectedCoord(const Coord& coord) {
-        m_selectedCoord = coord;
-        m_hasUserSelected = true;
+        m_selectedCoord.emplace(coord);
     }
 
-    const std::vector<Coord>& MasterOfFireFront::getAvailableChoices() const {
+    const std::unordered_set<uint16_t>& MasterOfFireFront::getAvailableChoices() const {
         return m_availableChoices;
     }
 
-    std::vector<Coord> MasterOfFireFront::getChoices(const Board& board, const Player& player) {
+    std::unordered_set<uint16_t> MasterOfFireFront::getChoices() {
         m_availableChoices.clear();
         int minimumSize = 2;
 
-        for (const auto& [coord, stack] : board) {
+        for (const auto& [coord, stack] : m_board) {
             auto& [x, y] = coord;
             if (stack.size() < minimumSize) {
                 continue;
             }
 
-            bool is_player_card = stack[stack.size() - 2].getColor() == player.getColor();
-            bool is_covered = stack.back().getColor() != player.getColor();
+            bool is_player_card = stack[stack.size() - 2].getColor() == m_color;
+            bool is_covered = stack.back().getColor() != m_color;
 
             if (is_player_card && is_covered) {
-                m_availableChoices.emplace_back(x, y);
+                m_availableChoices.insert(stack.back().getID());
             }
         }
 
         return m_availableChoices;
     }
 
-    bool MasterOfFireFront::apply(Board& board, Player& player) {
-        getChoices(board, player);
+    bool MasterOfFireFront::apply() {
         if (m_availableChoices.empty()) {
             Logger::log(Level::INFO, "You can't use this mage right now");
             return false;
         }
 
-        if (!m_hasUserSelected) {
+        if (!m_selectedCoord) {
             Logger::log(Level::INFO, "No selection made yet");
             return false;
         }
 
-        if (std::find(m_availableChoices.begin(), m_availableChoices.end(), m_selectedCoord)
-            == m_availableChoices.end()) {
+        /*if (std::find(m_availableChoices.begin(), m_availableChoices.end(), m_selectedCoord)
+           == m_availableChoices.end()) {
             Logger::log(Level::INFO, "Impossible choice");
             return false;
-        }
+        }*/
 
-        board.removeTopCardAt(m_selectedCoord);
+        m_board.removeTopCardAt(m_selectedCoord.value());
         Logger::log(Level::INFO, "Mage fire ability remove top card used");
 
-        m_hasUserSelected = false;
+        m_selectedCoord.reset();
         return true;
     }
 
 
     ///--------Burn Row and Col-----------
 
-
-    MasterOfFireBack::MasterOfFireBack() {
+    MasterOfFireBack::MasterOfFireBack(Board& board, Player& player_red, Player& player_blue, color::ColorType color)
+        : MageCard(board, player_red, player_blue, color),
+        line_choice{ LineChoice::None } {
         m_type = MageType::Fire;
         m_ability = MageTypeAbility::BurnRowOrColumn;
     }
-    const std::vector<uint16_t>& MasterOfFireBack::getAvailableRows() const {
-        return m_availableRows;
-    }
 
-    const std::vector<uint16_t>& MasterOfFireBack::getAvailableColumns() const {
-        return m_availableColumns;
-    }
-    bool MasterOfFireBack::hasUserSelected() const {
-        return m_hasUserSelected;
-    }
-    void MasterOfFireBack::setSelectedChoice(uint16_t choice, char type) {
-        m_selectedChoice = choice;
-        m_selectedType = type;
-        m_hasUserSelected = true;
-    }
 
-    void MasterOfFireBack::clearSelection() {
-        m_hasUserSelected = false;
-    }
-    std::pair<std::vector<uint16_t>, std::vector<uint16_t>> MasterOfFireBack::getChoices(const Board& board, const Player& player) {
-        std::vector<uint16_t> line_choices;
-        std::vector<uint16_t> column_choices;
+    void MasterOfFireBack::_setRowChoices() {
+        Config& config{ Config::getInstance() };
+        uint16_t x_step{ config.getCardSpacingX() };
+        uint16_t y_step{ config.getCardSpacingY() };
 
-        std::unordered_map<uint16_t, std::pair<uint16_t, bool>> rows;
-        std::unordered_map<uint16_t, std::pair<uint16_t, bool>> cols;
+        auto [min_corner, max_corner] {m_board.getBoudingRect()};
+        std::unordered_set<uint16_t> buffer1, buffer2;
+        bool has_own_color1 = false, has_own_color2 = false;
 
-        for (const auto& [coord, stack] : board) {
-            auto& [x, y] = coord;
+        uint16_t top = 0, bottom = 0;
+        for (uint16_t x = min_corner.first; x <= max_corner.first; x += x_step) {
+            Coord coord1{ x, min_corner.second }, coord2{ x, max_corner.second };
 
-            rows[y].first++;
-            cols[x].first++;
+            if (m_board.hasStack(coord1)) {
+                buffer1.insert(m_board[coord1].back().getID());
+                has_own_color1 = has_own_color1 || (m_board[coord1].back().getColor() == m_color);
+                top++;
+            }
 
-            if (stack.back().getColor() == player.getColor()) {
-                rows[y].second = true;
-                cols[x].second = true;
+            if (m_board.hasStack(coord2)) {
+                buffer2.insert(m_board[coord2].back().getID());
+                has_own_color2 = has_own_color2 || (m_board[coord2].back().getColor() == m_color);
+                bottom++;
             }
         }
 
-        for (const auto& [pos, val] : rows) {
-            if (val.first >= board.getSize() - 1 && val.second) {  // 
-                m_availableRows.push_back(pos);
-            }
+        if (top >= 3 && has_own_color1) {
+            m_availableRows[min_corner.second] = buffer1;
         }
-        for (const auto& [pos, val] : cols) {
-            if (val.first >= board.getSize() - 1 && val.second) {  //
-                m_availableColumns.push_back(pos);
+        if (bottom >= 3 && has_own_color2) {
+            m_availableRows[max_corner.second] = buffer2;
+        }
+    }
+    void MasterOfFireBack::_setColChoices() {
+        Config& config{ Config::getInstance() };
+        uint16_t x_step{ config.getCardSpacingX() };
+        uint16_t y_step{ config.getCardSpacingY() };
+
+        auto [min_corner, max_corner] {m_board.getBoudingRect()};
+        std::unordered_set<uint16_t> buffer1, buffer2;
+        bool has_own_color1 = false, has_own_color2 = false;
+
+        uint16_t left = 0, right = 0;
+        for (uint16_t y = min_corner.second; y <= max_corner.second; y += y_step) {
+            Coord coord1{ min_corner.first, y }, coord2{ max_corner.first, y };
+
+            if (m_board.hasStack(coord1)) {
+                buffer1.insert(m_board[coord1].back().getID());
+                has_own_color1 = has_own_color1 || (m_board[coord1].back().getColor() == m_color && !has_own_color1);
+                left++;
+            }
+
+            if (m_board.hasStack(coord2)) {
+                buffer2.insert(m_board[coord2].back().getID());
+                has_own_color2 = has_own_color2 || (m_board[coord2].back().getColor() == m_color);
+                right++;
             }
         }
 
-        return { m_availableRows, m_availableColumns };
+        if (left >= 3 && has_own_color1) {
+            m_availableColumns[min_corner.first] = buffer1;
+        }
+        if (right >= 3 && has_own_color2) {
+            m_availableColumns[max_corner.first] = buffer2;
+        }
     }
 
 
-    bool MasterOfFireBack::apply(Board& board, Player& player) {
-        getChoices(board, player);
+    std::unordered_set<uint16_t> MasterOfFireBack::getChoices() {
+        _setColChoices();
+        _setRowChoices();
+
+        std::unordered_set<uint16_t> choices;
+
+        for (auto& [pos, ids] : m_availableRows) {
+            choices.insert(ids.begin(), ids.end());
+        }
+        for (auto& [pos, ids] : m_availableColumns) {
+            choices.insert(ids.begin(), ids.end());
+        }
+
+        return choices;
+    }
+
+    std::unordered_set<uint16_t> MasterOfFireBack::getRemoveChoices(const Coord& coord) {
+        if (m_availableRows.contains(coord.second)) {
+            return m_availableRows[coord.second];
+        }
+
+        if (m_availableColumns.contains(coord.first)) {
+            return m_availableColumns[coord.first];
+        }
+    }
+
+    void MasterOfFireBack::setSelectedChoice(const Coord& coord) {
+        if (m_availableRows.contains(coord.second)) {
+            m_selectedChoice = coord.second;
+
+            line_choice = LineChoice::Row;
+            m_hasUserSelected = true;
+            return;
+        }
+
+        if (m_availableColumns.contains(coord.first)) {
+            m_selectedChoice = coord.first;
+
+            line_choice = LineChoice::Column;
+            m_hasUserSelected = true;
+        }
+    }
+
+    bool MasterOfFireBack::apply() {
+
         if (m_availableRows.empty() && m_availableColumns.empty())
         {
             Logger::log(Level::INFO, "You can't use this mage right now");
             return false;
         }
-        std::cout << "Available choices:\n";
 
         if (!m_hasUserSelected) {
             Logger::log(Level::INFO, "No selection made yet");
             return false;
         }
-        if (m_selectedType == 'r') {
-            if (std::find(m_availableRows.begin(), m_availableRows.end(), m_selectedChoice) != m_availableRows.end()) {
-                if (!board.isValidRemoveRow(m_selectedChoice)) {
-                    Logger::log(Level::ERROR, "You can't remove that row");
-                    return false;
-                }
-                board.removeRow(m_selectedChoice);
-            }
-            else {
-                Logger::log(Level::INFO, "invalid input");
-                return false;
-            }
+
+        if (line_choice == LineChoice::Row) {
+            m_board.removeRow(m_selectedChoice);
         }
-        else if (m_selectedType == 'c') {
-            if (std::find(m_availableColumns.begin(), m_availableColumns.end(), m_selectedChoice) != m_availableColumns.end()) {
-                if (!board.isValidRemoveColumn(m_selectedChoice)) {
-                    Logger::log(Level::ERROR, "You can't remove that column");
-                    return false;
-                }
-                board.removeColumn(m_selectedChoice);
-            }
-            else {
-                Logger::log(Level::INFO, "invalid input");
-                return false;
-            }
+        else if (line_choice == LineChoice::Column) {
+            m_board.removeColumn(m_selectedChoice);
         }
         else {
             Logger::log(Level::INFO, "invalid input");
@@ -183,44 +222,39 @@ namespace base {
         return true;
     }
 
-
-
-
-
-
     ///------------------------------------------ MasterOfEarth-------------------------------------------
     ///-------------Bury-------------
-    MasterOfEarthFront::MasterOfEarthFront() {
+    MasterOfEarthFront::MasterOfEarthFront(Board& board, Player& player_red, Player& player_blue, color::ColorType color)
+        : MageCard(board, player_red, player_blue, color) {
         m_type = MageType::Earth;
         m_ability = MageTypeAbility::Bury;
         m_hasUserSelected = false;
         m_hasCardTypeSelected = false;
     }
 
-    bool MasterOfEarthFront::validPosition(const Coord& coord, Board& board, const Player& player) const {
+    bool MasterOfEarthFront::validPosition(const Coord& coord, CombatCardType other_type) const {
+        using enum CombatCardType;
 
-        bool specialCards = board[coord].back().getType() == CombatCardType::ONE ||
-            board[coord].back().getType() == CombatCardType::ETER ||
-            board[coord].back().getType() == CombatCardType::HOLE ? true : false;
+        const auto& top_card{ m_board[coord].back() };
+        std::unordered_set available_types{ ONE, TWO, THREE, FOUR };
 
-        if (board[coord].back().getColor() != player.getColor() && !specialCards) {
-            return true;
-        }
+        bool correct_type{ available_types.contains(top_card.getType()) };
+        bool correct_val{ top_card.getType() > other_type };
+        bool correct_color{ top_card.getColor() != m_color };
 
-        return false;
+        return correct_color && correct_type && correct_val;
     }
 
-    std::vector<Coord> MasterOfEarthFront::getChoices(Board& board, const Player& player) {
-
+    std::unordered_set<uint16_t> MasterOfEarthFront::getChoices(CombatCardType type) {
         m_availableChoices.clear();
-        for (const auto& iterator : board) {
-            if (validPosition(iterator.first, board, player)) {
-                m_availableChoices.emplace_back(iterator.first);
+
+        for (const auto& [coord, stack] : m_board) {
+            if (validPosition(coord, type)) {
+                m_availableChoices.insert(stack.back().getID());
             }
         }
+
         return m_availableChoices;
-
-
     }
 
     void MasterOfEarthFront::setSelectedCoord(const Coord& coord) {
@@ -228,48 +262,49 @@ namespace base {
         m_hasUserSelected = true;
     }
 
-    void MasterOfEarthFront::setSelectedCardType(CombatCardType cardType) {
-        m_selectedCardType = cardType;
+    void MasterOfEarthFront::setSelectedCard(uint16_t id) {
+        m_selectedId = id;
         m_hasCardTypeSelected = true;
     }
 
-
-    bool MasterOfEarthFront::apply(Board& board, Player& player) {
-        getChoices(board, player);
+    bool MasterOfEarthFront::apply() {
+        if (m_board.hasStack(m_selectedCoord) == false) {
+            return false;
+        }
 
         if (m_availableChoices.empty()) {
             Logger::log(Level::INFO, "No valid position for using this Mage!");
             return false;
         }
 
-        if (!m_hasUserSelected) {
-            Logger::log(Level::WARNING, "No selection made yet!");
-            return false;
-        }
         if (!m_hasCardTypeSelected) {
             Logger::log(Level::WARNING, "No card type selected!");
             return false;
         }
 
-        if (std::find(m_availableChoices.begin(), m_availableChoices.end(), m_selectedCoord) == m_availableChoices.end()) {
-            Logger::log(Level::WARNING, "Invalid choice!");
+        if (m_availableChoices.contains(m_board[m_selectedCoord].back().getID()) == false) {
             return false;
         }
 
-        auto card = player.getCard(m_selectedCardType);
-        if (card.getType() >= board[m_selectedCoord].back().getType()) {
-            Logger::log(Level::WARNING, "Invalid card choice!");
-            return false;
+        if (m_color == color::ColorType::RED) {
+            CombatCard card = m_player_red.getCardByID(m_selectedId);
+
+            m_board.appendSpecialCard(m_selectedCoord, std::move(card));
+        }
+        else {
+            CombatCard card = m_player_blue.getCardByID(m_selectedId);
+
+            m_board.appendSpecialCard(m_selectedCoord, std::move(card));
         }
 
-        board.appendSpecialCard(m_selectedCoord, std::move(card));
         Logger::log(Level::INFO, "Mage Earth Bury ability card used");
         m_hasUserSelected = false;
         return true;
     }
     ///---------Hole----------
 
-    MasterOfEarthBack::MasterOfEarthBack() {
+    MasterOfEarthBack::MasterOfEarthBack(Board& board, Player& player_red, Player& player_blue, color::ColorType color)
+        : MageCard(board, player_red, player_blue, color) {
         m_type = MageType::Earth;
         m_ability = MageTypeAbility::Hole;
         m_hasUserSelected = false;
@@ -280,13 +315,13 @@ namespace base {
         m_hasUserSelected = true;
     }
 
-    const std::vector<Coord>& MasterOfEarthBack::getAvailableChoices(const Board& board) const {
-        m_availableChoices.assign(board.availableSpaces().begin(), board.availableSpaces().end());
+    const std::vector<Coord>& MasterOfEarthBack::getAvailableChoices() const {
+        m_availableChoices.assign(m_board.availableSpaces().begin(), m_board.availableSpaces().end());
         return m_availableChoices;
     }
 
-    bool MasterOfEarthBack::apply(Board& board, Player& player) {
-        getAvailableChoices(board);
+    bool MasterOfEarthBack::apply() {
+        getAvailableChoices();
 
         if (m_availableChoices.empty()) {
             Logger::log(Level::INFO, "No available choices for this mage rn");
@@ -303,8 +338,8 @@ namespace base {
             return false;
         }
 
-        CombatCard card(CombatCardType::HOLE, player.getColor());
-        board.appendMove(m_selectedCoord, std::move(card));
+        CombatCard card(CombatCardType::HOLE, color::ColorType::DEFAULT);
+        m_board.appendMove(m_selectedCoord, std::move(card));
         Logger::log(Level::INFO, "Mage Earth Hole ability card used");
         m_hasUserSelected = false;
         return true;
@@ -313,18 +348,16 @@ namespace base {
 
     /// ---------------------------------------MasterOfAir----------------------------------------
     /// ---------BlowAway--------
-    MasterOfAirFront::MasterOfAirFront()
-        : m_hasUserSelectedFrom(false), m_hasUserSelectedTo(false) {
+    MasterOfAirFront::MasterOfAirFront(Board& board, Player& player_red, Player& player_blue, color::ColorType color)
+        : MageCard(board, player_red, player_blue, color),
+        m_hasUserSelectedFrom(false), m_hasUserSelectedTo(false) {
         m_type = MageType::Air;
         m_ability = MageTypeAbility::BlowAway;
     }
 
 
-    bool MasterOfAirFront::apply(Board& board, Player& player) {
-
-        getAvailableChoices(board, player);
-
-        if (m_availableChoices.empty()) {
+    bool MasterOfAirFront::apply() {
+        if (m_availableChoicesFrom.empty() || m_availableChoicesTo.empty()) {
             Logger::log(Level::WARNING, "You can't use this mage right now!");
             return false;
         }
@@ -334,12 +367,14 @@ namespace base {
             return false;
         }
 
-        if (std::find(m_availableChoices.begin(), m_availableChoices.end(), m_moveFrom) == m_availableChoices.end()) {
+        if (!m_availableChoicesFrom.contains(m_board[m_moveFrom].back().getID()) ||
+            !m_availableChoicesTo.contains(m_moveTo)) {
             Logger::log(Level::WARNING, "Invalid source coordinate!");
             return false;
         }
-        if (board.isValidMoveStack(m_moveFrom, m_moveTo)) {
-            board.moveStack(m_moveFrom, m_moveTo);
+
+        if (m_board.isValidMoveStack(m_moveFrom, m_moveTo)) {
+            m_board.moveStack(m_moveFrom, m_moveTo);
             Logger::log(Level::INFO, "Mage Air BlowAway ability card used");
             m_hasUserSelectedFrom = false;
             m_hasUserSelectedTo = false;
@@ -354,6 +389,8 @@ namespace base {
     void MasterOfAirFront::setMoveFrom(const Coord& coord) {
         m_moveFrom = coord;
         m_hasUserSelectedFrom = true;
+        m_stackBufer.clear();
+        m_stackBufer = getIDSAt(coord);
     }
 
     void MasterOfAirFront::setMoveTo(const Coord& coord) {
@@ -362,19 +399,46 @@ namespace base {
     }
 
 
-    const std::vector<Coord>& MasterOfAirFront::getAvailableChoices(const Board& board, const Player& player) {
-        m_availableChoices.clear();
-        for (const auto& [coord, stack] : board) {
-            if (stack.back().getColor() == player.getColor()) {
-                m_availableChoices.emplace_back(coord);
+    const std::unordered_set<uint16_t>& MasterOfAirFront::getAvailableChoicesFrom() {
+        m_availableChoicesFrom.clear();
+        for (const auto& [coord, stack] : m_board) {
+            if (stack.back().getColor() == m_color) {
+                m_availableChoicesFrom.insert(stack.back().getID());
             }
         }
-        return m_availableChoices;
+        return m_availableChoicesFrom;
     }
 
-    // ---------BlowEter---------
+    const std::unordered_set<Coord, utils::CoordFunctor>& MasterOfAirFront::getAvailableChoicesTo() {
+        if (m_hasUserSelectedFrom == false) {
+            throw std::runtime_error("you  didn t select  from");
+        }
+        m_availableChoicesTo.clear();
 
-    MasterOfAirBack::MasterOfAirBack() {
+        for (const Coord& space : m_board.availableSpaces()) {
+            if (m_board.isValidMoveStack(m_moveFrom, space)) {
+                m_availableChoicesTo.insert(space);
+            }
+        }
+
+        return m_availableChoicesTo;
+    }
+
+    std::unordered_set<uint16_t> MasterOfAirFront::getIDSAt(const Coord& coord) {
+        std::unordered_set<uint16_t> res;
+
+        if (m_board.hasStack(coord)) {
+            for (const auto& card : m_board[coord]) {
+                res.insert(card.getID());
+            }
+        }
+
+        return res;
+    }
+    /// ---------BlowEter---------
+
+    MasterOfAirBack::MasterOfAirBack(Board& board, Player& player_red, Player& player_blue, color::ColorType color)
+        : MageCard(board, player_red, player_blue, color) {
         m_type = MageType::Air;
         m_ability = MageTypeAbility::BlowEter;
         m_hasUserSelected = false;
@@ -387,8 +451,8 @@ namespace base {
         m_availableChoices.assign(board.availableSpaces().begin(), board.availableSpaces().end());
         return m_availableChoices;
     }
-    bool MasterOfAirBack::apply(Board& board, Player& player) {
-        getAvailableChoices(board);
+    bool MasterOfAirBack::apply() {
+        getAvailableChoices(m_board);
         if (m_availableChoices.empty()) {
             Logger::log(Level::INFO, "No available options for this mage rn");
             return false;
@@ -408,47 +472,46 @@ namespace base {
             Logger::log(Level::INFO, "Invalid option");
             return false;
         }
-        CombatCard eter(CombatCardType::ETER, player.getColor());
-        board.appendMove(m_selectedCoord, std::move(eter));
+
+        if (!eter) {
+            return false;
+        }
+
+        m_board.appendMove(m_selectedCoord, std::move(eter.value()));
+        eter.reset();
         Logger::log(Level::INFO, "Mage Air BlowEter ability card used");
 
         m_hasUserSelected = false; // reset for next use
         return true;
     }
 
+    uint16_t MasterOfAirBack::createEter() {
+        eter.emplace(CombatCardType::ETER, m_color);
+
+        if (m_color == color::ColorType::RED) {
+            m_player_red.addCard(std::move(eter.value()));
+        }
+        else {
+            m_player_blue.addCard(std::move(eter.value()));
+        }
+
+        return eter->getID();
+    }
 
 
     //----------------------------------------- MasterOfWater---------------------------------------
 
     //---------Boat------------
-    MasterOfWaterFront::MasterOfWaterFront() {
+    MasterOfWaterFront::MasterOfWaterFront(Board& board, Player& player_red, Player& player_blue, color::ColorType color)
+        : MageCard(board, player_red, player_blue, color) {
         m_type = MageType::Water;
         m_ability = MageTypeAbility::Boat;
-        m_hasUserSelectedFrom = false;
-        m_hasUserSelectedTo = false;
-    }
-    void MasterOfWaterFront::setMoveFrom(const Coord& coord) {
-        m_moveFrom = coord;
-        m_hasUserSelectedFrom = true;
+
     }
 
-    void MasterOfWaterFront::setMoveTo(const Coord& coord) {
-        m_moveTo = coord;
-        m_hasUserSelectedTo = true;
-    }
-    const std::vector<Coord>& MasterOfWaterFront::getAvailableChoices(const Board& board, const Player& player) {
-        m_availableChoices.clear();
-        for (const auto& [coord, stack] : board) {
-            if (stack.back().getColor() != player.getColor()) {
-                m_availableChoices.emplace_back(coord);
-            }
-        }
-        return m_availableChoices;
-    }
-    bool MasterOfWaterFront::apply(Board& board, Player& player) {
-        getAvailableChoices(board, player);
-        if (m_availableChoices.empty()) {
-            Logger::log(Level::WARNING, "Invalid choice!");
+    bool MasterOfWaterFront::apply() {
+        if (m_availableChoicesFrom.empty() || m_availableChoicesTo.empty()) {
+            Logger::log(Level::WARNING, "You can't use this mage right now!");
             return false;
         }
 
@@ -457,36 +520,90 @@ namespace base {
             return false;
         }
 
-        if (std::find(m_availableChoices.begin(), m_availableChoices.end(), m_moveFrom) == m_availableChoices.end()) {
+        if (!m_availableChoicesFrom.contains(m_board[m_moveFrom].back().getID()) ||
+            !m_availableChoicesTo.contains(m_moveTo)) {
             Logger::log(Level::WARNING, "Invalid source coordinate!");
             return false;
         }
 
-
-        if (board.isValidMoveStack(m_moveFrom, m_moveTo)) {
-            board.moveStack(m_moveFrom, m_moveTo);
-            Logger::log(Level::INFO, "Mage Water Boat ability card used");
+        if (m_board.isValidMoveStack(m_moveFrom, m_moveTo)) {
+            m_board.moveStack(m_moveFrom, m_moveTo);
+            Logger::log(Level::INFO, "Mage Air BlowAway ability card used");
+            m_hasUserSelectedFrom = false;
+            m_hasUserSelectedTo = false;
+            return true;
         }
         else {
-            Logger::log(Level::INFO, "Wrong choice");
+            Logger::log(Level::INFO, "Invalid destination coordinate!");
             return false;
         }
-        return true;
+    }
+
+    void MasterOfWaterFront::setMoveFrom(const Coord& coord) {
+        m_moveFrom = coord;
+        m_hasUserSelectedFrom = true;
+        m_stackBufer.clear();
+        m_stackBufer = getIDSAt(coord);
+    }
+
+    void MasterOfWaterFront::setMoveTo(const Coord& coord) {
+        m_moveTo = coord;
+        m_hasUserSelectedTo = true;
     }
 
 
+    const std::unordered_set<uint16_t>& MasterOfWaterFront::getAvailableChoicesFrom() {
+        m_availableChoicesFrom.clear();
+        for (const auto& [coord, stack] : m_board) {
+            if (stack.back().getColor() != m_color) {
+                m_availableChoicesFrom.insert(stack.back().getID());
+            }
+        }
+        return m_availableChoicesFrom;
+    }
 
-    // -----------BoatRowOrColumn--------------
+    const std::unordered_set<Coord, utils::CoordFunctor>& MasterOfWaterFront::getAvailableChoicesTo() {
+        if (m_hasUserSelectedFrom == false) {
+            throw std::runtime_error("you  didn t select  from");
+        }
+        m_availableChoicesTo.clear();
 
-    MasterOfWaterBack::MasterOfWaterBack() {
+        for (const Coord& space : m_board.availableSpaces()) {
+            if (m_board.isValidMoveStack(m_moveFrom, space)) {
+                m_availableChoicesTo.insert(space);
+            }
+        }
+
+        return m_availableChoicesTo;
+    }
+
+    std::unordered_set<uint16_t> MasterOfWaterFront::getIDSAt(const Coord& coord) {
+        std::unordered_set<uint16_t> res;
+
+        if (m_board.hasStack(coord)) {
+            for (const auto& card : m_board[coord]) {
+                res.insert(card.getID());
+            }
+        }
+
+        return res;
+    }
+
+    /// -----------BoatRowOrColumn--------------
+
+    MasterOfWaterBack::MasterOfWaterBack(Board& board, Player& player_red, Player& player_blue, color::ColorType color)
+        : MageCard(board, player_red, player_blue, color) {
         m_type = MageType::Water;
         m_ability = MageTypeAbility::BoatRowOrColumn;
-        m_hasSelectedBorder = false;
-        m_hasSelectedDestination = false;
+        line_choice = LineChoice::None;
     }
 
 
     std::optional<std::unordered_map<BorderType, std::vector<Coord>>> MasterOfWaterBack::getBorders(Board& board, Player& player) const {
+        Config& config = Config::getInstance();
+        uint16_t x_step = config.getCardSpacingX();
+        uint16_t y_step = config.getCardSpacingY();
+
         std::unordered_map<BorderType, std::vector<Coord>> borders;
 
         auto [corner1, corner2] = board.getBoudingRect();
@@ -525,63 +642,38 @@ namespace base {
         return borders.empty() ? std::nullopt : std::make_optional(borders);
     }
 
-
-    void MasterOfWaterBack::setSelectedBorder(uint16_t index) {
-        m_selectedBorderIndex = index;
-        m_hasSelectedBorder = true;
-    }
-
-    void MasterOfWaterBack::setSelectedDestination(int destination) {
-        m_selectedDestination = destination;
-        m_hasSelectedDestination = true;
-    }
-
-    bool MasterOfWaterBack::apply(Board& board, Player& player) {
-        auto borders = getBorders(board, player);
-        if (!borders || borders->empty()) {
-            Logger::log(Level::INFO, "There are no borders to move yet");
+    bool MasterOfWaterBack::apply() {
+        if (getAvailableSpaces().contains(m_end) == false) {
             return false;
         }
 
-        if (!m_hasSelectedBorder || !m_hasSelectedDestination) {
-            Logger::log(Level::WARNING, "Border or destination not selected!");
+        if (!m_setStart || !m_setEnd) {
             return false;
         }
 
-        if (m_selectedBorderIndex >= borders->size()) {
-            Logger::log(Level::WARNING, "Invalid border index!");
+        if (moving_cards_buffer.empty()) {
             return false;
         }
 
-        auto selectedBorderIt = std::next(borders->begin(), m_selectedBorderIndex);
-        const auto& selectedBorder = selectedBorderIt->second;
+        if (line_choice == LineChoice::None) {
+            return false;
+        }
 
-        char direction = (selectedBorderIt->first == BorderType::Left || selectedBorderIt->first == BorderType::Right) ? 'c' : 'r';
-        uint16_t from_move = (direction == 'r') ? selectedBorder.front().second : selectedBorder.front().first;
+        if (line_choice == LineChoice::Row) {
+            int16_t end_rank{ m_end.second };
 
-        auto [corner1, corner2] = board.getBoudingRect();
-        if (direction == 'r') {
-            if (m_selectedDestination != corner2.second + y_step && m_selectedDestination != corner1.second - y_step) {
-                Logger::log(Level::WARNING, "Invalid row destination!");
-                return false;
-            }
-            board.moveRow(from_move, m_selectedDestination);
+            m_board.moveRow(moving_line, end_rank);
         }
         else {
-            if (m_selectedDestination != corner2.first + x_step && m_selectedDestination != corner1.first - x_step) {
-                Logger::log(Level::WARNING, "Invalid column destination!");
-                return false;
-            }
-            board.moveColumn(from_move, m_selectedDestination);
+            int16_t end_rank{ m_end.first };
+
+            m_board.moveColumn(moving_line, end_rank);
         }
 
-        Logger::log(Level::INFO, "Mage Water BoatRowOrColumn ability card used");
-        m_hasSelectedBorder = false;
-        m_hasSelectedDestination = false;
         return true;
     }
-}
-/*static std::string_view borderToString(BorderType border) {
+
+    /*static std::string_view borderToString(BorderType border) {
 
    switch (border) {
    case BorderType::Top:
@@ -600,4 +692,181 @@ namespace base {
        return "Unknown";
    }
 
-}*/
+   }*/
+
+
+    void MasterOfWaterBack::_setRowChoices() {
+        Config& config{ Config::getInstance() };
+        uint16_t x_step{ config.getCardSpacingX() };
+        uint16_t y_step{ config.getCardSpacingY() };
+
+        auto [min_corner, max_corner] {m_board.getBoudingRect()};
+        std::unordered_set<uint16_t> buffer1, buffer2;
+
+        uint16_t top = 0, bottom = 0;
+        for (uint16_t x = min_corner.first; x <= max_corner.first; x += x_step) {
+            Coord coord1{ x, min_corner.second }, coord2{ x, max_corner.second };
+
+            if (m_board.hasStack(coord1)) {
+                buffer1.insert(m_board[coord1].back().getID());
+                top++;
+            }
+
+            if (m_board.hasStack(coord2)) {
+                buffer2.insert(m_board[coord2].back().getID());
+                bottom++;
+            }
+        }
+
+        if (top >= 3 && buffer1.size()) {
+            m_availableRows[min_corner.second] = buffer1;
+        }
+        if (bottom >= 3 && buffer2.size()) {
+            m_availableRows[max_corner.second] = buffer2;
+        }
+    }
+    void MasterOfWaterBack::_setColChoices() {
+        Config& config{ Config::getInstance() };
+        uint16_t x_step{ config.getCardSpacingX() };
+        uint16_t y_step{ config.getCardSpacingY() };
+
+        auto [min_corner, max_corner] {m_board.getBoudingRect()};
+        std::unordered_set<uint16_t> buffer1, buffer2;
+
+        uint16_t left = 0, right = 0;
+        for (uint16_t y = min_corner.second; y <= max_corner.second; y += y_step) {
+            Coord coord1{ min_corner.first, y }, coord2{ max_corner.first, y };
+
+            if (m_board.hasStack(coord1)) {
+                buffer1.insert(m_board[coord1].back().getID());
+                left++;
+            }
+
+            if (m_board.hasStack(coord2)) {
+                buffer2.insert(m_board[coord2].back().getID());
+                right++;
+            }
+        }
+
+        if (left >= 3 && buffer1.size()) {
+            m_availableColumns[min_corner.first] = buffer1;
+        }
+        if (right >= 3 && buffer2.size()) {
+            m_availableColumns[max_corner.first] = buffer2;
+        }
+    }
+
+
+    std::unordered_set<uint16_t> MasterOfWaterBack::getChoices() {
+        _setColChoices();
+        _setRowChoices();
+
+        std::unordered_set<uint16_t> choices;
+
+        for (auto& [pos, ids] : m_availableRows) {
+            choices.insert(ids.begin(), ids.end());
+        }
+        for (auto& [pos, ids] : m_availableColumns) {
+            choices.insert(ids.begin(), ids.end());
+        }
+
+        return choices;
+    }
+
+    void MasterOfWaterBack::setStart(const Coord& coord) {
+        if (m_availableRows.contains(coord.second)) {
+            moving_line = coord.second;
+            line_choice = LineChoice::Row;
+            m_setStart = true;
+
+            for (const auto& [pos, stack] : m_board) {
+                if (m_availableRows[coord.second].contains(stack.back().getID())) {
+                    moving_cards_buffer[pos] = std::vector<uint16_t>();
+
+                    for (const auto& card : stack) {
+                        moving_cards_buffer[pos].push_back(card.getID());
+                    }
+                }
+            }
+        }
+        else if (m_availableColumns.contains(coord.first)) {
+            moving_line = coord.first;
+            line_choice = LineChoice::Column;
+            m_setStart = true;
+
+            for (const auto& [pos, stack] : m_board) {
+                if (m_availableColumns[coord.first].contains(stack.back().getID())) {
+                    moving_cards_buffer[pos] = std::vector<uint16_t>();
+
+                    for (const auto& card : stack) {
+                        moving_cards_buffer[pos].push_back(card.getID());
+                    }
+                }
+            }
+        }
+    }
+
+    void MasterOfWaterBack::setEnd(const Coord& coord) {
+        m_end = coord;
+        m_setEnd = true;
+    }
+
+    std::unordered_set<Coord, utils::CoordFunctor> MasterOfWaterBack::getAvailableSpaces() {
+        Config& config{ Config::getInstance() };
+        uint16_t x_step{ config.getCardSpacingX() };
+        uint16_t y_step{ config.getCardSpacingY() };
+
+        auto [min_corner, max_corner] {m_board.getBoudingRect()};
+
+        std::unordered_set<Coord, utils::CoordFunctor> available_spaces;
+
+        if (line_choice == LineChoice::Row) {
+            uint16_t available_y;
+
+            if (moving_line == min_corner.second) {
+                available_y = max_corner.second + y_step;
+            }
+            else {
+                available_y = min_corner.second - y_step;
+            }
+
+            for (const auto& [coord, _] : moving_cards_buffer) {
+                available_spaces.emplace(coord.first, available_y);
+            }
+        }
+        else if (line_choice == LineChoice::Column) {
+            uint16_t available_x;
+
+            if (moving_line == min_corner.first) {
+                available_x = max_corner.first + x_step;
+            }
+            else {
+                available_x = min_corner.first - x_step;
+            }
+
+            for (const auto& [coord, _] : moving_cards_buffer) {
+                available_spaces.emplace(available_x, coord.second);
+            }
+        }
+
+        return available_spaces;
+    }
+
+    /*void MasterOfWaterBack::setSelectedBorder(uint16_t index) {
+        m_selectedFrom = index;
+        m_hasSelectedBorder = true;
+    }
+
+    void MasterOfWaterBack::setSelectedDestination(int destination) {
+        m_selectedTo = destination;
+        m_hasSelectedDestination = true;
+    }*/
+    
+    void MasterOfWaterBack::resetBuffer() {
+        moving_cards_buffer.clear();
+        line_choice = LineChoice::None;
+        moving_line = 0;
+        m_setStart = false;
+        m_setEnd = false;
+    }
+}

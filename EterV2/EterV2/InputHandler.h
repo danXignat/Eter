@@ -4,6 +4,7 @@
 #include "ServiceType.h"
 #include "CombatCardType.h"
 #include "GameModeType.h"
+#include "colors.h"
 
 namespace base {
 	struct InputHandler {
@@ -11,6 +12,7 @@ namespace base {
 		void read();
 
 		std::pair<uint16_t, uint16_t> coord;
+		color::ColorType color;
 		uint16_t ID;
 		CombatCardType card_type;
 		ServiceType service_type;

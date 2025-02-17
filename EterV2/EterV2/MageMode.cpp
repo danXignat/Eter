@@ -11,7 +11,7 @@ namespace base {
 	//---------------------------------------Constructor-------------------------------------
 	MageMode::MageMode(const std::vector<ServiceType>& services, const std::pair<std::string, std::string>& player_names) :
 		BaseGameMode{GameSizeType::BIG, player_names, services},
-		m_mage_service{ m_board }
+		m_mage_service{ m_board, m_player_red, m_player_blue }
 	{}
 
 	//---------------------------------------Events----------------------------------------------
@@ -40,11 +40,11 @@ namespace base {
 				break;
 
 			case PlaceIllusion:
-				action_succed = placeIllusion(input);
+				//action_succed = placeIllusion(input);
 				break;
 
 			case UseMage:
-				action_succed = useMage();
+				//action_succed = useMage();
 				break;
 
 			default:
@@ -73,8 +73,8 @@ namespace base {
 		std::cin.get();
 	}
 
-	bool MageMode::useMage() {
-		return m_mage_service.apply(m_curr_player.get());
+	MageService& MageMode::getMageService() {
+		return m_mage_service;
 	}
 
 	////------------------------------------------------Methods-------------------------------------------------

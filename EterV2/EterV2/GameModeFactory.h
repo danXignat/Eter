@@ -6,6 +6,9 @@
 #include "GameModeType.h"
 #include "ServiceType.h"
 #include "TrainingMode.h"
+#include "MageMode.h"
+#include "ElementalMode.h"
+#include "TournamentMode.h"
 #include "TimedMode.h"
 
 namespace base {

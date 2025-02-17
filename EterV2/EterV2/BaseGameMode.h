@@ -23,10 +23,15 @@ namespace base {
 		const Player& getPlayerBlue() const override;
 		const Player& getCurrPlayer() const override;
 		const Board&  getBoard() const override;
-		std::optional <ExplosionService> &getExplosionService();
 
+		std::unordered_set<uint16_t> getAvailableIds(InputHandler&);
+		std::unordered_set<uint16_t> getRestrictedIds(InputHandler&);
+
+		std::optional <ExplosionService> &getExplosionService();
+		std::optional <IllusionService> &getIllusionService();
 		std::optional<color::ColorType> getWinningColor() const;
 		void switchPlayer();
+		void tryShiftBoard();
 
 		bool placeCombatCard(const InputHandler&);
 		bool placeIllusion(const InputHandler&);

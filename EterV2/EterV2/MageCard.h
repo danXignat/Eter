@@ -11,17 +11,22 @@
 namespace base {
 	class MageCard {
 	public:
-		MageCard();
+		MageCard(Board& board, Player& player_red, Player& player_blue, color::ColorType color);
 		virtual ~MageCard() = default;
 
 		MageType getType() const;
 		MageTypeAbility getMasterType() const;
 
-		virtual bool apply(Board& board, Player& player) = 0;
+		virtual bool apply() = 0;
 		
 	protected:
 		MageType m_type;
 		MageTypeAbility m_ability;
+		color::ColorType m_color;
+
+		Board& m_board;
+		Player& m_player_red;
+		Player& m_player_blue;
 	};
 
 }

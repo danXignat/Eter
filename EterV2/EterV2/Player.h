@@ -29,6 +29,7 @@ namespace base {
 
         bool hasCards() const;
         bool hasCard(CombatCardType) const;
+        bool hasCard(uint16_t) const;
         bool hasUsedCard(CombatCardType) const;
         bool hasUsedCards() const;
 
@@ -47,6 +48,8 @@ namespace base {
         void _addCard(CombatCardType, uint16_t);
 
     private:
+        static uint16_t card_id_counter;
+
         color::ColorType m_color;
         std::string m_name;
 

@@ -15,6 +15,7 @@
 #include "GameModeType.h"
 #include "typedefs.h"
 #include "Config.h"
+#include "InputHandler.h"
 
 namespace base {
 	class Board {
@@ -43,6 +44,7 @@ namespace base {
 		const std::unordered_map<Coord, Stack, utils::CoordFunctor>& getCombatCards() const;
 		std::optional<CombatCardRef> getTopCard(const Coord& coord);
 		const std::vector<CombatCard>& operator[](const Coord& coord) const;
+		std::vector<CombatCard>& operator[](const Coord& coord);
 		std::unordered_set<int16_t> getFixedRows() const;
 		std::unordered_set<int16_t> getFixedColumns() const;
 		std::unordered_set<int16_t> getUnfixedRows() const;
@@ -54,6 +56,8 @@ namespace base {
 		std::vector<Coord> getCoordsOnRow(int16_t row_index) const;
 		std::vector<Coord> getCoordsOnColumn(int16_t col_index) const;
 		std::optional<Coord> getWinCoord() const;
+		void shift(const Coord&);
+
 
 
 		void returnUsedCardToHand(CombatCardType card);
@@ -100,6 +104,7 @@ namespace base {
 		void removeColumn(uint16_t x);
 
 		bool isValidPlaceCard(const Coord&, const CombatCard&);
+		bool isValidPlaceCard(const InputHandler&);
 		bool isValidRemoveStack(const Coord&) const;
 		bool isValidRemoveRow(const uint16_t row_index)const;
 		bool isValidRemoveColumn(const uint16_t col_index)const;

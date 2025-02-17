@@ -19,16 +19,8 @@ namespace base {
 		m_color{ color },
 		m_illusion{ false } {
 
-		if (type == CombatCardType::ONE ||
-			type == CombatCardType::TWO ||
-			type == CombatCardType::THREE ||
-			type == CombatCardType::FOUR) {
-			m_ID = card_count;
-			card_count++;
-		}
-		else {
-			m_ID = -1;
-		}
+		m_ID = card_count;
+		card_count++;
 
 		logger::Logger::log(logger::Level::INFO, "card created ID {}", m_ID);
 	}

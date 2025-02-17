@@ -1,7 +1,4 @@
 ﻿#include "GameModeFactory.h"
-#include "MageMode.h"
-#include "ElementalMode.h"
-#include "TournamentMode.h"
 
 namespace base {
     GameModePtr GameModeFactory::get(const std::string& id, const std::pair<std::string, std::string>& player_names, int time_limit_seconds) {

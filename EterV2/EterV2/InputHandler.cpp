@@ -10,7 +10,8 @@ namespace base {
 		coord{0, 0},
 		card_type{ CombatCardType::NONE },
 		service_type{ ServiceType::NONE },
-		event_type{ EventType::NONE } {
+		event_type{ EventType::NONE },
+		color{color::ColorType::DEFAULT} {
 
 	}
 

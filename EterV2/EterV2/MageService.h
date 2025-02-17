@@ -15,16 +15,34 @@ namespace base {
     public:
         static constexpr const uint16_t MAGE_NUMBER = 8;
 
-        MageService(Board& board);
-        bool apply(Player& player);
+        MageService(Board& board, Player& red, Player& blue);
+        bool apply(color::ColorType color);
+
+        MageTypeAbility getMageAbility(color::ColorType color);
         void renderCard(PlayerRef player) const;
 
+        template <typename T>
+        T* getMageCard(color::ColorType color);
+
     private:
-        std::unique_ptr<MageCard> _factory(MageTypeAbility ability_type);
+        std::unique_ptr<MageCard> _factory(MageTypeAbility ability_type, color::ColorType color);
+ 
     private:
         Board& m_board;
+        Player& m_player_red;
+        Player& m_player_blue;
 
-        std::unique_ptr<MageCard> m_card_p1;
-        std::unique_ptr<MageCard> m_card_p2;
+        std::unique_ptr<MageCard> card_red;
+        std::unique_ptr<MageCard> card_blue;
     };
+
+    template <typename T>
+    T* MageService::getMageCard(color::ColorType color) {
+        if (color == color::ColorType::RED) {
+            return dynamic_cast<T*>(card_red.get());
+        }
+        else {
+            return dynamic_cast<T*>(card_blue.get());
+        }
+    }
 }

@@ -156,31 +156,32 @@ namespace base {
     }
 
     bool TournamentMode::processGameInput(const InputHandler& input) {
-        bool success = false;
-        switch (input.event_type) {
-        case EventType::PlaceCombatCard: {
-            success = m_base_mode->placeCombatCard(input);
-            break;
-        }
-        case EventType::PlaceIllusion: {
-            success = m_base_mode->placeIllusion(input);
-            break;
-        }
-        case EventType::UseMage: {
-            if (auto* mageMode = dynamic_cast<MageMode*>(m_base_mode.get())) {
-                success = mageMode->useMage();
-            }
-            break;
-        }
-        case EventType::UsePower: {
-            if (auto* elementalMode = dynamic_cast<ElementalMode*>(m_base_mode.get())) {
-                success = elementalMode->usePower();
-            }
-            break;
-        }
-        default:
-            break;
-        }
-        return success;
+        //bool success = false;
+        //switch (input.event_type) {
+        //case EventType::PlaceCombatCard: {
+        //    success = m_base_mode->placeCombatCard(input);
+        //    break;
+        //}
+        //case EventType::PlaceIllusion: {
+        //    //success = m_base_mode->placeIllusion(input);
+        //    break;
+        //}
+        //case EventType::UseMage: {
+        //    if (auto* mageMode = dynamic_cast<MageMode*>(m_base_mode.get())) {
+        //        success = mageMode->useMage();
+        //    }
+        //    break;
+        //}
+        //case EventType::UsePower: {
+        //    if (auto* elementalMode = dynamic_cast<ElementalMode*>(m_base_mode.get())) {
+        //        success = elementalMode->usePower();
+        //    }
+        //    break;
+        //}
+        //default:
+        //    break;
+        //}
+        //return success;
+        return true;
     }
 }
