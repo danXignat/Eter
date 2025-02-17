@@ -16,34 +16,34 @@ namespace base {
 
 	class ControllerExplosion :public PowerCard {
 	public:
-		ControllerExplosion();
+		ControllerExplosion(Board& board, Player& red, Player& blue);
 
-		void apply(Board& board, Player& player) override;
+		void apply() override;
 
 	};
 
 	class Destruction :public PowerCard {
 	public:
-		Destruction();
+		Destruction(Board& board, Player& red, Player& blue);
 
 		bool canUseAbility(const Board& board, const Player& player) const;
 		std::optional<Coord> getTargetPosition(const Board& board) const;
-		void apply(Board& board, Player& player) override;
+		void apply() override;
 		std::string getErrorMessage(const Board& board, const Player& player) const;
 
 	};
 
 	class Flame :public PowerCard {
 	public:
-		Flame();
+		Flame(Board& board, Player& red, Player& blue);
 
-		void apply(Board& board, Player& player) override;
+		void apply() override;
 
 	};
 
 	class Fire :public PowerCard {
 	public:
-		Fire();
+		Fire(Board& board, Player& red, Player& blue);
 
 		bool canUseAbility(const Board& board) const;
 		std::vector<std::pair<Coord, CombatCardType>> getVisibleCards(const Board& board) const;
@@ -52,7 +52,7 @@ namespace base {
 		void applyEffect(Board& board, CombatCardType chosen_type);
 		std::string getErrorMessage(const Board& board) const;
 
-		void apply(Board& board, Player& player) override;
+		void apply() override;
 		void setChosenCard(CombatCardType card_type);
 	private:
 		CombatCardType m_chosen_card;
@@ -63,7 +63,7 @@ namespace base {
 
 	class Ash :public PowerCard {
 	public:
-		Ash();
+		Ash(Board& board, Player& red, Player& blue);
 		struct UsedCardInfo {
 			CombatCardType type;
 			color::ColorType color;
@@ -75,7 +75,7 @@ namespace base {
 
 		std::string getErrorMessage(const Player& player) const;
 		void setSelection(const Coord& coordinates, CombatCardType card_type);
-		void apply(Board& board, Player& player) override;
+		void apply() override;
 
 	private:
 		Coord m_selected_coord;
@@ -85,8 +85,8 @@ namespace base {
 
 	class Spark :public PowerCard {
 	public:
-		Spark();
-		void apply(Board& board, Player& player) override;
+		Spark(Board& board, Player& red, Player& blue);
+		void apply() override;
 		std::vector<std::pair<Coord, CombatCardType>> coverCards(const Board& board, const Player& player);
 
 		void setAvailableChoices(const std::vector<std::pair<Coord, CombatCardType>>& choices);
@@ -112,9 +112,9 @@ namespace base {
 	public:
 
 
-		Squall();
+		Squall(Board& board, Player& red, Player& blue);
 
-		void apply(Board& board, Player& player) override;
+		void apply() override;
 		std::vector<std::pair<Coord, CombatCardType>> getVisibleCards(const Board& board, const Player& player);
 
 		void setVisibleCards(const std::vector<std::pair<Coord, CombatCardType>>& cards);
@@ -131,15 +131,15 @@ namespace base {
 	class Gale :public PowerCard {
 	public:
 
-		Gale();
-		void apply(Board& board, Player& player) override;
+		Gale(Board& board, Player& red, Player& blue);
+		void apply() override;
 
 	};
 
 	class Hurricane :public PowerCard {
 	public:
 		Hurricane();
-		void apply(Board& board, Player& player) override;
+		void apply() override;
 
 		void setOptions(const std::unordered_map<Orientation, std::vector<uint16_t>>& opts);
 		std::unordered_map<Orientation, std::vector<uint16_t>> getOptions() const;
@@ -158,9 +158,9 @@ namespace base {
 
 	class Gust :public PowerCard {
 	public:
-		Gust();
+		Gust(Board& board, Player& red, Player& blue);
 
-		void apply(Board& board, Player& player) override;
+		void apply() override;
 
 		void setValidSourceCards(const std::vector<Coord>& sources);
 		std::vector<Coord> getValidSourceCards() const;
@@ -183,17 +183,17 @@ namespace base {
 
 	class Mirrage :public PowerCard {
 	public:
-		Mirrage();
+		Mirrage(Board& board, Player& red, Player& blue);
 
-		void apply(Board& board, Player& player) override;
+		void apply() override;
 		bool getIllusion(Board& board, Player& player);
 
 	};
 
 	class Storm :public PowerCard {
 	public:
-		Storm();
-		void apply(Board& board, Player& player) override;
+		Storm(Board& board, Player& red, Player& blue);
+		void apply() override;
 		void setAvailableStacks(const std::vector<Coord>& stacks);
 		std::vector<Coord> getAvailableStacks() const;
 
@@ -207,9 +207,9 @@ namespace base {
 
 	class Tide :public PowerCard {
 	public:
-		Tide();
+		Tide(Board& board, Player& red, Player& blue);
 
-		void apply(Board& board, Player& player) override;
+		void apply() override;
 		void setAvailableStacks(const std::vector<Coord>& stacks);
 		std::vector<Coord> getAvailableStacks() const;
 
@@ -226,18 +226,18 @@ namespace base {
 
 	class Mist :public PowerCard {
 	public:
-		Mist();
+		Mist(Board& board, Player& red, Player& blue);
 
-		void apply(Board& board, Player& player) override;
+		void apply() override;
 		bool hasIllusion(Board& board, IllusionService& illusionService, Player& player);
 
 	};
 
 	class Wave :public PowerCard {
 	public:
-		Wave();
+		Wave(Board& board, Player& red, Player& blue);
 
-		void apply(Board& board, Player& player) override;
+		void apply() override;
 		void setAvailableStacks(const std::vector<Coord>& stacks);
 		std::vector<Coord> getAvailableStacks() const;
 
@@ -262,8 +262,8 @@ namespace base {
 
 	class Whirlpool : public PowerCard {
 	public:
-		Whirlpool();
-		void apply(Board& board, Player& player) override;
+		Whirlpool(Board& board, Player& red, Player& blue);
+		void apply() override;
 		void setUserChoice(char choice);
 		char getUserChoice() const;
 
@@ -295,7 +295,7 @@ namespace base {
 
 	class Blizzard :public PowerCard {
 	public:
-		Blizzard();
+		Blizzard(Board& board, Player& red, Player& blue);
 		void setBlockChoice(char choice);
 		std::optional<char> getBlockChoice() const;
 
@@ -304,7 +304,7 @@ namespace base {
 
 		void setChosenColumn(uint16_t column);
 		std::optional<uint16_t> getChosenColumn() const;
-		void apply(Board& board, Player& player) override;
+		void apply() override;
 	private:
 		std::optional<char> blockChoice;
 		std::optional<uint16_t> chosenRow;
@@ -315,7 +315,7 @@ namespace base {
 
 	class Waterfall :public PowerCard {
 	public:
-		Waterfall();
+		Waterfall(Board& board, Player& red, Player& blue);
 		void setOrientation(Orientation orientation);
 		std::optional<Orientation> getOrientation() const;
 
@@ -327,7 +327,7 @@ namespace base {
 
 		std::unordered_map<Orientation, std::vector<int16_t>> getOptions(Board& board);
 		std::tuple<Orientation, int16_t, MoveDirection> input(Board& board);
-		void apply(Board& board, Player& player) override;
+		void apply() override;
 
 	private:
 		std::optional<Orientation> selectedOrientation;
@@ -338,9 +338,9 @@ namespace base {
 
 	class Support :public PowerCard {
 	public:
-		Support();
+		Support(Board& board, Player& red, Player& blue);
 
-		void apply(Board& board, Player& player) override;
+		void apply() override;
 		void setSelectedCoord(const Coord& coord);
 		std::optional<Coord> getSelectedCoord() const;
 		std::vector<Coord> CoordCardType(Board& board, const Player& player) const;
@@ -351,9 +351,9 @@ namespace base {
 
 	class Earthquake :public PowerCard {
 	public:
-		Earthquake();
+		Earthquake(Board& board, Player& red, Player& blue);
 
-		void apply(Board& board, Player& player) override;
+		void apply() override;
 		void setCardsToRemove(const std::vector<Coord>& cards);
 		std::vector<Coord> getCardsToRemove() const;
 	private:
@@ -364,9 +364,9 @@ namespace base {
 
 	class Crumble :public PowerCard {
 	public:
-		Crumble();
+		Crumble(Board& board, Player& red, Player& blue);
 
-		void apply(Board& board, Player& player) override;
+		void apply() override;
 		void setValidCards(const std::vector<Coord>& cards);
 		std::vector<Coord> getValidCards() const;
 		std::vector<Coord> findValidCards(const Board& board, const Player& player) const;
@@ -380,9 +380,9 @@ namespace base {
 
 	class Border :public PowerCard {
 	public:
-		Border();
+		Border(Board& board, Player& red, Player& blue);
 
-		void apply(Board& board, Player& player) override;
+		void apply() override;
 		void setValidPositions(const std::set<int>& rows, const std::set<int>& cols);
 		std::pair<std::set<int>, std::set<int>> getValidPositions() const;
 
@@ -404,9 +404,9 @@ namespace base {
 
 	class Avalanche :public PowerCard {
 	public:
-		Avalanche();
+		Avalanche(Board& board, Player& red, Player& blue);
 
-		void apply(Board& board, Player& player) override;
+		void apply() override;
 		std::vector<std::pair<Orientation, std::pair<Coord, Coord>>> getPairs(Board& board);
 		std::vector<std::pair<MoveDirection, std::pair<Coord, Coord>>> checkShifting(
 			const std::vector<std::pair<Orientation, std::pair<Coord, Coord>>>& pack, Board& board);
@@ -421,9 +421,9 @@ namespace base {
 
 	class Rock :public PowerCard {
 	public:
-		Rock();
+		Rock(Board& board, Player& red, Player& blue);
 
-		void apply(Board& board, Player& player) override;
+		void apply() override;
 
 		std::vector<Coord>getIllusionCoords(const Board& board) const;
 

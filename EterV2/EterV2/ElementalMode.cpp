@@ -54,7 +54,7 @@ namespace base {
 				break;
 
 			case UsePower:
-				action_succed = usePower();
+				//action_succed = usePower();
 				break;
 
 			default:
@@ -82,16 +82,6 @@ namespace base {
 
 		std::cin.get();
 	}
-
-	bool ElementalMode::usePower() {
-		char choice;
-		std::cin >> choice;
-
-		m_elemental_service.apply(choice, m_curr_player.get());
-
-		return true;
-	}
-
 	
 	////------------------------------------------------Methods-------------------------------------------------
 
@@ -120,4 +110,7 @@ namespace base {
 		}
 	}
 
+	ElementalService& ElementalMode::getElementalService() {
+		return m_elemental_service;
+	}
 }

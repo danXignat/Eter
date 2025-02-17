@@ -16,8 +16,10 @@ namespace base {
 	public:
 		ElementalService() = default;
 		ElementalService(Board& board, Player& red_player, Player& blue_player);
+
 		void apply(char choice, Player& player);
 		void renderCards() const;
+		void getElementalService();
 
 	public:
 		static constexpr const uint16_t power_number = 24;
