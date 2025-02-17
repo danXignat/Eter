@@ -50,11 +50,9 @@ namespace base {
         return true;
     }
 
-    std::optional<Coord> Destruction::getTargetPosition() const {
-        if (!m_board.hasLastPlayedCard()) {
-            return std::nullopt;
-        }
-        return m_board.getLastCardPosition();
+    uint16_t Destruction::getTargetCardID() const {
+
+        return m_board.getTopCard(m_board.getLastCardPosition())->get().getID();
     }
 
     std::string Destruction::getErrorMessage(color::ColorType colorPlayer) const {
@@ -85,7 +83,7 @@ namespace base {
     }
     //
     //    ///------------------------------------------ Flame -------------------------------------------
-    //    Flame::Flame(Board& m_board, Player& red, Player& blue):PowerCard(m_board, red, blue) {                               ///////////////// asta e cu iluzie, nu merge
+    //    Flame::Flame(Board& m_board, Player& red, Player& blue):PowerCard(m_board, red, blue) {  //iluzie                        ///////////////// asta e cu iluzie, nu merge
     //        m_ability = PowerCardType::Flame;
     //    }
     //
@@ -198,9 +196,52 @@ namespace base {
             combatCardToChar(chosen_type));
     }
 
+    void Fire::setChosenCardByID(uint16_t card_id) {
+        if (auto card_type = getCardTypeByID(card_id)) {
+            m_chosen_card = *card_type;
+            m_has_choice = true;
+        }
+    }
+
     void Fire::setChosenCard(CombatCardType card_type) {
         m_chosen_card = card_type;
         m_has_choice = true;
+    }
+
+    std::unordered_set<uint16_t> Fire::getVisibleCardIDs() const {
+        std::unordered_set<uint16_t> card_ids;
+        auto visible_cards = getVisibleCards();
+
+        for (const auto& [coord, _] : visible_cards) {
+            const auto& stack = m_board[coord];
+            card_ids.insert(stack.back().getID());
+        }
+        return card_ids;
+    }
+
+    std::unordered_set<uint16_t> Fire::getCardIDsOfType(CombatCardType type) const {
+        std::unordered_set<uint16_t> card_ids;
+        auto visible_cards = getVisibleCards();
+
+        for (const auto& [coord, card_type] : visible_cards) {
+            if (card_type == type) {
+                const auto& stack = m_board[coord];
+                card_ids.insert(stack.back().getID());
+            }
+        }
+        return card_ids;
+    }
+    std::optional<CombatCardType> Fire::getCardTypeByID(uint16_t card_id) const {
+
+        auto visible_cards = getVisibleCards();
+
+        for (const auto& [coord, _] : visible_cards) {
+            const auto& stack = m_board[coord];
+            if (stack.back().getID() == card_id) {
+                return stack.back().getType();
+            }
+        }
+        return std::nullopt;
     }
 
     void Fire::apply() {
@@ -234,6 +275,33 @@ namespace base {
             return m_player_blue.hasUsedCards();
         }
         return m_player_red.hasUsedCards();
+    }
+
+    std::unordered_set<uint16_t>Ash::getUsedCardIDs(color::ColorType colorPlayer) const {
+        if (!canUseAbility(colorPlayer)) {
+            return {};
+        }
+
+        std::unordered_set<uint16_t> card_ids;
+        const auto& player = (m_player_blue.getColor() == colorPlayer) ? m_player_blue : m_player_red;
+        const auto& cards = player.getUsedCards();
+
+        for (const auto& card : cards) {
+            card_ids.insert(card.second.getID());
+        }
+        return card_ids;
+    }
+
+    std::optional<std::pair<CombatCardType, color::ColorType>>Ash::getCardInfoByID(uint16_t card_id) const {
+        const auto& player = (m_color == color::ColorType::BLUE) ? m_player_blue : m_player_red;
+        const auto& used_cards = player.getUsedCards();
+
+        for (const auto& [type, card] : used_cards) {
+            if (card.getID() == card_id) {
+                return std::make_pair(card.getType(), card.getColor());
+            }
+        }
+        return std::nullopt;
     }
 
     std::vector<Ash::UsedCardInfo> Ash::getUsedCardsInfo(color::ColorType colorPlayer) const {
@@ -278,6 +346,14 @@ namespace base {
         return "";
     }
 
+    void Ash::setSelectionByID(const Coord& coordinates, uint16_t card_id) {
+        if (auto card_info = getCardInfoByID(card_id)) {
+            m_selected_coord = coordinates;
+            m_selected_card = card_info->first;
+            m_has_selection = true;
+        }
+    }
+
     void Ash::setSelection(const Coord& coordinates, CombatCardType card_type) {
         m_selected_coord = coordinates;
         m_selected_card = card_type;
@@ -314,6 +390,19 @@ namespace base {
         m_color = colorPlayer;
     }
 
+    void Ash::setSelectionByID(const Coord& coordinates, uint16_t card_id) {
+        const auto& player = (m_color == color::ColorType::BLUE) ? m_player_blue : m_player_red;
+        const auto& used_cards = player.getUsedCards();
+
+        for (const auto& [type, card] : used_cards) {
+            if (card.getID() == card_id) {
+                m_selected_coord = coordinates;
+                m_selected_card = card.getType();
+                m_has_selection = true;
+                return;
+            }
+        }
+    }
 
 
     ////------------------------------------------ Spark -------------------------------------------
@@ -325,10 +414,6 @@ namespace base {
         availableChoices = choices;
     }
 
-    std::optional<Coord> Spark::getSelectedFromCoord() const {
-        return selectedFromCoord;
-    }
-
     void Spark::setSelectedFromCoord(Coord coord) {
         selectedFromCoord = coord;
     }
@@ -336,21 +421,59 @@ namespace base {
     void Spark::setSelectedCardType(CombatCardType type) {
         selectedCardType = type;
     }
+    void Spark::setMoveDestination(Coord coord) {
+        moveDestination = coord;
+    }
+
+    void Spark::setColor(color::ColorType colorPlayer) {
+        m_color = colorPlayer;
+    }
+
+    void Spark::setSelectionByID(uint16_t card_id) {
+        if (auto card_info = getCardInfoByID(card_id)) {
+            selectedFromCoord = card_info->coord;
+            selectedCardType = card_info->type;
+        }
+    }
 
     std::optional<CombatCardType> Spark::getSelectedCardType() const {
         return selectedCardType;
     }
 
-    void Spark::setMoveDestination(Coord coord) {
-        moveDestination = coord;
+    std::optional<Coord> Spark::getSelectedFromCoord() const {
+        return selectedFromCoord;
     }
 
     std::optional<Coord> Spark::getMoveDestination() const {
         return moveDestination;
     }
 
-    void Spark::setColor(color::ColorType colorPlayer) {
-        m_color = colorPlayer;
+    std::unordered_set<uint16_t> Spark::getCoveredCardIDs() {
+        std::unordered_set<uint16_t> card_ids;
+        for (const auto& [coord, stack] : m_board) {
+            if (stack.size() < 2) continue;
+            for (size_t i = 0; i < stack.size() - 1; ++i) {
+                const CombatCard& card = stack[i];
+                if ((m_color == color::ColorType::BLUE && card.getColor() == m_player_blue.getColor()) ||
+                    (m_color == color::ColorType::RED && card.getColor() == m_player_red.getColor())) {
+                    card_ids.insert(card.getID());
+                }
+            }
+        }
+        return card_ids;
+    }
+
+    std::optional<Spark::CardInfo>Spark::getCardInfoByID(uint16_t card_id) const {
+        for (const auto& [coord, stack] : m_board) {
+            if (stack.size() < 2) continue;
+            for (size_t i = 0; i < stack.size() - 1; ++i) {
+                const CombatCard& card = stack[i];
+                if (card.getID() == card_id) {
+                    return CardInfo{ coord, card.getType(), card.getID() };
+                }
+            }
+        }
+        return std::nullopt;
     }
 
     void Spark::apply() {
@@ -429,12 +552,13 @@ namespace base {
     Squall::Squall(Board& m_board, Player& red, Player& blue) :PowerCard(m_board, red, blue) {
         m_ability = PowerCardType::Squall;
     }
-    void Squall::setVisibleCards(const std::vector<std::pair<Coord, CombatCardType>>& cards) {
-        visibleCards = cards;
+    void Squall::setSelectedCardID(uint16_t card_id) {
+        m_selected_card_id = card_id;
+
     }
 
-    std::optional<Coord> Squall::getSelectedCardCoord() const {
-        return selectedCardCoord;
+    void Squall::setVisibleCards(const std::vector<std::pair<Coord, CombatCardType>>& cards) {
+        visibleCards = cards;
     }
 
     void Squall::setSelectedCardCoord(Coord coord) {
@@ -443,6 +567,14 @@ namespace base {
 
     void Squall::setColor(color::ColorType colorPlayer) {
         m_color = colorPlayer;
+    }
+
+    std::optional<uint16_t> Squall::getSelectedCardID() const {
+        return m_selected_card_id;
+    }
+
+    std::optional<Coord> Squall::getSelectedCardCoord() const {
+        return selectedCardCoord;
     }
 
     std::vector<std::pair<Coord, CombatCardType>> Squall::getVisibleCards() {
@@ -456,6 +588,28 @@ namespace base {
             }
         }
         return visible_cards;
+    }
+
+    std::optional<CombatCardType> Squall::getCardTypeByID(uint16_t card_id) const {
+        for (const auto& [coord, stack] : m_board) {
+            if (!stack.empty() && stack.back().getID() == card_id) {
+                return stack.back().getType();
+            }
+        }
+        return std::nullopt;
+    }
+
+    std::unordered_set<uint16_t> Squall::getVisibleCardsIDs() const {
+        std::unordered_set<uint16_t> visible_cards_ids;
+        for (const auto& [coord, stack] : m_board) {
+            if (!stack.empty()) {
+                const CombatCard& top_card = stack.back();
+                if (!top_card.isIllusion() && top_card.getColor() != m_color) {
+                    visible_cards_ids.insert(top_card.getID());
+                }
+            }
+        }
+        return visible_cards_ids;
     }
 
     void Squall::apply() {
@@ -621,8 +775,71 @@ namespace base {
         return validSourceCards;
     }
 
+    std::unordered_set<uint16_t> Gust::getValidSourceCardIDs() const {
+        std::unordered_set<uint16_t> valid_sources;
+        for (const auto& [coord, stack] : m_board) {
+            if (!stack.empty() && !stack.back().isIllusion()) {
+                valid_sources.insert(stack.back().getID());
+            }
+        }
+        return valid_sources;
+    }
+
+    std::unordered_set<uint16_t> Gust::getValidDestinationIDs() const {
+        if (!m_selected_source_id) {
+            return {};
+        }
+
+        std::unordered_set<uint16_t> valid_destinations;
+
+        Coord sourceCoord;
+        CombatCardType sourceValue;
+        bool found = false;
+
+        for (const auto& [coord, stack] : m_board) {
+            if (!stack.empty() && stack.back().getID() == *m_selected_source_id) {
+                sourceCoord = coord;
+                sourceValue = stack.back().getType();
+                found = true;
+                break;
+            }
+        }
+
+        if (!found) return {};
+        const std::vector<std::pair<int16_t, int16_t>> adjacentOffsets = {
+            {2, 0}, {-2, 0}, {0, 1}, {0, -1}
+        };
+
+        for (const auto& [dx, dy] : adjacentOffsets) {
+            Coord adjCoord = { sourceCoord.first + dx, sourceCoord.second + dy };
+            if (m_board.hasStack(adjCoord)) {
+                auto& adjStack = m_board[adjCoord];
+                if (!adjStack.empty() && !adjStack.back().isIllusion()) {
+                    if (adjStack.back().getType() < sourceValue) {
+                        valid_destinations.insert(adjStack.back().getID());
+                    }
+                }
+            }
+        }
+
+        return valid_destinations;
+
+    }
+
+    std::optional<uint16_t> Gust::getSelectedSourceID() const {
+        return m_selected_source_id;
+    }
+
+    std::optional<uint16_t> Gust::getSelectedDestinationID() const {
+        return m_selected_destination_id;
+    }
+
     void Gust::setSelectedSource(Coord coord) {
         selectedSource = coord;
+    }
+
+    void Gust::setSelectedDestinationID(uint16_t card_id) {
+        m_selected_destination_id = card_id;
     }
 
     std::optional<Coord> Gust::getSelectedSource() const {
@@ -637,6 +854,10 @@ namespace base {
         return validDestinations;
     }
 
+    void Gust::setSelectedSourceID(uint16_t card_id) {
+        m_selected_source_id = card_id;
+    }
+
     void Gust::setSelectedDestination(Coord coord) {
         selectedDestination = coord;
     }
@@ -646,71 +867,55 @@ namespace base {
     }
 
     void Gust::apply() {
-        std::vector<Coord> sources;
-        for (const auto& [coord, stack] : m_board) {
-            if (!stack.empty() && !stack.back().isIllusion()) {
-                sources.push_back(coord);
-            }
-        }
-        setValidSourceCards(sources);
-
-        if (sources.empty()) {
+        auto valid_sources = getValidSourceCardIDs();
+        if (valid_sources.empty()) {
             Logger::log(Level::WARNING, "No valid cards to move");
             return;
         }
 
-        if (!getSelectedSource()) {
+        if (!m_selected_source_id) {
             Logger::log(Level::WARNING, "No source card selected!");
             return;
         }
 
-        Coord sourceCoord = *getSelectedSource();
-        if (std::find(sources.begin(), sources.end(), sourceCoord) == sources.end()) {
-            Logger::log(Level::WARNING, "Invalid source coordinates");
+        if (valid_sources.find(*m_selected_source_id) == valid_sources.end()) {
+            Logger::log(Level::WARNING, "Invalid source card");
             return;
         }
 
-        std::vector<Coord> destinations;
-        const std::vector<std::pair<int16_t, int16_t>> adjacentOffsets = {
-            {2, 0}, {-2, 0}, {0, 1}, {0, -1}
-        };
-
-        CombatCardType sourceValue = m_board[sourceCoord].back().getType();
-        for (const auto& [dx, dy] : adjacentOffsets) {
-            Coord adjCoord = { sourceCoord.first + dx, sourceCoord.second + dy };
-            if (m_board.hasStack(adjCoord)) {
-                auto& adjStack = m_board[adjCoord];
-                if (!adjStack.empty() && !adjStack.back().isIllusion()) {
-                    if (adjStack.back().getType() < sourceValue) {
-                        destinations.push_back(adjCoord);
-                    }
-                }
-            }
-        }
-        setValidDestinations(destinations);
-
-        if (destinations.empty()) {
+        auto valid_destinations = getValidDestinationIDs();
+        if (valid_destinations.empty()) {
             Logger::log(Level::WARNING, "No valid destinations available");
             return;
         }
 
-        if (!getSelectedDestination()) {
+        if (!m_selected_destination_id) {
             Logger::log(Level::WARNING, "No destination selected!");
             return;
         }
 
-        Coord destCoord = *getSelectedDestination();
-        if (std::find(destinations.begin(), destinations.end(), destCoord) == destinations.end()) {
-            Logger::log(Level::WARNING, "Invalid destination coordinates");
+        if (valid_destinations.find(*m_selected_destination_id) == valid_destinations.end()) {
+            Logger::log(Level::WARNING, "Invalid destination card");
             return;
+        }
+
+        Coord sourceCoord, destCoord;
+        for (const auto& [coord, stack] : m_board) {
+            if (!stack.empty()) {
+                if (stack.back().getID() == *m_selected_source_id) {
+                    sourceCoord = coord;
+                }
+                if (stack.back().getID() == *m_selected_destination_id) {
+                    destCoord = coord;
+                }
+            }
         }
 
         CombatCard card = std::move(m_board.popTopCardAt(sourceCoord));
         m_board.appendMove(destCoord, std::move(card));
-
-        Logger::log(Level::INFO, "Gust power: Successfully moved card from ({}, {}) to ({}, {})",
-            sourceCoord.first, sourceCoord.second, destCoord.first, destCoord.second);
+        Logger::log(Level::INFO, "Gust power: Successfully moved card!");
     }
+
     //    ////------------------------------------------ Mirrage -------------------------------------------
     //    Mirrage::Mirrage(Board& m_board, Player& red, Player& blue):PowerCard(m_board, red, blue) {                                 /////////////// iluzie, nu merge
     //        m_ability = PowerCardType::Mirrage;
@@ -765,8 +970,8 @@ namespace base {
         availableStacks = stacks;
     }
 
-    std::vector<Coord> Storm::getAvailableStacks() const {
-        return availableStacks;
+    void Storm::setSelectedStackID(uint16_t card_id) {
+        m_selected_stack_id = card_id;
     }
 
     void Storm::setSelectedStack(size_t index) {
@@ -777,35 +982,63 @@ namespace base {
         return selectedStack;
     }
 
-    void Storm::apply() {
-        std::vector<Coord> stacksToRemove;
+    std::optional<uint16_t> Storm::getSelectedStackID() const {
+        return m_selected_stack_id;
+    }
 
+    std::vector<Coord> Storm::getAvailableStacks() const {
+        return availableStacks;
+    }
+
+    std::unordered_set<uint16_t> Storm::getAvailableStackIDs() const {
+        std::unordered_set<uint16_t> stacks_ids;
         for (const auto& [coord, stack] : m_board) {
             if (stack.size() > 1) {
-                stacksToRemove.push_back(coord);
+                stacks_ids.insert(stack.back().getID());
             }
         }
-        setAvailableStacks(stacksToRemove);
+        return stacks_ids;
+    }
 
-        if (stacksToRemove.empty()) {
-            Logger::log(Level::WARNING, "No stacks with 2 or more cards found on the m_board");
+    std::optional<size_t> Storm::getStackSize(uint16_t card_id) const {
+        for (const auto& [coord, stack] : m_board) {
+            if (!stack.empty() && stack.back().getID() == card_id) {
+                return stack.size();
+            }
+        }
+        return std::nullopt;
+    }
+
+    void Storm::apply() {
+        auto stacks_ids = getAvailableStackIDs();
+        if (stacks_ids.empty()) {
+            Logger::log(Level::WARNING, "No stacks with 2 or more cards found on the board");
             return;
         }
 
-        if (!getSelectedStack() || *getSelectedStack() == 0 || *getSelectedStack() > stacksToRemove.size()) {
+        if (!m_selected_stack_id) {
+            Logger::log(Level::WARNING, "No stack selected");
+            return;
+        }
+
+        if (stacks_ids.find(*m_selected_stack_id) == stacks_ids.end()) {
             Logger::log(Level::WARNING, "Invalid stack selection");
             return;
         }
 
-        const Coord& selectedCoord = stacksToRemove[*getSelectedStack() - 1];
-
-        try {
-            if (m_board.isValidRemoveStack(selectedCoord)) {
-                m_board.removeStack(selectedCoord);
+        for (const auto& [coord, stack] : m_board) {
+            if (!stack.empty() && stack.back().getID() == *m_selected_stack_id) {
+                try {
+                    if (m_board.isValidRemoveStack(coord)) {
+                        m_board.removeStack(coord);
+                        Logger::log(Level::INFO, "Successfully removed stack");
+                    }
+                }
+                catch (const std::runtime_error& e) {
+                    Logger::log(Level::ERROR, "Failed to remove stack: {}", e.what());
+                }
+                return;
             }
-        }
-        catch (const std::runtime_error& e) {
-            Logger::log(Level::ERROR, "Failed to remove stack: {}", e.what());
         }
     }
     //
@@ -826,8 +1059,26 @@ namespace base {
         selectedStacks = stacks;
     }
 
+    void Tide::setSelectedStackIDs(uint16_t first_id, uint16_t second_id) {
+        m_selected_stack_ids = std::make_pair(first_id, second_id);
+    }
+
     std::optional<std::pair<Coord, Coord>> Tide::getSelectedStacks() const {
         return selectedStacks;
+    }
+
+    std::unordered_set<uint16_t> Tide::getAvailableStackIDs() const {
+        std::unordered_set<uint16_t> stack_ids;
+        for (const auto& [coord, stack] : m_board) {
+            if (!stack.empty()) {
+                stack_ids.insert(stack.back().getID());
+            }
+        }
+        return stack_ids;
+    }
+
+    std::optional<std::pair<uint16_t, uint16_t>> Tide::getSelectedStackIDs() {
+        return m_selected_stack_ids;
     }
 
     std::vector<Coord> Tide::getStacks() {
@@ -840,32 +1091,52 @@ namespace base {
         return stacks_coord;
     }
 
-    void Tide::apply() {
-        std::vector<Coord> stacks = getStacks();
-        setAvailableStacks(stacks);
-
-        if (stacks.size() < 2) {
+    void Tide:: apply() {
+        auto available_stacks = getAvailableStackIDs();
+        if (available_stacks.size() < 2) {
             Logger::log(Level::WARNING, "There are not enough stacks to swap.");
             return;
         }
 
-        if (!getSelectedStacks()) {
+        if (!m_selected_stack_ids) {
             Logger::log(Level::WARNING, "No stacks selected for swapping.");
             return;
         }
 
-        auto [coord_from, coord_to] = *getSelectedStacks();
+        auto [first_id, second_id] = *m_selected_stack_ids;
 
-        if (std::find(stacks.begin(), stacks.end(), coord_from) == stacks.end() ||
-            std::find(stacks.begin(), stacks.end(), coord_to) == stacks.end()) {
+        if (available_stacks.find(first_id) == available_stacks.end() ||
+            available_stacks.find(second_id) == available_stacks.end()) {
             Logger::log(Level::WARNING, "Invalid stack selection.");
             return;
         }
 
+        Coord coord_from, coord_to;
+        bool found_first = false, found_second = false;
+
+        for (const auto& [coord, stack] : m_board) {
+            if (!stack.empty()) {
+                if (stack.back().getID() == first_id) {
+                    coord_from = coord;
+                    found_first = true;
+                }
+                else if (stack.back().getID() == second_id) {
+                    coord_to = coord;
+                    found_second = true;
+                }
+            }
+            if (found_first && found_second) break;
+        }
+
+        if (!found_first || !found_second) {
+            Logger::log(Level::WARNING, "Could not find selected stacks.");
+            return;
+        }
+
         m_board.swapStacks(coord_from, coord_to);
-        Logger::log(Level::INFO, "Tide power card was used to swap stacks at ({}, {}) and ({}, {}).",
-            coord_from.first, coord_from.second, coord_to.first, coord_to.second);
+        Logger::log(Level::INFO, "Tide power card was used to swap stacks successfully.");
     }
+
 
     //
     //    ////------------------------------------------ Mist -------------------------------------------
@@ -905,39 +1176,57 @@ namespace base {
     }
 
     void Wave::setAvailableStacks(const std::vector<Coord>& stacks) {
-        availableStacks = stacks;
+        m_available_stacks = stacks;
     }
 
-    std::vector<Coord> Wave::getAvailableStacks() const {
-        return availableStacks;
-    }
-
+   
     void Wave::setSelectedStack(const Coord& stack) {
-        selectedStack = stack;
+        m_selected_stack = stack;
     }
 
     std::optional<Coord> Wave::getSelectedStack() const {
-        return selectedStack;
+        return m_selected_stack;
+    }
+    void Wave::setSelectedStackID(uint16_t stack_id) {
+        m_selected_stack_id = stack_id;
     }
 
-    void Wave::setDestination(const Coord& destination) {
-        this->destination = destination;
-    }
 
-    std::optional<Coord> Wave::getDestination() const {
-        return destination;
+    std::unordered_set<uint16_t> Wave::getAvailableStackIDs() const {
+        std::unordered_set<uint16_t> stack_ids;
+        for (const auto& [coord, stack] : m_board) {
+            if (stack.size() > 1) {
+                stack_ids.insert(stack.back().getID());
+            }
+        }
+        return stack_ids;
     }
-
-    void Wave::setSelectedCard(char card) {
-        selectedCard = card;
+    std::vector<Coord> Wave::getAvailableStacks() const {
+        return m_available_stacks;
     }
-
-    std::optional<char> Wave::getSelectedCard() const {
-        return selectedCard;
+   
+    std::optional<uint16_t> Wave::getSelectedStackID() const {
+        return m_selected_stack_id;
     }
 
     void Wave::setColor(color::ColorType colorPlayer) {
         m_color = colorPlayer;
+    }
+
+    void Wave::setDestination(const Coord& destination) {
+        this->m_destination = destination;
+    }
+
+    std::optional<Coord> Wave::getDestination() const {
+        return m_destination;
+    }
+
+    void Wave::setSelectedCard(char card) {
+        m_selected_card = card;
+    }
+
+    std::optional<char> Wave::getSelectedCard() const {
+        return m_selected_card;
     }
 
     std::vector<Coord> Wave::validStacks() const {
@@ -1460,7 +1749,7 @@ namespace base {
     }
 
     void Support::apply() {
-        std::vector<Coord> validCards = CoordCardType(m_board, m_player_red);
+        std::vector<Coord> validCards = CoordCardType( );
         if (validCards.empty()) {
             Logger::log(Level::WARNING, "No valid cards to apply the power card");
             return;
@@ -1482,12 +1771,12 @@ namespace base {
         Logger::log(Level::INFO, "Support power used!");
     }
 
-    std::vector<Coord> Support::CoordCardType(Board& m_board, const Player& player) const {
+    std::vector<Coord> Support::CoordCardType() const {
         std::vector<Coord> coordCards;
         for (const auto& [coord, stack] : m_board) {
             if (stack.empty()) continue;
             const CombatCard& card = stack.back();
-            if (card.getColor() == player.getColor() &&
+            if (card.getColor() == m_color &&
                 (card.getType() == CombatCardType::TWO ||
                     card.getType() == CombatCardType::THREE ||
                     card.getType() == CombatCardType::ONE)) {
@@ -1495,6 +1784,10 @@ namespace base {
             }
         }
         return coordCards;
+    }
+
+    void Support::setColor(color::ColorType colorPlayer){
+        m_color = colorPlayer;
     }
 
 
@@ -1565,14 +1858,17 @@ namespace base {
     std::optional<Coord> Crumble::getSelectedCard() const {
         return selectedCard;
     }
-    /*  std::vector<Coord> Crumble::findValidCards(const Board& m_board, const Player& player) const {
+    void Crumble::setColor(color::ColorType colorPlayer){
+        m_color = colorPlayer;
+    }
+      std::vector<Coord> Crumble::findValidCards( ) const {
           std::vector<Coord> foundCards;
           for (const auto& [coord, stack] : m_board) {
               if (stack.empty()) continue;
 
               const CombatCard& card = stack.back();
               if (!m_board.isDecrementedCard(coord) &&
-                  card.getColor() != player.getColor() &&
+                  card.getColor() != m_color &&
                   (card.getType() == CombatCardType::TWO ||
                       card.getType() == CombatCardType::THREE ||
                       card.getType() == CombatCardType::FOUR)) {
@@ -1580,15 +1876,15 @@ namespace base {
               }
           }
           return foundCards;
-      }*/
+      }
     void Crumble::apply() {
-        // std::vector<Coord> foundCards = findValidCards(m_board, player);
+         std::vector<Coord> foundCards = findValidCards();
 
-      /*   if (foundCards.empty()) {
+         if (foundCards.empty()) {
              Logger::log(Level::WARNING, "No valid cards to apply the power card");
              return;
-         }*/
-         //   setValidCards(foundCards);
+         }
+            setValidCards(foundCards);
 
         if (!getSelectedCard()) {
             Logger::log(Level::WARNING, "No card selected to decrease");
@@ -1630,7 +1926,7 @@ namespace base {
         return selectedCoord;
     }
 
-    /*   bool Border::applyNeutralCard(Player& player, Board& m_board) {
+       bool Border::applyNeutralCard() {
            auto rect_size = m_board.getBoundingRectSize();
            std::set<int> unique_cols;
            std::set<int> unique_rows;
@@ -1669,20 +1965,27 @@ namespace base {
            bool isValidPosition = validRows.contains(coords.second) || validCols.contains(coords.first);
 
            if (isValidPosition) {
-               CombatCard card(CombatCardType::BORDER, player.getColor());
-               m_board.appendMove(coords, std::move(card));
-               return true;
+               if (m_color == color::ColorType::BLUE) {
+                   CombatCard card(CombatCardType::BORDER, color::ColorType::BLUE);
+                   m_board.appendMove(coords, std::move(card));
+                   return true;
+               }
+               else if (m_color == color::ColorType::RED) {
+                   CombatCard card(CombatCardType::BORDER, color::ColorType::RED);
+                   m_board.appendMove(coords, std::move(card));
+                   return true;
+               }
            }
            else {
                Logger::log(Level::WARNING, "Invalid coordinate choice");
                return false;
            }
-       }*/
+       }
 
     void Border::apply() {
-        /* if (!applyNeutralCard(player, m_board)) {
+         if (!applyNeutralCard()) {
              return;
-         }*/
+         }
 
         if (!getSelectedCoord()) {
             Logger::log(Level::WARNING, "No second card selected");
@@ -1696,8 +1999,8 @@ namespace base {
             return;
         }
 
-        //  CombatCard card(*selectedCardType, player.getColor());
-       //   m_board.appendMove(coord_input, std::move(card));
+          CombatCard card(*selectedCardType, m_color);
+          m_board.appendMove(coord_input, std::move(card));
         Logger::log(Level::INFO, "Border power used");
     }
 
@@ -1707,6 +2010,10 @@ namespace base {
 
     std::optional<CombatCardType> Border::getSelectedCardType() const {
         return selectedCardType;
+    }
+
+    void Border::setColor(color::ColorType colorPlayer){
+        m_color = colorPlayer;
     }
 
     //

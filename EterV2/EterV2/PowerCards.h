@@ -27,10 +27,14 @@ namespace base {
 		Destruction(Board& board, Player& red, Player& blue);
 
 		bool canUseAbility(color::ColorType color) const;
-		std::optional<Coord> getTargetPosition() const;
-		void apply() override;
+
+		uint16_t getTargetCardID() const;
 		std::string getErrorMessage(color::ColorType colorPlayer) const;
+
 		void setColor(color::ColorType colorPlayer);
+
+		void apply() override;
+
 	private:
 		color::ColorType m_color = color::ColorType::DEFAULT;
 	};
@@ -47,15 +51,22 @@ namespace base {
 	public:
 		Fire(Board& board, Player& red, Player& blue);
 
-		bool canUseAbility() const;
 		std::vector<std::pair<Coord, CombatCardType>> getVisibleCards() const;
 		std::vector<CombatCardType> getValidChoices() const;
-		bool isValidChoice(CombatCardType chosen_type, const std::vector<CombatCardType>& valid_choices) const;
-		void applyEffect(CombatCardType chosen_type);
 		std::string getErrorMessage() const;
+		std::unordered_set<uint16_t> getVisibleCardIDs() const;
+		std::unordered_set<uint16_t> getCardIDsOfType(CombatCardType type) const;
+		std::optional<CombatCardType> getCardTypeByID(uint16_t card_id) const;
 
-		void apply() override;
+		void setChosenCardByID(uint16_t card_id);
 		void setChosenCard(CombatCardType card_type);
+
+		bool canUseAbility() const;
+		bool isValidChoice(CombatCardType chosen_type, const std::vector<CombatCardType>& valid_choices) const;
+
+		void applyEffect(CombatCardType chosen_type); 
+		void apply() override;
+		
 
 	private:
 		CombatCardType m_chosen_card;
@@ -66,24 +77,31 @@ namespace base {
 
 	class Ash :public PowerCard {
 	public:
+
 		Ash(Board& board, Player& red, Player& blue);
+
 		struct UsedCardInfo {
 			CombatCardType type;
 			color::ColorType color;
 		};
+		
 
 		bool canUseAbility(color::ColorType colorPlayer) const;
+		
 		std::vector<UsedCardInfo> getUsedCardsInfo(color::ColorType colorPlayer) const;
-
-
 		std::string getErrorMessage(color::ColorType color) const;
+		std::unordered_set<uint16_t> getUsedCardIDs(color::ColorType colorPlayer) const;
+		std::optional<std::pair<CombatCardType, color::ColorType>> getCardInfoByID(uint16_t card_id) const;
+
+		void setSelectionByID(const Coord& coordinates, uint16_t card_id);
 		void setSelection(const Coord& coordinates, CombatCardType card_type);
-		void apply() override;
 		void setColor(color::ColorType colorPlayer);
+		void setSelectionByID(const Coord& coordinates, uint16_t card_id);
+
+		void apply() override; 
+
 	private:
 		color::ColorType m_color = color::ColorType::DEFAULT;
-
-	private:
 		Coord m_selected_coord;
 		CombatCardType m_selected_card;
 		bool m_has_selection{ false };
@@ -92,19 +110,29 @@ namespace base {
 	class Spark :public PowerCard {
 	public:
 		Spark(Board& board, Player& red, Player& blue);
-		void apply() override;
+
+		struct CardInfo {
+			Coord coord;
+			CombatCardType type;
+			uint16_t id;
+		};
+
+		std::unordered_set<uint16_t> getCoveredCardIDs();
+		std::optional<Coord> getSelectedFromCoord() const;
+		std::optional<Coord> getMoveDestination() const;
+		std::optional<CombatCardType> getSelectedCardType() const; 
+		std::optional<CardInfo> getCardInfoByID(uint16_t card_id) const;
+
 		std::vector<std::pair<Coord, CombatCardType>> coverCards();
 
+		void setSelectionByID(uint16_t card_id);
 		void setAvailableChoices(const std::vector<std::pair<Coord, CombatCardType>>& choices);
-		std::optional<Coord> getSelectedFromCoord() const;
 		void setSelectedFromCoord(Coord coord);
-
 		void setSelectedCardType(CombatCardType type);
-		std::optional<CombatCardType> getSelectedCardType() const;
-
 		void setMoveDestination(Coord coord);
-		std::optional<Coord> getMoveDestination() const;
 		void setColor(color::ColorType colorPlayer);
+
+		void apply() override;
 
 	private:
 		color::ColorType m_color = color::ColorType::DEFAULT;
@@ -125,7 +153,11 @@ namespace base {
 
 		void apply() override;
 		std::vector<std::pair<Coord, CombatCardType>> getVisibleCards();
+		std::unordered_set<uint16_t> getVisibleCardsIDs() const;
+		std::optional<CombatCardType> getCardTypeByID(uint16_t card_id) const;
+		std::optional<uint16_t> getSelectedCardID() const;
 
+		void setSelectedCardID(uint16_t card_id);
 		void setVisibleCards(const std::vector<std::pair<Coord, CombatCardType>>& cards);
 		std::optional<Coord> getSelectedCardCoord() const;
 		void setSelectedCardCoord(Coord coord);
@@ -136,6 +168,7 @@ namespace base {
 		color::ColorType m_color = color::ColorType::DEFAULT;
 		std::vector<std::pair<Coord, CombatCardType>> visibleCards;
 		std::optional<Coord> selectedCardCoord;
+		std::optional<uint16_t> m_selected_card_id;
 
 
 	};
@@ -177,23 +210,31 @@ namespace base {
 
 		void apply() override;
 
-		void setValidSourceCards(const std::vector<Coord>& sources);
+		
 		std::vector<Coord> getValidSourceCards() const;
-
-		void setSelectedSource(Coord coord);
+		std::unordered_set<uint16_t> getValidSourceCardIDs() const;
+		std::unordered_set<uint16_t> getValidDestinationIDs() const;
+		std::optional<uint16_t> getSelectedSourceID() const;
+		std::optional<uint16_t> getSelectedDestinationID() const;
 		std::optional<Coord> getSelectedSource() const;
-
-		void setValidDestinations(const std::vector<Coord>& destinations);
+		std::optional<Coord> getSelectedDestination() const;
 		std::vector<Coord> getValidDestinations() const;
 
+		void setValidDestinations(const std::vector<Coord>& destinations);
+		void setValidSourceCards(const std::vector<Coord>& sources);
+		void setSelectedSource(Coord coord);
+		void setSelectedDestinationID(uint16_t card_id);
+		void setSelectedSourceID(uint16_t card_id);
 		void setSelectedDestination(Coord coord);
-		std::optional<Coord> getSelectedDestination() const;
+		
 
 	private:
 		std::vector<Coord> validSourceCards;
 		std::optional<Coord> selectedSource;
 		std::vector<Coord> validDestinations;
 		std::optional<Coord> selectedDestination;
+		std::optional<uint16_t> m_selected_source_id;
+		std::optional<uint16_t> m_selected_destination_id;
 	};
 
 	class Mirrage :public PowerCard {
@@ -209,15 +250,21 @@ namespace base {
 	public:
 		Storm(Board& board, Player& red, Player& blue);
 		void apply() override;
-		void setAvailableStacks(const std::vector<Coord>& stacks);
+		
 		std::vector<Coord> getAvailableStacks() const;
-
-		void setSelectedStack(size_t index);
+		std::unordered_set<uint16_t> getAvailableStackIDs() const;
+		std::optional<size_t> getStackSize(uint16_t card_id) const;
 		std::optional<size_t> getSelectedStack() const;
+		std::optional<uint16_t> getSelectedStackID() const;
+		void setSelectedStackID(uint16_t card_id);
+		void setSelectedStack(size_t index);
+		void setAvailableStacks(const std::vector<Coord>& stacks);
+		
 
 	private:
 		std::vector<Coord> availableStacks;
 		std::optional<size_t> selectedStack;
+		std::optional<uint16_t> m_selected_stack_id; 
 	};
 
 	class Tide :public PowerCard {
@@ -225,18 +272,22 @@ namespace base {
 		Tide(Board& board, Player& red, Player& blue);
 
 		void apply() override;
-		void setAvailableStacks(const std::vector<Coord>& stacks);
+
 		std::vector<Coord> getAvailableStacks() const;
+		std::optional<std::pair<Coord, Coord>> getSelectedStacks() const;
+		std::unordered_set<uint16_t> getAvailableStackIDs() const; 
+		std::optional<std::pair<uint16_t, uint16_t>> getSelectedStackIDs();
 
 		void setSelectedStacks(const std::pair<Coord, Coord>& stacks);
-		std::optional<std::pair<Coord, Coord>> getSelectedStacks() const;
+		void setSelectedStackIDs(uint16_t first_id, uint16_t second_id);
+		void setAvailableStacks(const std::vector<Coord>& stacks);
 
 	private:
 		std::vector<Coord> availableStacks;
 		std::optional<std::pair<Coord, Coord>> selectedStacks;
 
 		std::vector<Coord> getStacks();
-
+		std::optional<std::pair<uint16_t, uint16_t>> m_selected_stack_ids;
 	};
 
 	class Mist :public PowerCard {
@@ -258,7 +309,9 @@ namespace base {
 
 		void setSelectedStack(const Coord& stack);
 		std::optional<Coord> getSelectedStack() const;
-
+		std::unordered_set<uint16_t> getAvailableStackIDs() const;
+		void setSelectedStackID(uint16_t stack_id);
+		std::optional<uint16_t> getSelectedStackID() const;
 		void setDestination(const Coord& destination);
 		std::optional<Coord> getDestination() const;
 
@@ -269,11 +322,11 @@ namespace base {
 
 	private:
 		color::ColorType m_color = color::ColorType::DEFAULT;
-		std::vector<Coord> availableStacks;
-		std::optional<Coord> selectedStack;
-		std::optional<Coord> destination;
-		std::optional<char> selectedCard;
-
+		std::vector<Coord> m_available_stacks;
+		std::optional<Coord> m_selected_stack;
+		std::optional<Coord> m_destination;
+		std::optional<char> m_selected_card;
+		std::optional<uint16_t> m_selected_stack_id;
 		std::vector<Coord> validStacks() const;
 	};
 
@@ -364,8 +417,11 @@ namespace base {
 		void apply() override;
 		void setSelectedCoord(const Coord& coord);
 		std::optional<Coord> getSelectedCoord() const;
-		std::vector<Coord> CoordCardType(Board& board, const Player& player) const;
+		std::vector<Coord> CoordCardType( ) const;
+		void setColor(color::ColorType colorPlayer);
+
 	private:
+		color::ColorType m_color = color::ColorType::DEFAULT;
 		std::optional<Coord> selectedCoord;
 
 	};
@@ -390,10 +446,13 @@ namespace base {
 		void apply() override;
 		void setValidCards(const std::vector<Coord>& cards);
 		std::vector<Coord> getValidCards() const;
-		//std::vector<Coord> findValidCards(const Board& board, const Player& player) const;
+		std::vector<Coord> findValidCards() const;
 		void setSelectedCard(const Coord& coord);
 		std::optional<Coord> getSelectedCard() const;
+		void setColor(color::ColorType colorPlayer);
+
 	private:
+		color::ColorType m_color = color::ColorType::DEFAULT;
 		std::vector<Coord> validCards;
 		std::optional<Coord> selectedCard;
 
@@ -413,8 +472,11 @@ namespace base {
 		void setSelectedCardType(CombatCardType type);
 		std::optional<CombatCardType> getSelectedCardType() const;
 
+		void setColor(color::ColorType colorPlayer);
+
 	private:
-		//bool applyNeutralCard(Player& player, Board& board);
+		color::ColorType m_color = color::ColorType::DEFAULT;
+		bool applyNeutralCard();
 
 		std::set<int> validRows;
 		std::set<int> validCols;
