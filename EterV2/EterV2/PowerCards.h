@@ -26,13 +26,13 @@ namespace base {
 	public:
 		Destruction(Board& board, Player& red, Player& blue);
 
-		bool canUseAbility( color::ColorType color) const;
+		bool canUseAbility(color::ColorType color) const;
 		std::optional<Coord> getTargetPosition() const;
 		void apply() override;
 		std::string getErrorMessage(color::ColorType colorPlayer) const;
 		void setColor(color::ColorType colorPlayer);
 	private:
-		color::ColorType m_color=color::ColorType::DEFAULT;
+		color::ColorType m_color = color::ColorType::DEFAULT;
 	};
 
 	class Flame :public PowerCard {
@@ -51,16 +51,16 @@ namespace base {
 		std::vector<std::pair<Coord, CombatCardType>> getVisibleCards() const;
 		std::vector<CombatCardType> getValidChoices() const;
 		bool isValidChoice(CombatCardType chosen_type, const std::vector<CombatCardType>& valid_choices) const;
-		void applyEffect( CombatCardType chosen_type);
+		void applyEffect(CombatCardType chosen_type);
 		std::string getErrorMessage() const;
 
 		void apply() override;
 		void setChosenCard(CombatCardType card_type);
-		
+
 	private:
 		CombatCardType m_chosen_card;
 		bool m_has_choice{ false };
-		
+
 
 	};
 
