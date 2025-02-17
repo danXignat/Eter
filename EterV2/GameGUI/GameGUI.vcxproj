@@ -109,9 +109,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="controlls.cpp" />
+    <ClCompile Include="ElementalController.cpp" />
     <ClCompile Include="GameController.cpp" />
     <ClCompile Include="GameView.cpp" />
     <ClCompile Include="items.cpp" />
+    <ClCompile Include="MageController.cpp" />
     <ClCompile Include="MainWindow.cpp">
       <DynamicSource Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">input</DynamicSource>
       <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(Filename).moc</QtMocFileName>
@@ -134,6 +136,8 @@
     <QtMoc Include="GameView.h" />
     <QtMoc Include="scenes.h" />
     <QtMoc Include="controls.h" />
+    <ClInclude Include="ElementalController.h" />
+    <ClInclude Include="MageController.h" />
     <ClInclude Include="utils.h" />
     <QtMoc Include="MainWindow.h" />
     <ClInclude Include="qt_includes.h" />

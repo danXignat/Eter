@@ -187,6 +187,10 @@ void GameController::_initVisuals() {
         cardStartPos = 240;
     }
 
+    if (dynamic_cast<base::TournamentMode*>(model.get())) {
+        view->drawArena(model->getGameSizeType());
+    }
+
     view->drawPlayerCards(model->getPlayerRed(), { cardStartPos, 800 });
     view->drawPlayerCards(model->getPlayerBlue(), { cardStartPos, 800 });
     view->drawAvailablePositions(model->getBoard());

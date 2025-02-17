@@ -35,6 +35,12 @@
     <ClCompile Include="controlls.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ElementalController.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MageController.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="qt_includes.h">
@@ -44,6 +50,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="CardTypes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ElementalController.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MageController.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

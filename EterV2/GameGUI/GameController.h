@@ -32,6 +32,7 @@ private:
     GameView* view;
 
     MageController* m_mage_controller;
+    ElementalController* m_elemental_controller;
 
 public slots:
     void onCardAppend(Card* card);

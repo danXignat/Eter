@@ -233,3 +233,61 @@ private:
 
     bool m_is_used;
 };
+
+///---------------------------------------ELEMENTAL---------------------------------
+
+///-----------------------------------------TOURNAMENT---------------------------------
+
+class Arena : public QGraphicsPixmapItem {
+public:
+    Arena(base::GameSizeType mode, QGraphicsItem* parent = nullptr)
+        : QGraphicsPixmapItem(parent) {
+
+        QString texturePath = "../pictures/tournament/arena_";
+        texturePath += (mode == base::GameSizeType::SMALL) ? "small.png" : "big.png";
+
+        originalPixmap.load(texturePath);
+        if (originalPixmap.isNull()) {
+            qDebug() << "Failed to load arena texture:" << texturePath;
+            return;
+        }
+
+        QPixmap scaledPixmap = originalPixmap.scaled(
+            ARENA_SIZE, ARENA_SIZE,
+            Qt::KeepAspectRatio,
+            Qt::SmoothTransformation
+        );
+
+        setPixmap(scaledPixmap);
+
+        setPos(ARENA_POS - QPointF(scaledPixmap.width() / 2.0, scaledPixmap.height() / 2.0));
+
+        setZValue(0);
+    }
+
+    QSizeF getSize() const {
+        return pixmap().size();
+    }
+
+    QPointF getPosition() const {
+        return pos();
+    }
+
+    void setArenaPosition(const QPointF& newPos) {
+        setPos(newPos - QPointF(pixmap().width() / 2.0, pixmap().height() / 2.0));
+    }
+
+    void setArenaSize(const QSizeF& newSize) {
+        QPixmap scaledPixmap = originalPixmap.scaled(
+            newSize.toSize(),
+            Qt::KeepAspectRatio,
+            Qt::SmoothTransformation
+        );
+        setPixmap(scaledPixmap);
+        // Maintain center position
+        setArenaPosition(pos() + QPointF(pixmap().width() / 2.0, pixmap().height() / 2.0));
+    }
+
+private:
+    QPixmap originalPixmap;
+};

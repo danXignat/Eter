@@ -11,11 +11,13 @@ constexpr const int SPECIAL_CARD_SIZE	{ 145 };
 constexpr const int EFFECT_SIZE			{ 37 };
 constexpr const int INFO_ICON_SIZE		{ 37 };
 constexpr const int VORTEX_SIZE			{ 250 };
+constexpr const int ARENA_SIZE			{ 300 };
 constexpr const int VERTEX_RANGE		{ 100 };
 
 const QPointF		VORTEX_POS		{ 1000, 200 };
 const QPointF		EXPLOSION_POS	{ 1119, 450 };
 const QPointF		MAGE_POS		{ 1148, 713 };
+const QPointF		ARENA_POS		{ 200, 713 };
 
 constexpr const int WINDOW_WIDTH	{ 1300 };
 constexpr const int WINDOW_HEIGHT	{ 900 };

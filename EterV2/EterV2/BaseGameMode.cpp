@@ -12,7 +12,8 @@ namespace base {
 		m_player_red{ player_names.first, color::ColorType::RED, game_size },
 		m_player_blue{ player_names.second, color::ColorType::BLUE, game_size },
 		m_board{ game_size, m_player_red, m_player_blue },
-		m_curr_player{ m_player_red } {
+		m_curr_player{ m_player_red },
+		m_game_size_type{game_size} {
 
 		for (ServiceType service : services) {
 			switch (service) {
@@ -45,6 +46,10 @@ namespace base {
 
 	const Board& BaseGameMode::getBoard() const {
 		return m_board;
+	}
+
+	GameSizeType BaseGameMode::getGameSizeType() const {
+		return m_game_size_type;
 	}
 
 	std::optional<color::ColorType> BaseGameMode::getWinningColor() const {

@@ -31,6 +31,7 @@ public:
     void drawExplosion          (const base::ExplosionService& effect, uint16_t, QPointF start_point);
     void drawHole       (const QPointF& pos);
     void drawMages      (base::MageTypeAbility mage_red, const QString& desc_red, base::MageTypeAbility mage_blue, const QString& desc_blue);
+    void drawArena      (base::GameSizeType game_size);
 
     void cardAppendBoard    (Card* card);
     void setExplosionActive ();
@@ -92,6 +93,8 @@ private:
 
     Explosion*  explosion;
     Vortex*     vortex;
+
+    Arena* arena;
 
     MageCard* mage_card_red;
     MageCard* mage_card_blue;

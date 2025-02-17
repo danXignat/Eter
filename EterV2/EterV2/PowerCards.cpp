@@ -2,37 +2,39 @@
 //#include<set>
 //using namespace logger;
 //
-//namespace base {
-//
-//    ////------------------------------------------ ControllerExplosion -------------------------------------------
-//    ControllerExplosion::ControllerExplosion(Board& m_board, Player& red, Player& blue)
-//        : PowerCard(m_board, red, blue) {
-//        m_ability = PowerCardType::ControllerExplosion;
-//    }
-//
-//    void ControllerExplosion::apply() { /// nu stiu cum functioneaza explozia daca poti sa o faci tu :( 
-//        ExplosionService explosionService(m_board, m_player_red, m_player_red);
-//
-//        if (!explosionService.checkAvailability()) {
-//            Logger::log(Level::WARNING, "No valid spaces for explosion");
-//            return;
-//        }
-//
-//        explosionService.setting();
-//
-//        auto effectCoords = explosionService.getEffectCoords();
-//
-//        /* if (!effectCoords.empty()) {
-//             explosionService.renderExplosion();
-//             explosionService.apply();
-//
-//             Logger::log(Level::INFO, "Controller Explosion power card was used succesfully");
-//         }
-//         else {
-//             Logger::log(Level::WARNING, "No valid explosion effects to apply");
-//         }*/
-//    }
-//
+namespace base {
+	//
+	//    ////------------------------------------------ ControllerExplosion -------------------------------------------
+	    ControllerExplosion::ControllerExplosion(Board& m_board, Player& red, Player& blue)
+	        : PowerCard(m_board, red, blue) {
+	        m_ability = PowerCardType::ControllerExplosion;
+
+			
+	    }
+	
+	//    void ControllerExplosion::apply() { /// nu stiu cum functioneaza explozia daca poti sa o faci tu :( 
+	//        ExplosionService explosionService(m_board, m_player_red, m_player_red);
+	//
+	//        if (!explosionService.checkAvailability()) {
+	//            Logger::log(Level::WARNING, "No valid spaces for explosion");
+	//            return;
+	//        }
+	//
+	//        explosionService.setting();
+	//
+	//        auto effectCoords = explosionService.getEffectCoords();
+	//
+	//        /* if (!effectCoords.empty()) {
+	//             explosionService.renderExplosion();
+	//             explosionService.apply();
+	//
+	//             Logger::log(Level::INFO, "Controller Explosion power card was used succesfully");
+	//         }
+	//         else {
+	//             Logger::log(Level::WARNING, "No valid explosion effects to apply");
+	//         }*/
+	//    }
+}
 //    ////------------------------------------------ Destruction -------------------------------------------
 //    Destruction::Destruction(Board& m_board, Player& red, Player& blue) {
 //        m_ability = PowerCardType::Destruction;

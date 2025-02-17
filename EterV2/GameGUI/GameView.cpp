@@ -380,3 +380,8 @@ void GameView::hideCards(std::function<bool(Card*)> condition) {
         }
     }
 }
+
+void GameView::drawArena(base::GameSizeType game_size) {
+    arena = new Arena(game_size);
+    scene->addItem(arena);
+}

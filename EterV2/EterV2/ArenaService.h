@@ -7,33 +7,28 @@ namespace base {
 
     class ArenaService {
     public:
-        explicit ArenaService(GameSizeType size, Player& player1, Player& player2);
+        explicit ArenaService(GameSizeType size, Board& board, Player& player1, Player& player2);
 
-        void renderArena(const Board& board);
-        Coord getArenaBoard(const Coord& coord, const Board& board);
-
-        // Getters
-        const Coord& getTransformedCoord() const;
-        uint16_t getSize() const;
-        const std::unordered_map<Coord, color::ColorType, utils::CoordFunctor> getMarker() const ;
-        std::optional<Coord>getWinPosition() const;
-
-        void placeMarker(const Coord& coord, const Board& board, color::ColorType winnerColor);
-        uint16_t countMarkers(color::ColorType color) const;
-        bool hasWinner() const;
-
+        void addMarker(const Coord& board_coord, color::ColorType color);
+        
+        std::vector<std::vector<color::ColorType>> getMarkerCoords() const;
+        std::optional<std::pair<Coord, color::ColorType>> getWinPos() const;
 
     private:
-        void _checkWinPosition(const Coord& coord);
 
     private:
-        std::unordered_map<Coord, color::ColorType, utils::CoordFunctor>m_marker;
+        std::vector<std::vector<color::ColorType>> m_markers;
+
+        std::unordered_map<int16_t, int16_t> m_row_count;
+        std::unordered_map<int16_t, int16_t> m_col_count;
+        int16_t diag1{ 0 }, diag2{0};
+
         uint16_t m_size;
-        Coord m_transformedCoord;
-        Player& m_player1;
-        Player& m_player2;
+        Player& m_player_red;
+        Player& m_player_blue;
+        Board& m_board;
 
-        std::optional<Coord>m_win_pos;
+        std::optional<std::pair<Coord, color::ColorType>> m_win_data;
     };
 
 } 

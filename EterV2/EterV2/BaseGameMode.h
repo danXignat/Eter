@@ -23,6 +23,7 @@ namespace base {
 		const Player& getPlayerBlue() const override;
 		const Player& getCurrPlayer() const override;
 		const Board&  getBoard() const override;
+		GameSizeType getGameSizeType() const;
 
 		std::unordered_set<uint16_t> getAvailableIds(InputHandler&);
 		std::unordered_set<uint16_t> getRestrictedIds(InputHandler&);
@@ -46,5 +47,7 @@ namespace base {
 
 		std::optional<IllusionService> m_illusion_service;
 		std::optional<ExplosionService> m_explosion_service;
+
+		GameSizeType m_game_size_type;
 	};
 }
