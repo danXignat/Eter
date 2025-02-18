@@ -7,7 +7,6 @@
 [INFO] card created ID 6
 [INFO] card created ID 7
 [INFO] card created ID 8
-[INFO] card created ID -1
 [INFO] card created ID 9
 [INFO] card created ID 10
 [INFO] card created ID 11
@@ -17,4 +16,5 @@
 [INFO] card created ID 15
 [INFO] card created ID 16
 [INFO] card created ID 17
-[INFO] card created ID -1
+[INFO] card created ID 18
+[INFO] card created ID 19

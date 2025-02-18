@@ -189,15 +189,15 @@ namespace base {
 	class Hurricane :public PowerCard {
 	public:
 		Hurricane(Board& board, Player& red, Player& blue);
+
 		void apply() override;
 
 		void setOptions(const std::unordered_map<Orientation, std::vector<uint16_t>>& opts);
-		std::unordered_map<Orientation, std::vector<uint16_t>> getOptions() const;
-
 		void setUserSelection(Orientation orient, uint16_t index);
-		std::optional<std::tuple<Orientation, uint16_t>> getUserSelection() const;
-
 		void setUserDirection(MoveDirection dir);
+
+		std::unordered_map<Orientation, std::vector<uint16_t>> getOptions() const;
+		std::optional<std::tuple<Orientation, uint16_t>> getUserSelection() const;
 		std::optional<MoveDirection> getUserDirection() const;
 	private:
 		std::unordered_map<Orientation, std::vector<uint16_t>> options;
@@ -305,21 +305,22 @@ namespace base {
 		Wave(Board& board, Player& red, Player& blue);
 
 		void apply() override;
+
 		void setAvailableStacks(const std::vector<Coord>& stacks);
-		std::vector<Coord> getAvailableStacks() const;
-
 		void setSelectedStack(const Coord& stack);
-		std::optional<Coord> getSelectedStack() const;
-		std::unordered_set<uint16_t> getAvailableStackIDs() const;
 		void setSelectedStackID(uint16_t stack_id);
-		std::optional<uint16_t> getSelectedStackID() const;
 		void setDestination(const Coord& destination);
-		std::optional<Coord> getDestination() const;
-
 		void setSelectedCard(char card);
+		void setColor(color::ColorType colorPlayer);
+
+
+		std::optional<Coord> getSelectedStack() const;
+		std::vector<Coord> getAvailableStacks() const;
+		std::unordered_set<uint16_t> getAvailableStackIDs() const;
+		std::optional<uint16_t> getSelectedStackID() const;
+		std::optional<Coord> getDestination() const;
 		std::optional<char> getSelectedCard() const;
 
-		void setColor(color::ColorType colorPlayer);
 
 	private:
 		color::ColorType m_color = color::ColorType::DEFAULT;
@@ -336,23 +337,21 @@ namespace base {
 	public:
 		Whirlpool(Board& board, Player& red, Player& blue);
 		void apply() override;
-		void setUserChoice(char choice);
-		char getUserChoice() const;
-
-		void setFirstCoord(const Coord& coord);
-		Coord getFirstCoord() const;
-
-		void setSecondCoord(const Coord& coord);
+		
 		Coord getSecondCoord() const;
-
-		void setEqualCardCoord(const Coord& coord);
 		Coord getEqualCardCoord() const;
-
-		void setValidPairsOnRow(const std::vector<std::pair<Coord, Coord>>& pairs);
+		Coord getFirstCoord() const;
+		char getUserChoice() const;
 		std::vector<std::pair<Coord, Coord>> getValidPairsOnRow() const;
+		std::vector<std::pair<Coord, Coord>> getValidPairsOnColumn() const; 
 
+		void setUserChoice(char choice);
+		void setFirstCoord(const Coord& coord);
+		void setSecondCoord(const Coord& coord);
+		void setEqualCardCoord(const Coord& coord);
+		void setValidPairsOnRow(const std::vector<std::pair<Coord, Coord>>& pairs);
 		void setValidPairsOnColumn(const std::vector<std::pair<Coord, Coord>>& pairs);
-		std::vector<std::pair<Coord, Coord>> getValidPairsOnColumn() const;
+		
 
 	private:
 		std::vector<std::pair<Coord, Coord>> validPairsOnRow;
@@ -369,15 +368,16 @@ namespace base {
 	public:
 		Blizzard(Board& board, Player& red, Player& blue);
 		void setBlockChoice(char choice);
-		std::optional<char> getBlockChoice() const;
-
 		void setChosenRow(uint16_t row);
-		std::optional<uint16_t> getChosenRow() const;
-
 		void setChosenColumn(uint16_t column);
-		std::optional<uint16_t> getChosenColumn() const;
-		void apply() override;
 		void setColor(color::ColorType colorPlayer);
+
+		std::optional<uint16_t> getChosenRow() const;
+		std::optional<char> getBlockChoice() const;
+		std::optional<uint16_t> getChosenColumn() const;
+
+		void apply() override;
+		
 
 	private:
 		color::ColorType m_color = color::ColorType::DEFAULT;
@@ -391,17 +391,19 @@ namespace base {
 	class Waterfall :public PowerCard {
 	public:
 		Waterfall(Board& board, Player& red, Player& blue);
-		void setOrientation(Orientation orientation);
-		std::optional<Orientation> getOrientation() const;
 
-		void setIndex(int16_t index);
-		std::optional<int16_t> getIndex() const;
-
-		void setMoveDirection(MoveDirection direction);
-		std::optional<MoveDirection> getMoveDirection() const;
-
-		std::unordered_map<Orientation, std::vector<int16_t>> getOptions();
 		std::tuple<Orientation, int16_t, MoveDirection> input();
+
+		void setOrientation(Orientation orientation);
+		void setIndex(int16_t index);
+		void setMoveDirection(MoveDirection direction);
+
+		std::optional<int16_t> getIndex() const;
+		std::optional<Orientation> getOrientation() const;
+		std::optional<MoveDirection> getMoveDirection() const;
+		std::unordered_map<Orientation, std::vector<int16_t>> getOptions();
+
+
 		void apply() override;
 
 	private:
@@ -415,28 +417,38 @@ namespace base {
 	public:
 		Support(Board& board, Player& red, Player& blue);
 
-		void apply() override;
+		std::vector<Coord> CoordCardType() const;
+
+
 		void setSelectedCoord(const Coord& coord);
-		std::optional<Coord> getSelectedCoord() const;
-		std::vector<Coord> CoordCardType( ) const;
+		void setSelectedCardID(uint16_t card_id);
 		void setColor(color::ColorType colorPlayer);
+
+		std::optional<Coord> getSelectedCoord() const;
+		std::unordered_set<uint16_t> getValidCardIDs() const;
+		std::optional<uint16_t> getSelectedCardID() const;
+		
+		void apply() override;
 
 	private:
 		color::ColorType m_color = color::ColorType::DEFAULT;
 		std::optional<Coord> selectedCoord;
-
+		std::optional<uint16_t> m_selected_card_id;
 	};
 
 	class Earthquake :public PowerCard {
 	public:
 		Earthquake(Board& board, Player& red, Player& blue);
 
-		void apply() override;
-		void setCardsToRemove(const std::vector<Coord>& cards);
+		std::unordered_set<uint16_t> getCardsToRemoveIDs()const;
 		std::vector<Coord> getCardsToRemove() const;
+
+		void setCardsToRemove(const std::vector<Coord>& cards);
+
+		void apply() override;
 	private:
 		std::vector<Coord> cardsToRemove;
-
+		std::unordered_set<uint16_t> m_cards_to_remove;
 
 	};
 
@@ -444,41 +456,47 @@ namespace base {
 	public:
 		Crumble(Board& board, Player& red, Player& blue);
 
-		void apply() override;
-		void setValidCards(const std::vector<Coord>& cards);
-		std::vector<Coord> getValidCards() const;
 		std::vector<Coord> findValidCards() const;
-		void setSelectedCard(const Coord& coord);
-		std::optional<Coord> getSelectedCard() const;
-		void setColor(color::ColorType colorPlayer);
 
+		void setValidCards(const std::vector<Coord>& cards);
+		void setSelectedCard(const Coord& coord);
+		void setColor(color::ColorType colorPlayer);
+		void setSelectedCardID(uint16_t card_id);
+
+		std::optional<Coord> getSelectedCard() const;
+		std::unordered_set<uint16_t> getValidCardIDs() const;
+		std::optional<uint16_t> getSelectedCardID() const;
+		std::vector<Coord> getValidCards() const;
+
+		void apply() override;
 	private:
 		color::ColorType m_color = color::ColorType::DEFAULT;
 		std::vector<Coord> validCards;
 		std::optional<Coord> selectedCard;
-
+		std::optional<uint16_t> m_selected_card_id;
 	};
 
 	class Border :public PowerCard {
 	public:
 		Border(Board& board, Player& red, Player& blue);
 
-		void apply() override;
 		void setValidPositions(const std::set<int>& rows, const std::set<int>& cols);
-		std::pair<std::set<int>, std::set<int>> getValidPositions() const;
-
 		void setSelectedCoord(const Coord& coord);
-		std::optional<Coord> getSelectedCoord() const;
-
+		void setSecondCardIDAndType(uint16_t card_id, CombatCardType type);
 		void setSelectedCardType(CombatCardType type);
-		std::optional<CombatCardType> getSelectedCardType() const;
-
 		void setColor(color::ColorType colorPlayer);
+
+		std::optional<CombatCardType> getSelectedCardType() const;
+		std::optional<Coord> getSelectedCoord() const;
+		std::pair<std::set<int>, std::set<int>> getValidPositions() const;
+		std::optional<uint16_t> getSecondCardID() const;
+
+		void apply() override;
 
 	private:
 		color::ColorType m_color = color::ColorType::DEFAULT;
 		bool applyNeutralCard();
-
+		std::optional<uint16_t> second_card_id;  
 		std::set<int> validRows;
 		std::set<int> validCols;
 		std::optional<Coord> selectedCoord;
@@ -490,17 +508,21 @@ namespace base {
 	public:
 		Avalanche(Board& board, Player& red, Player& blue);
 
-		void apply() override;
-		std::vector<std::pair<Orientation, std::pair<Coord, Coord>>> getPairs();
+	
 		std::vector<std::pair<MoveDirection, std::pair<Coord, Coord>>> checkShifting(
 			const std::vector<std::pair<Orientation, std::pair<Coord, Coord>>>& pack);
 
-		void setSelectedMove(const std::pair<MoveDirection, std::pair<Coord, Coord>>& move);
+		std::vector<std::pair<Orientation, std::pair<Coord, Coord>>> getPairs();
 		std::optional<std::pair<MoveDirection, std::pair<Coord, Coord>>> getSelectedMove() const;
+		std::vector<std::tuple<uint16_t, uint16_t, MoveDirection>> getAvailableMovesWithIDs();
+
+		void setSelectedMoveByIDs(uint16_t first_id, uint16_t second_id, MoveDirection direction);
+		void setSelectedMove(const std::pair<MoveDirection, std::pair<Coord, Coord>>& move);
+
+		void apply() override;
+
 	private:
 		std::optional<std::pair<MoveDirection, std::pair<Coord, Coord>>> selectedMove;
-
-
 	};
 
 	class Rock :public PowerCard {
