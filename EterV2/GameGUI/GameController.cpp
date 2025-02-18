@@ -102,6 +102,11 @@ void GameController::onExplosionRotateRight() {
     model->getExplosionService()->rotateRight();
 }
 
+void GameController::onAddExplosion() {
+    model->addExplosion();
+    view->drawExplosion(*model->getExplosionService(), model->getBoard().size(), EXPLOSION_POS);
+}
+
 void GameController::onSelectIllusion(Card* card) {
     color::ColorType color{ card->getColor() };
 
@@ -172,6 +177,19 @@ void GameController::onNextRound() {
 
         view->drawMarker(gui::utils::coordToQPointF(coord), color);
     }
+
+    if (model->getExplosionService().has_value()) {
+        view->eraseExplosion();
+        model->removeExplosion();
+
+        onAddExplosion();
+    }
+}
+
+void GameController::onGettingCurrPlayer(color::ColorType& color) {
+    const auto& player_color{ model->getCurrPlayer().getColor() };
+
+    color = player_color;
 }
 
 ///--------------------------------------------------------INIT-------------------------------------------------
@@ -198,6 +216,9 @@ void GameController::_initConections() {
     if (m_elemental_controller) {
         connect(m_elemental_controller, &ElementalController::switchPlayer, this, &GameController::onSwitchPlayer);
         connect(m_elemental_controller, &ElementalController::updateCards, this, &GameController::onUpdateCards);
+        connect(m_elemental_controller, &ElementalController::addExplosion, this, &GameController::onAddExplosion);
+        connect(m_elemental_controller, &ElementalController::getCurrPlayer, this, &GameController::onGettingCurrPlayer);
+        connect(m_elemental_controller, &ElementalController::cardAppend, this, &GameController::onCardAppend);
         //connect(m_elemental_controller, &ElementalController::cardAppend, this, &GameController::onCardAppend);
     }
 }

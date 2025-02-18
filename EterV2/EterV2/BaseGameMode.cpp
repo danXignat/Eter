@@ -107,6 +107,11 @@ namespace base {
 		m_explosion_service.reset();
 	}
 
+	void BaseGameMode::addExplosion() {
+		m_explosion_service.reset();
+		m_explosion_service.emplace(m_board, m_player_red, m_player_blue);
+	}
+
 	std::unordered_set<uint16_t> BaseGameMode::getAvailableIds(InputHandler& input) {
 		std::unordered_set<uint16_t> ids;
 

@@ -57,8 +57,8 @@ namespace base {
 		type_card1 = static_cast<PowerCardType>(choices[0]);
 		type_card2 = static_cast<PowerCardType>(choices[1]);
 
-		type_card1 = static_cast<PowerCardType>(0);
-		type_card2 = static_cast<PowerCardType>(1);
+		type_card1 = static_cast<PowerCardType>(2);
+		type_card2 = static_cast<PowerCardType>(3);
 
 		card1 = _factory(type_card1);
 		card2 = _factory(type_card2);
@@ -112,7 +112,7 @@ namespace base {
 			return std::make_unique<Destruction>(m_board, m_red_player, m_blue_player);
 
 		case PowerCardType::Flame:
-			return std::make_unique<Flame>(m_board, m_red_player, m_blue_player);
+			return std::make_unique<Flame>(m_board, m_red_player, m_blue_player, *m_illusion_service);
 
 		case PowerCardType::Fire:
 			return std::make_unique<Fire>(m_board, m_red_player, m_blue_player);

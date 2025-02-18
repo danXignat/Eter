@@ -255,6 +255,8 @@ public:
     void setTargetZone(TargetZone* zone);
     void setUsed(bool is_used);
     uint16_t getId()const;
+    void setStartPoint(const QPointF& point);
+    void goBack();
 
 protected:
 
@@ -286,6 +288,7 @@ private:
 
     uint16_t m_id;
     bool m_is_used;
+    QPointF start_point;
 };
 
 ///-----------------------------------------TOURNAMENT---------------------------------

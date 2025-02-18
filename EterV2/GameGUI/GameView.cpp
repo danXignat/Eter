@@ -164,6 +164,9 @@ void GameView::drawPowers(const std::pair<std::pair<uint16_t, base::PowerCardTyp
     power_card1->setTargetZone(target_zone);
     power_card2->setTargetZone(target_zone);
 
+    power_card1->setStartPoint(POWER_POS1);
+    power_card2->setStartPoint(POWER_POS2);
+
     power_card1->setPos(POWER_POS1);
     power_card2->setPos(POWER_POS2);
 

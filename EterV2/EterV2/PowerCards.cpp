@@ -16,7 +16,6 @@ namespace base {
                 return false;
             }
 
-            m_explosion_service.generate();
             return true;
         }
 
@@ -80,38 +79,25 @@ namespace base {
     }
     
         ///------------------------------------------ Flame -------------------------------------------
-        Flame::Flame(Board& m_board, Player& red, Player& blue):PowerCard(m_board, red, blue) {  //iluzie                        ///////////////// asta e cu iluzie, nu merge
+        Flame::Flame(Board& m_board, Player& red, Player& blue, IllusionService& illusion_service)
+            :PowerCard(m_board, red, blue),
+            m_illusion_service{illusion_service} {  //iluzie                        ///////////////// asta e cu iluzie, nu merge
             m_ability = PowerCardType::Flame;
+        }
+
+        void Flame::setColor(color::ColorType colorPlayer) {
+            m_color = colorPlayer;
         }
     
         bool Flame::apply() {
-            for (const auto& [coord, stack] : m_board) {
-                auto top_card = m_board.getTopCard(coord);
-                CombatCard& card = top_card->get();
-                if (card.getColor() != m_player_red.getColor() && card.isIllusion()) {
-                    card.flip();
-                    Logger::log(Level::INFO, "The opponent's Illusion has been revealed");
-                }
-    
-                Logger::log(Level::INFO, "It's your turn, place a card");
-                Coord new_coord;
-                std::cin >> new_coord.first >> new_coord.second;
-                char card_type;
-                std::cin >> card_type;
-    
-    
-                auto selected_card = m_player_red.getCard(charToCombatCard(card_type));
-    
-                if (m_board.isValidPlaceCard(new_coord, selected_card)) {
-                    m_board.appendMove(new_coord, std::move(selected_card));
-                    Logger::log(Level::INFO, "Flame power was used. Card placed at ({}, {})",
-                        new_coord.first, new_coord.second);
-                    break;
-                }
-                else {
-                    Logger::log(Level::WARNING, "Invalid move!");
-                }
+            Player& enemy_player{ (m_color == color::ColorType::RED) ? m_player_blue : m_player_red };
+
+            if (m_illusion_service.hasIllusion(enemy_player)) {
+                return false;
             }
+            
+
+
             return false;
         }
     

@@ -48,10 +48,14 @@ namespace base {
 
 	class Flame :public PowerCard {
 	public:
-		Flame(Board& board, Player& red, Player& blue);
+		Flame(Board& board, Player& red, Player& blue, IllusionService& illusion_service);
 
+		void setColor(color::ColorType colorPlayer);
 		bool apply() override;
 
+	private:
+		IllusionService& m_illusion_service;
+		color::ColorType m_color = color::ColorType::DEFAULT;
 	};
 
 	class Fire :public PowerCard {
