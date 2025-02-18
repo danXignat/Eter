@@ -98,7 +98,6 @@ namespace base {
 		void setSelectionByID(const Coord& coordinates, uint16_t card_id);
 		void setSelection(const Coord& coordinates, CombatCardType card_type);
 		void setColor(color::ColorType colorPlayer);
-		void setSelectionByID(const Coord& coordinates, uint16_t card_id);
 
 		void apply() override; 
 

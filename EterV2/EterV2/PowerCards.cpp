@@ -1,7 +1,7 @@
 #include "PowerCards.h"
-#include<set>
+//#include<set>
 using namespace logger;
-
+//
 namespace base {
     
         ////------------------------------------------ ControllerExplosion -------------------------------------------
@@ -12,20 +12,20 @@ namespace base {
     
         void ControllerExplosion::apply() { /// nu stiu cum functioneaza explozia daca poti sa o faci tu :( 
             ExplosionService explosionService(m_board, m_player_red, m_player_red);
-
+    
             if (!explosionService.checkAvailability()) {
                 Logger::log(Level::WARNING, "No valid spaces for explosion");
                 return;
             }
-
+    
             explosionService.setting();
-
+    
             auto effectCoords = explosionService.getEffectCoords();
-
+    
             /* if (!effectCoords.empty()) {
                  explosionService.renderExplosion();
                  explosionService.apply();
-
+    
                  Logger::log(Level::INFO, "Controller Explosion power card was used succesfully");
              }
              else {
@@ -83,7 +83,7 @@ namespace base {
     }
     
         ///------------------------------------------ Flame -------------------------------------------
-        Flame::Flame(Board& m_board, Player& red, Player& blue):PowerCard(m_board, red, blue) {                               ///////////////// asta e cu iluzie, nu merge
+        Flame::Flame(Board& m_board, Player& red, Player& blue):PowerCard(m_board, red, blue) {  //iluzie                        ///////////////// asta e cu iluzie, nu merge
             m_ability = PowerCardType::Flame;
         }
     
@@ -118,7 +118,7 @@ namespace base {
         }
     
         ////------------------------------------------ Fire -------------------------------------------
-    
+    //
 
 
     Fire::Fire(Board& m_board, Player& red, Player& blue) : PowerCard(m_board, red, blue) {
@@ -344,14 +344,6 @@ namespace base {
             }
         }
         return "";
-    }
-
-    void Ash::setSelectionByID(const Coord& coordinates, uint16_t card_id) {
-        if (auto card_info = getCardInfoByID(card_id)) {
-            m_selected_coord = coordinates;
-            m_selected_card = card_info->first;
-            m_has_selection = true;
-        }
     }
 
     void Ash::setSelection(const Coord& coordinates, CombatCardType card_type) {
@@ -916,9 +908,6 @@ namespace base {
         Logger::log(Level::INFO, "Gust power: Successfully moved card!");
     }
 
-        Logger::log(Level::INFO, "Gust power: Successfully moved card from ({}, {}) to ({}, {})",
-            sourceCoord.first, sourceCoord.second, destCoord.first, destCoord.second);
-    }
         ////------------------------------------------ Mirrage -------------------------------------------
         Mirrage::Mirrage(Board& m_board, Player& red, Player& blue):PowerCard(m_board, red, blue) {                                 /////////////// iluzie, nu merge
             m_ability = PowerCardType::Mirrage;
@@ -1094,7 +1083,7 @@ namespace base {
         return stacks_coord;
     }
 
-    void Tide:: apply() {
+    void Tide::apply() {
         auto available_stacks = getAvailableStackIDs();
         if (available_stacks.size() < 2) {
             Logger::log(Level::WARNING, "There are not enough stacks to swap.");
@@ -1140,9 +1129,10 @@ namespace base {
         Logger::log(Level::INFO, "Tide power card was used to swap stacks successfully.");
     }
 
+
     
         ////------------------------------------------ Mist -------------------------------------------
-        Mist::Mist(Board& m_board, Player& red, Player& blue):PowerCard(m_board, red, blue) { 
+        Mist::Mist(Board& m_board, Player& red, Player& blue):PowerCard(m_board, red, blue) { /////////////////////////////////////////////////////////joaca inca o iluzie, nu merge
             m_ability = PowerCardType::Mist;
     
         }
@@ -1181,7 +1171,7 @@ namespace base {
         m_available_stacks = stacks;
     }
 
-   
+
     void Wave::setSelectedStack(const Coord& stack) {
         m_selected_stack = stack;
     }
@@ -1206,7 +1196,7 @@ namespace base {
     std::vector<Coord> Wave::getAvailableStacks() const {
         return m_available_stacks;
     }
-   
+
     std::optional<uint16_t> Wave::getSelectedStackID() const {
         return m_selected_stack_id;
     }
@@ -1751,7 +1741,7 @@ namespace base {
     }
 
     void Support::apply() {
-        std::vector<Coord> validCards = CoordCardType( );
+        std::vector<Coord> validCards = CoordCardType();
         if (validCards.empty()) {
             Logger::log(Level::WARNING, "No valid cards to apply the power card");
             return;
@@ -1788,7 +1778,7 @@ namespace base {
         return coordCards;
     }
 
-    void Support::setColor(color::ColorType colorPlayer){
+    void Support::setColor(color::ColorType colorPlayer) {
         m_color = colorPlayer;
     }
 
@@ -1860,33 +1850,33 @@ namespace base {
     std::optional<Coord> Crumble::getSelectedCard() const {
         return selectedCard;
     }
-    void Crumble::setColor(color::ColorType colorPlayer){
+    void Crumble::setColor(color::ColorType colorPlayer) {
         m_color = colorPlayer;
     }
-      std::vector<Coord> Crumble::findValidCards( ) const {
-          std::vector<Coord> foundCards;
-          for (const auto& [coord, stack] : m_board) {
-              if (stack.empty()) continue;
+    std::vector<Coord> Crumble::findValidCards() const {
+        std::vector<Coord> foundCards;
+        for (const auto& [coord, stack] : m_board) {
+            if (stack.empty()) continue;
 
-              const CombatCard& card = stack.back();
-              if (!m_board.isDecrementedCard(coord) &&
-                  card.getColor() != m_color &&
-                  (card.getType() == CombatCardType::TWO ||
-                      card.getType() == CombatCardType::THREE ||
-                      card.getType() == CombatCardType::FOUR)) {
-                  foundCards.emplace_back(coord);
-              }
-          }
-          return foundCards;
-      }
+            const CombatCard& card = stack.back();
+            if (!m_board.isDecrementedCard(coord) &&
+                card.getColor() != m_color &&
+                (card.getType() == CombatCardType::TWO ||
+                    card.getType() == CombatCardType::THREE ||
+                    card.getType() == CombatCardType::FOUR)) {
+                foundCards.emplace_back(coord);
+            }
+        }
+        return foundCards;
+    }
     void Crumble::apply() {
-         std::vector<Coord> foundCards = findValidCards();
+        std::vector<Coord> foundCards = findValidCards();
 
-         if (foundCards.empty()) {
-             Logger::log(Level::WARNING, "No valid cards to apply the power card");
-             return;
-         }
-            setValidCards(foundCards);
+        if (foundCards.empty()) {
+            Logger::log(Level::WARNING, "No valid cards to apply the power card");
+            return;
+        }
+        setValidCards(foundCards);
 
         if (!getSelectedCard()) {
             Logger::log(Level::WARNING, "No card selected to decrease");
@@ -1928,66 +1918,66 @@ namespace base {
         return selectedCoord;
     }
 
-       bool Border::applyNeutralCard() {
-           auto rect_size = m_board.getBoundingRectSize();
-           std::set<int> unique_cols;
-           std::set<int> unique_rows;
+    bool Border::applyNeutralCard() {
+        auto rect_size = m_board.getBoundingRectSize();
+        std::set<int> unique_cols;
+        std::set<int> unique_rows;
 
-           if (rect_size.first == 3) {
-               auto unfixed_col = m_board.getUnfixedColumns();
-               auto available_spaces = m_board.availableSpaces();
-               for (auto y : available_spaces) {
-                   if (unfixed_col.find(y.first) == unfixed_col.end()) {
-                       unique_cols.insert(y.first);
-                   }
-               }
-           }
-           else if (rect_size.second == 3) {
-               auto unfixed_rows = m_board.getUnfixedRows();
-               auto available_spaces = m_board.availableSpaces();
-               for (auto x : available_spaces) {
-                   if (unfixed_rows.find(x.second) == unfixed_rows.end()) {
-                       unique_rows.insert(x.second);
-                   }
-               }
-           }
-           else {
-               Logger::log(Level::WARNING, "You cannot use this power right now");
-               return false;
-           }
+        if (rect_size.first == 3) {
+            auto unfixed_col = m_board.getUnfixedColumns();
+            auto available_spaces = m_board.availableSpaces();
+            for (auto y : available_spaces) {
+                if (unfixed_col.find(y.first) == unfixed_col.end()) {
+                    unique_cols.insert(y.first);
+                }
+            }
+        }
+        else if (rect_size.second == 3) {
+            auto unfixed_rows = m_board.getUnfixedRows();
+            auto available_spaces = m_board.availableSpaces();
+            for (auto x : available_spaces) {
+                if (unfixed_rows.find(x.second) == unfixed_rows.end()) {
+                    unique_rows.insert(x.second);
+                }
+            }
+        }
+        else {
+            Logger::log(Level::WARNING, "You cannot use this power right now");
+            return false;
+        }
 
-           setValidPositions(unique_rows, unique_cols);
+        setValidPositions(unique_rows, unique_cols);
 
-           if (!getSelectedCoord()) {
-               Logger::log(Level::WARNING, "No coordinates selected for placement");
-               return false;
-           }
+        if (!getSelectedCoord()) {
+            Logger::log(Level::WARNING, "No coordinates selected for placement");
+            return false;
+        }
 
-           Coord coords = *getSelectedCoord();
-           bool isValidPosition = validRows.contains(coords.second) || validCols.contains(coords.first);
+        Coord coords = *getSelectedCoord();
+        bool isValidPosition = validRows.contains(coords.second) || validCols.contains(coords.first);
 
-           if (isValidPosition) {
-               if (m_color == color::ColorType::BLUE) {
-                   CombatCard card(CombatCardType::BORDER, color::ColorType::BLUE);
-                   m_board.appendMove(coords, std::move(card));
-                   return true;
-               }
-               else if (m_color == color::ColorType::RED) {
-                   CombatCard card(CombatCardType::BORDER, color::ColorType::RED);
-                   m_board.appendMove(coords, std::move(card));
-                   return true;
-               }
-           }
-           else {
-               Logger::log(Level::WARNING, "Invalid coordinate choice");
-               return false;
-           }
-       }
+        if (isValidPosition) {
+            if (m_color == color::ColorType::BLUE) {
+                CombatCard card(CombatCardType::BORDER, color::ColorType::BLUE);
+                m_board.appendMove(coords, std::move(card));
+                return true;
+            }
+            else if (m_color == color::ColorType::RED) {
+                CombatCard card(CombatCardType::BORDER, color::ColorType::RED);
+                m_board.appendMove(coords, std::move(card));
+                return true;
+            }
+        }
+        else {
+            Logger::log(Level::WARNING, "Invalid coordinate choice");
+            return false;
+        }
+    }
 
     void Border::apply() {
-         if (!applyNeutralCard()) {
-             return;
-         }
+        if (!applyNeutralCard()) {
+            return;
+        }
 
         if (!getSelectedCoord()) {
             Logger::log(Level::WARNING, "No second card selected");
@@ -2001,8 +1991,8 @@ namespace base {
             return;
         }
 
-          CombatCard card(*selectedCardType, m_color);
-          m_board.appendMove(coord_input, std::move(card));
+        CombatCard card(*selectedCardType, m_color);
+        m_board.appendMove(coord_input, std::move(card));
         Logger::log(Level::INFO, "Border power used");
     }
 
@@ -2014,7 +2004,7 @@ namespace base {
         return selectedCardType;
     }
 
-    void Border::setColor(color::ColorType colorPlayer){
+    void Border::setColor(color::ColorType colorPlayer) {
         m_color = colorPlayer;
     }
 
@@ -2140,8 +2130,8 @@ namespace base {
     }
 
 
-    //
-    //    ////------------------------------------------ Rock -------------------------------------------
+    
+        ////------------------------------------------ Rock -------------------------------------------
         Rock::Rock(Board& m_board, Player& red, Player& blue):PowerCard(m_board, red, blue) {  ///////////////////////////////// foloseste iluzie, nu merge 
             m_ability = PowerCardType::Rock;
         }
@@ -2183,4 +2173,4 @@ namespace base {
             return illusionCoords;
         }
     
-}
+    }
