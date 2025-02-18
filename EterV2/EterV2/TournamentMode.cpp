@@ -21,7 +21,7 @@ namespace base {
                 break;
 
             case base::ServiceType::ELEMENTAL:
-                m_elemental_service.emplace(m_board, m_player_red, m_player_blue);
+                m_elemental_service.emplace(m_board, m_player_red, m_player_blue, m_illusion_service, m_explosion_service);
                 break;
 
             default:

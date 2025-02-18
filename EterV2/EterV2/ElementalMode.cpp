@@ -12,7 +12,7 @@ namespace base {
 	//---------------------------------------Constructor-------------------------------------
 	ElementalMode::ElementalMode(const std::vector<ServiceType>& services, const std::pair<std::string, std::string>& player_names) :
 		BaseGameMode{ GameSizeType::BIG, player_names, services},
-		m_elemental_service{ m_board,m_player_red, m_player_blue}
+		m_elemental_service{ m_board,m_player_red, m_player_blue, m_illusion_service, m_explosion_service}
 	{
 	}
 

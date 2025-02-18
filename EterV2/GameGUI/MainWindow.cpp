@@ -33,7 +33,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
 
     playerBlueNameGlobal = "BLUE";
     playerRedNameGlobal = "RED";
-    selectedMode = "3";
+    selectedMode = "312";
     gameScene = new GameScene(selectedMode, playerBlueNameGlobal, playerRedNameGlobal);
     stackedWidget->addWidget(gameScene);
     stackedWidget->setCurrentWidget(gameScene);

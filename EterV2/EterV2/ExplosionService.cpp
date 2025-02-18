@@ -35,6 +35,39 @@ namespace base {
 		}
 	}
 
+	uint16_t ExplosionService::size() const {
+		return m_board.size();
+	}
+
+	void ExplosionService::generate() {
+		m_effects.clear();
+		for (uint16_t i = 0; i < m_board.size(); i++) {
+			m_effects.push_back(std::vector<std::optional<Effect>>(m_board.size()));
+		}
+
+		std::random_device rd;
+		std::mt19937 gen(rd());
+
+		m_effect_count = _generateEffectCount(gen);
+		std::vector<Coord> positions{ _generateEffectPos(gen) };
+		std::vector<Effect> effects{ _generateEffectType(gen) };
+
+		for (const auto& [coord, effect] : std::views::zip(positions, effects)) {
+			auto& [row, col] = coord;
+			m_effects[row][col] = effect;
+
+			Logger::log(
+				Level::INFO, "explosion effect [{}, {}] -> {}",
+				row, col,
+				static_cast<int>(effect)
+			);
+		}
+	}
+
+	bool ExplosionService::used() const {
+		return m_used;
+	}
+
 	bool ExplosionService::checkAvailability() const {
 		std::unordered_map<uint16_t, uint16_t> x_field_counter;
 		std::unordered_map<uint16_t, uint16_t> y_field_counter;
@@ -145,6 +178,8 @@ namespace base {
 				}
 			}
 		}
+
+		m_used = true;
 	}
 
 	std::unordered_map<Coord, Effect, utils::CoordFunctor> ExplosionService::getEffectCoords() const {

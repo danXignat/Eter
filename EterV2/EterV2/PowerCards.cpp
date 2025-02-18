@@ -5,32 +5,27 @@ using namespace logger;
 namespace base {
     
         ////------------------------------------------ ControllerExplosion -------------------------------------------
-        ControllerExplosion::ControllerExplosion(Board& m_board, Player& red, Player& blue)
-            : PowerCard(m_board, red, blue) {
+        ControllerExplosion::ControllerExplosion(Board& m_board, Player& red, Player& blue, ExplosionService& explosion_service)
+            : PowerCard(m_board, red, blue),
+            m_explosion_service{explosion_service} {
             m_ability = PowerCardType::ControllerExplosion;
         }
-    
-        void ControllerExplosion::apply() { /// nu stiu cum functioneaza explozia daca poti sa o faci tu :( 
-            ExplosionService explosionService(m_board, m_player_red, m_player_red);
-    
-            if (!explosionService.checkAvailability()) {
-                Logger::log(Level::WARNING, "No valid spaces for explosion");
-                return;
+        
+        bool ControllerExplosion::apply() {
+            if (!m_explosion_service.used()) {
+                return false;
             }
-    
-            explosionService.setting();
-    
-            auto effectCoords = explosionService.getEffectCoords();
-    
-            /* if (!effectCoords.empty()) {
-                 explosionService.renderExplosion();
-                 explosionService.apply();
-    
-                 Logger::log(Level::INFO, "Controller Explosion power card was used succesfully");
-             }
-             else {
-                 Logger::log(Level::WARNING, "No valid explosion effects to apply");
-             }*/
+
+            m_explosion_service.generate();
+            return true;
+        }
+
+        ExplosionService& ControllerExplosion::getExplosionService() {
+            return m_explosion_service;
+        }
+
+        bool ControllerExplosion::isAvailable() const {
+            return m_explosion_service.used();
         }
     
         ////------------------------------------------ Destruction -------------------------------------------
@@ -69,10 +64,10 @@ namespace base {
         m_color = colorPlayer;
     }
 
-    void Destruction::apply() {
+    bool Destruction::apply() {
         if (!canUseAbility(m_color)) {
             Logger::log(Level::WARNING, getErrorMessage(m_color));
-            return;
+            return false;
         }
 
         Coord last_position = m_board.getLastCardPosition();
@@ -80,6 +75,8 @@ namespace base {
 
         Logger::log(Level::INFO, "Destruction power destroyed the last played card at ({}, {})",
             last_position.first, last_position.second);
+
+        return true;
     }
     
         ///------------------------------------------ Flame -------------------------------------------
@@ -87,7 +84,7 @@ namespace base {
             m_ability = PowerCardType::Flame;
         }
     
-        void Flame::apply() {
+        bool Flame::apply() {
             for (const auto& [coord, stack] : m_board) {
                 auto top_card = m_board.getTopCard(coord);
                 CombatCard& card = top_card->get();
@@ -115,6 +112,7 @@ namespace base {
                     Logger::log(Level::WARNING, "Invalid move!");
                 }
             }
+            return false;
         }
     
         ////------------------------------------------ Fire -------------------------------------------
@@ -244,26 +242,28 @@ namespace base {
         return std::nullopt;
     }
 
-    void Fire::apply() {
+    bool Fire::apply() {
         if (!canUseAbility()) {
             Logger::log(Level::WARNING, getErrorMessage());
-            return;
+            return false;
         }
 
         auto valid_choices = getValidChoices();
 
         if (!m_has_choice) {
             Logger::log(Level::WARNING, "No card type was chosen");
-            return;
+            return false;
         }
 
         if (!isValidChoice(m_chosen_card, valid_choices)) {
             Logger::log(Level::WARNING, "Invalid choice");
-            return;
+            return false;
         }
 
         applyEffect(m_chosen_card);
         m_has_choice = false;
+
+        return false;
     }
     ////------------------------------------------ Ash -------------------------------------------
     Ash::Ash(Board& m_board, Player& red, Player& blue) : PowerCard(m_board, red, blue) {
@@ -352,15 +352,15 @@ namespace base {
         m_has_selection = true;
     }
 
-    void Ash::apply() {
+    bool Ash::apply() {
         if (!canUseAbility(m_color)) {
             Logger::log(Level::WARNING, getErrorMessage(m_color));
-            return;
+            return false;
         }
 
         if (!m_has_selection) {
             Logger::log(Level::WARNING, "No selection was made");
-            return;
+            return false;
         }
         if (m_color == color::ColorType::BLUE) {
             auto card = m_player_blue.getUsedCard(m_selected_card);
@@ -376,6 +376,7 @@ namespace base {
         }
 
         m_has_selection = false;
+        return false;
     }
 
     void Ash::setColor(color::ColorType colorPlayer) {
@@ -468,18 +469,18 @@ namespace base {
         return std::nullopt;
     }
 
-    void Spark::apply() {
+    bool Spark::apply() {
         auto choices = coverCards();
         setAvailableChoices(choices);
 
         if (choices.empty()) {
             Logger::log(Level::WARNING, "You have no covered cards on the m_board!");
-            return;
+            return false;
         }
 
         if (!getSelectedFromCoord()) {
             Logger::log(Level::WARNING, "No card selected!");
-            return;
+            return false;
         }
 
         auto it = std::find_if(choices.begin(), choices.end(),
@@ -487,35 +488,36 @@ namespace base {
 
         if (it == choices.end()) {
             Logger::log(Level::WARNING, "You don't have any covered card at these coordinates!");
-            return;
+            return false;
         }
 
         if (!getSelectedCardType()) {
             Logger::log(Level::WARNING, "No card type selected!");
-            return;
+            return false;
         }
 
         if (it->second != *getSelectedCardType()) {
             Logger::log(Level::WARNING, "This card doesn't exist at the specified position!");
-            return;
+            return false;
         }
 
         if (!getMoveDestination()) {
             Logger::log(Level::WARNING, "No move destination selected!");
-            return;
+            return false;
         }
 
         CombatCard card(*getSelectedCardType(), m_player_red.getColor());
 
         if (!m_board.isValidPlaceCard(*getMoveDestination(), card)) {
             Logger::log(Level::WARNING, "You can't move the card to this position!");
-            return;
+            return false;
         }
 
         m_board.removeCardFromStackAt(*getSelectedFromCoord(), card);
         m_board.appendMove(*getMoveDestination(), std::move(card));
 
         Logger::log(Level::INFO, "Card successfully moved!");
+        return false;
     }
 
     std::vector<std::pair<Coord, CombatCardType>> Spark::coverCards() {
@@ -604,18 +606,18 @@ namespace base {
         return visible_cards_ids;
     }
 
-    void Squall::apply() {
+    bool Squall::apply() {
         auto visible_cards = getVisibleCards();
         setVisibleCards(visible_cards);
 
         if (visible_cards.empty()) {
             Logger::log(Level::WARNING, "No visible opponent cards on the m_board!");
-            return;
+            return false;
         }
 
         if (!getSelectedCardCoord()) {
             Logger::log(Level::WARNING, "No card selected!");
-            return;
+            return false;
         }
 
         auto it = std::find_if(visible_cards.begin(), visible_cards.end(),
@@ -623,7 +625,7 @@ namespace base {
 
         if (it == visible_cards.end()) {
             Logger::log(Level::WARNING, "Invalid coordinates! No opponent card there.");
-            return;
+            return false;
         }
         if (m_color == color::ColorType::RED) {
             m_player_red.addCard(m_board.popTopCardAt(*getSelectedCardCoord()));
@@ -633,6 +635,7 @@ namespace base {
         }
 
         Logger::log(Level::INFO, "Card successfully returned to opponent's hand!");
+        return false;
     }
 
     //    ////------------------------------------------ Gale -------------------------------------------
@@ -640,7 +643,7 @@ namespace base {
         m_ability = PowerCardType::Gale;
     }
 
-    void Gale::apply() {
+    bool Gale::apply() {
         std::vector<std::pair<Coord, CombatCardType>> cards_to_remove;
 
 
@@ -660,6 +663,7 @@ namespace base {
         }
 
         Logger::log(Level::INFO, "Gale power card effect completed");
+        return false;
     }
 
     void Gale::setColor(color::ColorType colorPlayer) {
@@ -695,16 +699,16 @@ namespace base {
         return userDirection;
     }
 
-    void Hurricane::apply() {
+    bool Hurricane::apply() {
         auto options = getOptions();
         if (options.empty()) {
             Logger::log(Level::WARNING, "You can't use this mage right now");
-            return;
+            return false;
         }
 
         if (!getUserSelection() || !getUserDirection()) {
             Logger::log(Level::WARNING, "No valid selection or direction set!");
-            return;
+            return false;
         }
 
         auto [orient, index] = *getUserSelection();
@@ -752,6 +756,7 @@ namespace base {
                 m_board.shiftColumnDown(vect_coord);
             }
         }
+        return false;
     }
     //
     //
@@ -858,37 +863,37 @@ namespace base {
         return selectedDestination;
     }
 
-    void Gust::apply() {
+    bool Gust::apply() {
         auto valid_sources = getValidSourceCardIDs();
         if (valid_sources.empty()) {
             Logger::log(Level::WARNING, "No valid cards to move");
-            return;
+            return false;
         }
 
         if (!m_selected_source_id) {
             Logger::log(Level::WARNING, "No source card selected!");
-            return;
+            return false;
         }
 
         if (valid_sources.find(*m_selected_source_id) == valid_sources.end()) {
             Logger::log(Level::WARNING, "Invalid source card");
-            return;
+            return false;
         }
 
         auto valid_destinations = getValidDestinationIDs();
         if (valid_destinations.empty()) {
             Logger::log(Level::WARNING, "No valid destinations available");
-            return;
+            return false;
         }
 
         if (!m_selected_destination_id) {
             Logger::log(Level::WARNING, "No destination selected!");
-            return;
+            return false;
         }
 
         if (valid_destinations.find(*m_selected_destination_id) == valid_destinations.end()) {
             Logger::log(Level::WARNING, "Invalid destination card");
-            return;
+            return false;
         }
 
         Coord sourceCoord, destCoord;
@@ -906,6 +911,7 @@ namespace base {
         CombatCard card = std::move(m_board.popTopCardAt(sourceCoord));
         m_board.appendMove(destCoord, std::move(card));
         Logger::log(Level::INFO, "Gust power: Successfully moved card!");
+        return false;
     }
 
         ////------------------------------------------ Mirrage -------------------------------------------
@@ -913,7 +919,7 @@ namespace base {
             m_ability = PowerCardType::Mirrage;
         }
     
-        void Mirrage::apply() {
+        bool Mirrage::apply() {
             if (getIllusion(m_board, m_player_red)) {
                 std::cout << "Choose the coordinates for the new illusion and the new illusion" << std::endl;
                 Coord coord;
@@ -928,6 +934,8 @@ namespace base {
                 Logger::log(Level::INFO, "Mirrage power card was used");
                 // }
             }
+
+            return false;
         }
     
         bool Mirrage::getIllusion(Board& m_board, Player& m_player_red) {
@@ -1001,21 +1009,21 @@ namespace base {
         return std::nullopt;
     }
 
-    void Storm::apply() {
+    bool Storm::apply() {
         auto stacks_ids = getAvailableStackIDs();
         if (stacks_ids.empty()) {
             Logger::log(Level::WARNING, "No stacks with 2 or more cards found on the board");
-            return;
+            return false;
         }
 
         if (!m_selected_stack_id) {
             Logger::log(Level::WARNING, "No stack selected");
-            return;
+            return false;
         }
 
         if (stacks_ids.find(*m_selected_stack_id) == stacks_ids.end()) {
             Logger::log(Level::WARNING, "Invalid stack selection");
-            return;
+            return false;
         }
 
         for (const auto& [coord, stack] : m_board) {
@@ -1029,9 +1037,10 @@ namespace base {
                 catch (const std::runtime_error& e) {
                     Logger::log(Level::ERROR, "Failed to remove stack: {}", e.what());
                 }
-                return;
+                return false;
             }
         }
+        return false;
     }
     //
     //    ////------------------------------------------ Tide -------------------------------------------
@@ -1083,16 +1092,16 @@ namespace base {
         return stacks_coord;
     }
 
-    void Tide::apply() {
+    bool Tide::apply() {
         auto available_stacks = getAvailableStackIDs();
         if (available_stacks.size() < 2) {
             Logger::log(Level::WARNING, "There are not enough stacks to swap.");
-            return;
+            return false;
         }
 
         if (!m_selected_stack_ids) {
             Logger::log(Level::WARNING, "No stacks selected for swapping.");
-            return;
+            return false;
         }
 
         auto [first_id, second_id] = *m_selected_stack_ids;
@@ -1100,7 +1109,7 @@ namespace base {
         if (available_stacks.find(first_id) == available_stacks.end() ||
             available_stacks.find(second_id) == available_stacks.end()) {
             Logger::log(Level::WARNING, "Invalid stack selection.");
-            return;
+            return false;
         }
 
         Coord coord_from, coord_to;
@@ -1122,11 +1131,12 @@ namespace base {
 
         if (!found_first || !found_second) {
             Logger::log(Level::WARNING, "Could not find selected stacks.");
-            return;
+            return false;
         }
 
         m_board.swapStacks(coord_from, coord_to);
         Logger::log(Level::INFO, "Tide power card was used to swap stacks successfully.");
+        return false;
     }
 
 
@@ -1137,8 +1147,8 @@ namespace base {
     
         }
     
-        void Mist::apply() {
-    
+        bool Mist::apply() {
+            return false;
         }
         bool Mist::hasIllusion(Board& m_board, IllusionService& illusionService, Player& player) {
             auto playerColor = player.getColor();
@@ -1231,10 +1241,10 @@ namespace base {
         return coordStack;
     }
 
-    void Wave::apply() {
+    bool Wave::apply() {
         if (m_board.availableSpaces().empty()) {
             Logger::log(Level::WARNING, "No empty spaces to move the stack.");
-            return;
+            return false;
         }
 
         std::vector<Coord> stacks = validStacks();
@@ -1242,31 +1252,31 @@ namespace base {
 
         if (stacks.empty()) {
             Logger::log(Level::WARNING, "No stacks on the m_board.");
-            return;
+            return false;
         }
 
         if (!getSelectedStack()) {
             Logger::log(Level::WARNING, "No stack selected.");
-            return;
+            return false;
         }
 
         Coord selected = *getSelectedStack();
 
         if (std::find(stacks.begin(), stacks.end(), selected) == stacks.end()) {
             Logger::log(Level::WARNING, "Invalid stack selection.");
-            return;
+            return false;
         }
 
         if (!getDestination()) {
             Logger::log(Level::WARNING, "No destination selected.");
-            return;
+            return false;
         }
 
         Coord dest = *getDestination();
 
         if (!m_board.availableSpaces().contains(dest)) {
             Logger::log(Level::WARNING, "Invalid destination coordinates.");
-            return;
+            return false;
         }
 
         if (m_board.isValidMoveStack(selected, dest)) {
@@ -1274,7 +1284,7 @@ namespace base {
 
             if (!getSelectedCard()) {
                 Logger::log(Level::WARNING, "No card selected for placement.");
-                return;
+                return false;
             }
 
             try {
@@ -1291,8 +1301,10 @@ namespace base {
             catch (const std::runtime_error& e) {
                 Logger::log(Level::ERROR, "Error placing card: {}", e.what());
             }
+            return false;
         }
         else {
+            return false;
             Logger::log(Level::WARNING, "Invalid stack movement.");
         }
     }
@@ -1303,13 +1315,13 @@ namespace base {
         m_ability = PowerCardType::Whirlpool;
     }
 
-    void Whirlpool::apply() {
+    bool Whirlpool::apply() {
         validPairsOnRow = getPairsOnRow();
         validPairsOnColumn = getPairsOnColumn();
 
         if (validPairsOnRow.empty() && validPairsOnColumn.empty()) {
             Logger::log(Level::WARNING, "No valid row or column to use power card");
-            return;
+            return false;
         }
 
         setValidPairsOnRow(validPairsOnRow);
@@ -1325,7 +1337,7 @@ namespace base {
             std::pair<Coord, Coord> inputCoords{ firstCoord, secondCoord };
             if (std::find(validPairsOnRow.begin(), validPairsOnRow.end(), inputCoords) == validPairsOnRow.end()) {
                 Logger::log(Level::WARNING, "Invalid coordinate pairs");
-                return;
+                return false;
             }
 
             auto optFirstCard = m_board.getTopCard(firstCoord);
@@ -1333,7 +1345,7 @@ namespace base {
 
             if (!optFirstCard.has_value() || !optSecondCard.has_value()) {
                 Logger::log(Level::WARNING, "No card found at one or both coordinates");
-                return;
+                return false;
             }
 
             CombatCard& firstCard = optFirstCard->get();
@@ -1349,7 +1361,7 @@ namespace base {
                 Coord equalCardCoord = getEqualCardCoord();
                 if (equalCardCoord != firstCoord && equalCardCoord != secondCoord) {
                     Logger::log(Level::WARNING, "Invalid coordinates for placing card");
-                    return;
+                    return false;
                 }
 
                 if (equalCardCoord == firstCoord) {
@@ -1379,7 +1391,7 @@ namespace base {
             std::pair<Coord, Coord> inputCoords{ firstCoord, secondCoord };
             if (std::find(validPairsOnRow.begin(), validPairsOnRow.end(), inputCoords) == validPairsOnRow.end()) {
                 Logger::log(Level::WARNING, "Invalid coordinate pairs");
-                return;
+                return false;
             }
 
             auto optFirstCard = m_board.getTopCard(firstCoord);
@@ -1387,7 +1399,7 @@ namespace base {
 
             if (!optFirstCard.has_value() || !optSecondCard.has_value()) {
                 Logger::log(Level::WARNING, "No card found at one or both coordinates");
-                return;
+                return false;
             }
 
             CombatCard& firstCard = optFirstCard->get();
@@ -1403,7 +1415,7 @@ namespace base {
                 Coord equalCardCoord = getEqualCardCoord();
                 if (equalCardCoord != firstCoord && equalCardCoord != secondCoord) {
                     Logger::log(Level::WARNING, "Invalid coordinates for placing card");
-                    return;
+                    return false;
                 }
 
                 if (equalCardCoord == firstCoord) {
@@ -1424,6 +1436,7 @@ namespace base {
             m_board.popTopCardAt(firstCoord);
             m_board.popTopCardAt(secondCoord);
             Logger::log(Level::INFO, "Whirlpool power card was played");
+            return false;
         }
 
 
@@ -1539,15 +1552,15 @@ namespace base {
         return chosenColumn;
     }
 
-    void Blizzard::apply() {
+    bool Blizzard::apply() {
         if (m_board.availableSpaces().empty()) {
             Logger::log(Level::WARNING, "No available spaces for opponent's next turn");
-            return;
+            return false;
         }
 
         if (!getBlockChoice()) {
             Logger::log(Level::WARNING, "No block choice set (Row or Column)");
-            return;
+            return false;
         }
 
         char choice = toupper(*getBlockChoice());
@@ -1563,14 +1576,14 @@ namespace base {
 
             if (!getChosenRow()) {
                 Logger::log(Level::WARNING, "No row selected");
-                return;
+                return false;
             }
 
             uint16_t chosen_row = *getChosenRow();
 
             if (rows.find(chosen_row) == rows.end()) {
                 Logger::log(Level::WARNING, "Invalid row selection");
-                return;
+                return false;
             }
 
             m_board.blockRow(chosen_row, m_color);
@@ -1587,21 +1600,23 @@ namespace base {
 
             if (!getChosenColumn()) {
                 Logger::log(Level::WARNING, "No column selected");
-                return;
+                return false;
             }
 
             uint16_t chosen_column = *getChosenColumn();
 
             if (columns.find(chosen_column) == columns.end()) {
                 Logger::log(Level::WARNING, "Invalid column selection");
-                return;
+                return false;
             }
 
             m_board.blockColumn(chosen_column, m_color);
             Logger::log(Level::INFO, "Column {} has been blocked for the opponent's next turn", chosen_column);
+            return false;
         }
         else {
             Logger::log(Level::WARNING, "Invalid choice. Please enter R for Row or C for Column");
+            return false;
         }
     }
     void Blizzard::setColor(color::ColorType colorPlayer) {
@@ -1696,7 +1711,7 @@ namespace base {
         return { orient, index, move_dir };
     }
 
-    void Waterfall::apply() {
+    bool Waterfall::apply() {
         auto choice = input();
         auto orient = std::get<0>(choice);
         auto index = std::get<1>(choice);
@@ -1724,6 +1739,8 @@ namespace base {
                 m_board.mergeStacks(vect, destination);
             }
         }
+
+        return false;
     }
 
     //
@@ -1740,30 +1757,31 @@ namespace base {
         return selectedCoord;
     }
 
-    void Support::apply() {
+    bool Support::apply() {
         auto valid_cards = getValidCardIDs();
         if (valid_cards.empty()) {
             Logger::log(Level::WARNING, "No valid cards to apply the power card");
-            return;
+            return false;
         }
 
         if (!m_selected_card_id) {
             Logger::log(Level::WARNING, "No card selected");
-            return;
+            return false;
         }
 
         if (valid_cards.find(*m_selected_card_id) == valid_cards.end()) {
             Logger::log(Level::WARNING, "No valid card with that ID");
-            return;
+            return false;
         }
 
         for (const auto& [coord, stack] : m_board) {
             if (!stack.empty() && stack.back().getID() == *m_selected_card_id) {
                 m_board.incrementCardValue(coord);
                 Logger::log(Level::INFO, "Support power used!");
-                return;
+                return false;
             }
         }
+        return false;
     }
 
     std::vector<Coord> Support::CoordCardType() const {
@@ -1834,11 +1852,11 @@ namespace base {
         return cardsToRemove;
     }
 
-    void Earthquake::apply() {
+    bool Earthquake::apply() {
         auto cards_to_remove = getCardsToRemoveIDs();
         if (cards_to_remove.empty()) {
             Logger::log(Level::WARNING, "No visible cards with value ONE found on the board");
-            return;
+            return false;
         }
 
         m_cards_to_remove = cards_to_remove;
@@ -1860,6 +1878,7 @@ namespace base {
                 }
             }
         }
+        return false;
     }
 
     //
@@ -1922,30 +1941,31 @@ namespace base {
         }
         return foundCards;
     }
-    void Crumble::apply() {
+    bool Crumble::apply() {
         auto valid_cards = getValidCardIDs();
         if (valid_cards.empty()) {
             Logger::log(Level::WARNING, "No valid cards to apply the power card");
-            return;
+            return false;
         }
 
         if (!m_selected_card_id) {
             Logger::log(Level::WARNING, "No card selected to decrease");
-            return;
+            return false;
         }
 
         if (valid_cards.find(*m_selected_card_id) == valid_cards.end()) {
             Logger::log(Level::WARNING, "No valid card with that ID");
-            return;
+            return false;
         }
 
         for (const auto& [coord, stack] : m_board) {
             if (!stack.empty() && stack.back().getID() == *m_selected_card_id) {
                 m_board.decrementCard(coord);
                 Logger::log(Level::INFO, "Successfully decremented card");
-                return;
+                return false;
             }
         }
+        return false;
     }
 
     //
@@ -2038,26 +2058,27 @@ namespace base {
         }
     }
 
-    void Border::apply() {
+    bool Border::apply() {
         if (!applyNeutralCard()) {
-            return;
+            return false;
         }
 
         if (!getSelectedCoord()) {
             Logger::log(Level::WARNING, "No second card selected");
-            return;
+            return false;
         }
 
         Coord coord_input = *getSelectedCoord();
 
         if (!selectedCardType) {
             Logger::log(Level::WARNING, "No card type selected");
-            return;
+            return false;
         }
 
         CombatCard card(*selectedCardType, m_color);
         m_board.appendMove(coord_input, std::move(card));
         Logger::log(Level::INFO, "Border power used");
+        return false;
     }
 
     void Border::setSelectedCardType(CombatCardType type) {
@@ -2165,17 +2186,17 @@ namespace base {
         return choices;
     }
 
-    void Avalanche::apply() {
+    bool Avalanche::apply() {
 
         auto available_moves = getAvailableMovesWithIDs();
         if (available_moves.empty()) {
             Logger::log(Level::WARNING, "No valid moves available");
-            return;
+            return false;
         }
 
         if (!selectedMove) {
             Logger::log(Level::WARNING, "No move selected");
-            return;
+            return false;
         }
         Coord first_coord, second_coord;
         const auto& [direction, coords] = *selectedMove;
@@ -2212,7 +2233,7 @@ namespace base {
         else {
             Logger::log(Level::WARNING, "Invalid move!");
         }
-
+        return false;
         Logger::log(Level::INFO, "Avalanche card used");
     }
 
@@ -2222,7 +2243,7 @@ namespace base {
             m_ability = PowerCardType::Rock;
         }
     
-        void Rock::apply() {
+        bool Rock::apply() {
             std::vector<Coord>illusionCoord = getIllusionCoords(m_board);
             if (!illusionCoord.empty() && m_player_red.hasCards()) {
     
@@ -2243,6 +2264,7 @@ namespace base {
                 m_board.appendMove(coord, std::move(card));
             }
             Logger::log(Level::INFO, "Rock power card was used");
+            return false;
         }
     
         std::vector<Coord>Rock::getIllusionCoords(const Board& m_board) const {

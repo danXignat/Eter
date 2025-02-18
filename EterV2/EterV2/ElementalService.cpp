@@ -11,17 +11,54 @@
 using namespace logger;
 
 namespace base {
-	ElementalService::ElementalService(Board& board, Player& red_player, Player& blue_player) : m_board{ board },
-		m_red_player{ red_player }, m_blue_player{ blue_player } {
-		std::random_device rd;
-		std::mt19937 gen(rd());
+	const std::vector<PowerCardType> ElementalService::explosion_options{PowerCardType::ControllerExplosion};
+	const std::vector<PowerCardType> ElementalService::illusion_options{
+		PowerCardType::Flame,
+		PowerCardType::Mirrage,
+		PowerCardType::Mist,
+		PowerCardType::Rock
+	};
+
+	ElementalService::ElementalService(Board& board, Player& red_player, Player& blue_player
+		, std::optional<IllusionService>& illusion_service, std::optional<ExplosionService>& explosion_service) : m_board{ board },
+		m_red_player{ red_player }, m_blue_player{ blue_player },
+		m_illusion_service{ illusion_service }, m_explosion_service{explosion_service},
+		type_card1{ PowerCardType::None }, type_card2{PowerCardType::None} {
 
 		std::array<uint16_t, ElementalService::power_number> choices;
 		std::iota(choices.begin(), choices.end(), 0);
-		std::shuffle(choices.begin(), choices.end(), gen);
+		m_choices.insert(choices.begin(), choices.end());
+
+		if (!m_illusion_service.has_value()) {
+			for (auto ability : illusion_options) {
+				m_choices.erase(static_cast<uint16_t>(ability));
+			}
+		}
+
+		if (!m_explosion_service.has_value()) {
+			for (auto ability : explosion_options) {
+				m_choices.erase(static_cast<uint16_t>(ability));
+			}
+		}
+
+		pickRandomCards();
+	}
+
+	void ElementalService::pickRandomCards() {
+		std::random_device rd;
+		std::mt19937 gen(rd());
+
+		std::vector<uint16_t> choices(2);
+		std::sample(m_choices.begin(), m_choices.end(), choices.begin(), 2, gen);
+
+		m_choices.erase(choices[0]);
+		m_choices.erase(choices[1]);
 
 		type_card1 = static_cast<PowerCardType>(choices[0]);
 		type_card2 = static_cast<PowerCardType>(choices[1]);
+
+		type_card1 = static_cast<PowerCardType>(0);
+		type_card2 = static_cast<PowerCardType>(1);
 
 		card1 = _factory(type_card1);
 		card2 = _factory(type_card2);
@@ -69,7 +106,7 @@ namespace base {
 	std::unique_ptr<PowerCard>ElementalService::_factory(PowerCardType ability) {
 		switch (ability) {
 		case PowerCardType::ControllerExplosion:
-			return std::make_unique<ControllerExplosion>(m_board, m_red_player, m_blue_player);
+			return std::make_unique<ControllerExplosion>(m_board, m_red_player, m_blue_player, *m_explosion_service);
 
 		case PowerCardType::Destruction:
 			return std::make_unique<Destruction>(m_board, m_red_player, m_blue_player);

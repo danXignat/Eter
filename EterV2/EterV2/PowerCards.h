@@ -18,10 +18,15 @@ namespace base {
 
 	class ControllerExplosion :public PowerCard {
 	public:
-		ControllerExplosion(Board& board, Player& red, Player& blue);
+		ControllerExplosion(Board& board, Player& red, Player& blue, ExplosionService& explosion_service);
 
-		void apply() override;
+		bool apply() override;
+		bool isAvailable() const;
 
+		ExplosionService& getExplosionService();
+
+	private:
+		ExplosionService& m_explosion_service;
 	};
 
 	class Destruction :public PowerCard {
@@ -35,7 +40,7 @@ namespace base {
 
 		void setColor(color::ColorType colorPlayer);
 
-		void apply() override;
+		bool apply() override;
 
 	private:
 		color::ColorType m_color = color::ColorType::DEFAULT;
@@ -45,7 +50,7 @@ namespace base {
 	public:
 		Flame(Board& board, Player& red, Player& blue);
 
-		void apply() override;
+		bool apply() override;
 
 	};
 
@@ -67,7 +72,7 @@ namespace base {
 		bool isValidChoice(CombatCardType chosen_type, const std::vector<CombatCardType>& valid_choices) const;
 
 		void applyEffect(CombatCardType chosen_type); 
-		void apply() override;
+		bool apply() override;
 		
 
 	private:
@@ -99,7 +104,7 @@ namespace base {
 		void setSelection(const Coord& coordinates, CombatCardType card_type);
 		void setColor(color::ColorType colorPlayer);
 
-		void apply() override; 
+		bool apply() override; 
 
 	private:
 		color::ColorType m_color = color::ColorType::DEFAULT;
@@ -133,7 +138,7 @@ namespace base {
 		void setMoveDestination(Coord coord);
 		void setColor(color::ColorType colorPlayer);
 
-		void apply() override;
+		bool apply() override;
 
 	private:
 		color::ColorType m_color = color::ColorType::DEFAULT;
@@ -152,7 +157,7 @@ namespace base {
 
 		Squall(Board& board, Player& red, Player& blue);
 
-		void apply() override;
+		bool apply() override;
 		std::vector<std::pair<Coord, CombatCardType>> getVisibleCards();
 		std::unordered_set<uint16_t> getVisibleCardsIDs() const;
 		std::optional<CombatCardType> getCardTypeByID(uint16_t card_id) const;
@@ -178,7 +183,7 @@ namespace base {
 	public:
 
 		Gale(Board& board, Player& red, Player& blue);
-		void apply() override;
+		bool apply() override;
 		void setColor(color::ColorType colorPlayer);
 
 	private:
@@ -190,7 +195,7 @@ namespace base {
 	public:
 		Hurricane(Board& board, Player& red, Player& blue);
 
-		void apply() override;
+		bool apply() override;
 
 		void setOptions(const std::unordered_map<Orientation, std::vector<uint16_t>>& opts);
 		void setUserSelection(Orientation orient, uint16_t index);
@@ -209,7 +214,7 @@ namespace base {
 	public:
 		Gust(Board& board, Player& red, Player& blue);
 
-		void apply() override;
+		bool apply() override;
 
 		
 		std::vector<Coord> getValidSourceCards() const;
@@ -242,7 +247,7 @@ namespace base {
 	public:
 		Mirrage(Board& board, Player& red, Player& blue);
 
-		void apply() override;
+		bool apply() override;
 		bool getIllusion(Board& board, Player& player);
 
 	};
@@ -250,7 +255,7 @@ namespace base {
 	class Storm :public PowerCard {
 	public:
 		Storm(Board& board, Player& red, Player& blue);
-		void apply() override;
+		bool apply() override;
 		
 		std::vector<Coord> getAvailableStacks() const;
 		std::unordered_set<uint16_t> getAvailableStackIDs() const;
@@ -272,7 +277,7 @@ namespace base {
 	public:
 		Tide(Board& board, Player& red, Player& blue);
 
-		void apply() override;
+		bool apply() override;
 
 		std::vector<Coord> getAvailableStacks() const;
 		std::optional<std::pair<Coord, Coord>> getSelectedStacks() const;
@@ -295,7 +300,7 @@ namespace base {
 	public:
 		Mist(Board& board, Player& red, Player& blue);
 
-		void apply() override;
+		bool apply() override;
 		bool hasIllusion(Board& board, IllusionService& illusionService, Player& player);
 
 	};
@@ -304,7 +309,7 @@ namespace base {
 	public:
 		Wave(Board& board, Player& red, Player& blue);
 
-		void apply() override;
+		bool apply() override;
 
 		void setAvailableStacks(const std::vector<Coord>& stacks);
 		void setSelectedStack(const Coord& stack);
@@ -336,7 +341,7 @@ namespace base {
 	class Whirlpool : public PowerCard {
 	public:
 		Whirlpool(Board& board, Player& red, Player& blue);
-		void apply() override;
+		bool apply() override;
 		
 		Coord getSecondCoord() const;
 		Coord getEqualCardCoord() const;
@@ -376,7 +381,7 @@ namespace base {
 		std::optional<char> getBlockChoice() const;
 		std::optional<uint16_t> getChosenColumn() const;
 
-		void apply() override;
+		bool apply() override;
 		
 
 	private:
@@ -404,7 +409,7 @@ namespace base {
 		std::unordered_map<Orientation, std::vector<int16_t>> getOptions();
 
 
-		void apply() override;
+		bool apply() override;
 
 	private:
 		std::optional<Orientation> selectedOrientation;
@@ -428,7 +433,7 @@ namespace base {
 		std::unordered_set<uint16_t> getValidCardIDs() const;
 		std::optional<uint16_t> getSelectedCardID() const;
 		
-		void apply() override;
+		bool apply() override;
 
 	private:
 		color::ColorType m_color = color::ColorType::DEFAULT;
@@ -445,7 +450,7 @@ namespace base {
 
 		void setCardsToRemove(const std::vector<Coord>& cards);
 
-		void apply() override;
+		bool apply() override;
 	private:
 		std::vector<Coord> cardsToRemove;
 		std::unordered_set<uint16_t> m_cards_to_remove;
@@ -468,7 +473,7 @@ namespace base {
 		std::optional<uint16_t> getSelectedCardID() const;
 		std::vector<Coord> getValidCards() const;
 
-		void apply() override;
+		bool apply() override;
 	private:
 		color::ColorType m_color = color::ColorType::DEFAULT;
 		std::vector<Coord> validCards;
@@ -491,7 +496,7 @@ namespace base {
 		std::pair<std::set<int>, std::set<int>> getValidPositions() const;
 		std::optional<uint16_t> getSecondCardID() const;
 
-		void apply() override;
+		bool apply() override;
 
 	private:
 		color::ColorType m_color = color::ColorType::DEFAULT;
@@ -519,7 +524,7 @@ namespace base {
 		void setSelectedMoveByIDs(uint16_t first_id, uint16_t second_id, MoveDirection direction);
 		void setSelectedMove(const std::pair<MoveDirection, std::pair<Coord, Coord>>& move);
 
-		void apply() override;
+		bool apply() override;
 
 	private:
 		std::optional<std::pair<MoveDirection, std::pair<Coord, Coord>>> selectedMove;
@@ -529,7 +534,7 @@ namespace base {
 	public:
 		Rock(Board& board, Player& red, Player& blue);
 
-		void apply() override;
+		bool apply() override;
 
 		std::vector<Coord>getIllusionCoords(const Board& board) const;
 

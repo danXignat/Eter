@@ -42,7 +42,8 @@ namespace base {
 		Crumble,
 		Border,
 		Avalanche,
-		Rock
+		Rock,
+		None
 	};
  const std::unordered_map<PowerCardType, std::string_view> mapPowers = {
 		{PowerCardType::ControllerExplosion,"ControlledExplosion"},

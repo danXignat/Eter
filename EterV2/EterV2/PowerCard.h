@@ -17,7 +17,7 @@ namespace base {
 		PowerCardType getType() const;
 		uint16_t getId() const;
 
-		virtual void apply() = 0;
+		virtual bool apply() = 0;
 
 	protected:
 		Board& m_board;

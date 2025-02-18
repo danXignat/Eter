@@ -46,9 +46,12 @@ namespace base {
 		std::vector<Coord> getAffectedFields() const;
 		std::unordered_map<Coord, Effect, utils::CoordFunctor> getEffectCoords() const;
 
+		void generate();
 		void setting();
 		void render();
 		bool checkAvailability() const;
+		bool used() const;
+		uint16_t size() const;
 
 	private:
 		uint16_t _generateEffectCount(std::mt19937&);
@@ -71,5 +74,6 @@ namespace base {
 		std::unordered_set<Coord, utils::CoordFunctor> m_visited_effects;
 		std::vector<std::vector<std::optional<Effect>>> m_effects;
 		Coord m_effect_corner1, m_effect_corner2;
+		bool m_used{false};
 	};
 }
