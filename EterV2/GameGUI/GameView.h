@@ -22,6 +22,9 @@ signals:
     void explosionRotateRight();
 
     void applyMageCard(MageCard* card);
+    void applyPowerCard(PowerCard* card);
+
+    void nextRound();
 
 public:
     GameView(const QString& name_red, const QString& name_blue, QWidget* parent = nullptr);
@@ -32,6 +35,8 @@ public:
     void drawHole       (const QPointF& pos);
     void drawMages      (base::MageTypeAbility mage_red, const QString& desc_red, base::MageTypeAbility mage_blue, const QString& desc_blue);
     void drawArena      (base::GameSizeType game_size);
+    void drawMarker(const QPointF& point, color::ColorType color);
+    void drawPowers(const std::pair<std::pair<uint16_t, base::PowerCardType>, std::pair<uint16_t, base::PowerCardType>>& data);
 
     void cardAppendBoard    (Card* card);
     void setExplosionActive ();
@@ -77,6 +82,7 @@ private:
     Card* _createCardAt(color::ColorType color, base::CombatCardType type, QPointF pos, uint16_t id);
 
 private:
+    VictoryScreen* victory_screen;
 
     QVBoxLayout*    layout;
     QLabel*         infoLabel;
@@ -94,8 +100,12 @@ private:
     Explosion*  explosion;
     Vortex*     vortex;
 
-    Arena* arena;
-
     MageCard* mage_card_red;
     MageCard* mage_card_blue;
+
+    PowerCard* power_card1;
+    PowerCard* power_card2;
+
+    Arena* arena;
+    QList<Marker*> markers;
 };

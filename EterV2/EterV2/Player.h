@@ -42,6 +42,7 @@ namespace base {
 
         void renderCards() const;
         void renderUsedCards() const;
+        void reset();
 
     private:
         void _initializeCards(GameSizeType);

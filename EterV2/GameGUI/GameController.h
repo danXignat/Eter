@@ -47,4 +47,6 @@ public slots:
 
     void onSwitchPlayer();
     void onUpdateCards();
+
+    void onNextRound();
 };

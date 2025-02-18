@@ -1219,8 +1219,8 @@ namespace base {
 		};
 	}
 
-	std::optional<Coord> Board::getWinCoord() const {
-		return m_win_pos;
+	std::optional<std::pair<Coord, color::ColorType>> Board::getWinData() const {
+		return m_win_data;
 	}
 
 	void Board::shift(const Coord& offset) {
@@ -1238,6 +1238,25 @@ namespace base {
 		m_combat_cards = std::move(temp);
 	}
 
+	void Board::reset() {
+		for (auto& [coord, stack] : m_combat_cards) {
+			for (auto& card : stack) {
+				if (card.getColor() == color::ColorType::RED) {
+					m_player1.addCard(std::move(card));
+				}
+				else if (card.getColor() == color::ColorType::BLUE) {
+					m_player2.addCard(std::move(card));
+				}
+			}
+		}
+
+		m_combat_cards.clear();
+		m_available_spaces.clear();
+		m_available_spaces.insert(Config::getInstance().getStartPoint());
+		m_bounding_rect = BoundingRect(m_size);
+		m_win_data.reset();
+	}
+
 	///----------------------------Private Methods--------------------------------
 	void Board::_setWinPosition(const Coord& coord) {
 		std::unordered_map<uint16_t, int16_t> x_count, y_count;
@@ -1248,7 +1267,7 @@ namespace base {
 		for (const auto& [coord, stack] : m_combat_cards) {
 			auto [x, y] { coord };
 			color::ColorType color{ stack.back().getColor() };
-			int16_t incr{ (color == color::ColorType::RED) ? -1 : 1 };
+			int16_t incr{ (color == color::ColorType::DEFAULT) ? 0 : (color == color::ColorType::RED) ? -1 : 1 };
 
 			x_count[x] += incr;
 			y_count[y] += incr;
@@ -1272,7 +1291,7 @@ namespace base {
 		bool won_on_diags = abs(y_count[y]) == m_size || abs(x_count[x]) == m_size;
 
 		if (won_on_lines || won_on_diags) {
-			m_win_pos.emplace(coord);
+			m_win_data.emplace(coord, m_combat_cards[coord].back().getColor());
 		}
 	}
 

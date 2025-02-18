@@ -76,8 +76,8 @@ void testArenaService() {
 	board.appendMove({ 16, 5 }, base::CombatCard(base::CombatCardType::FOUR, color::ColorType::BLUE));
 	board.render();
 	board.sideViewRender();
-	base::ArenaService arenaService(base::GameSizeType::BIG, player1, player2);
-	arenaService.renderArena(board);
+	/*base::ArenaService arenaService(base::GameSizeType::BIG, player1, player2);
+	arenaService.renderArena(board);*/
 }
 
 int main() {

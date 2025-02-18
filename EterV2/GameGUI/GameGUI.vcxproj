@@ -136,8 +136,8 @@
     <QtMoc Include="GameView.h" />
     <QtMoc Include="scenes.h" />
     <QtMoc Include="controls.h" />
-    <ClInclude Include="ElementalController.h" />
-    <ClInclude Include="MageController.h" />
+    <QtMoc Include="ElementalController.h" />
+    <QtMoc Include="MageController.h" />
     <ClInclude Include="utils.h" />
     <QtMoc Include="MainWindow.h" />
     <ClInclude Include="qt_includes.h" />

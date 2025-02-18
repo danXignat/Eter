@@ -1,5 +1,7 @@
 #pragma once
 
+#include <ranges>
+
 #include "..\EterV2\GameModeFactory.h"
 
 #include "GameView.h"

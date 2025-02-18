@@ -18,15 +18,3 @@
 [INFO] card created ID 17
 [INFO] card created ID 18
 [INFO] card created ID 19
-[INFO] explosion effect [2, 0] -> 0
-[INFO] explosion effect [2, 2] -> 0
-[INFO] explosion effect [3, 0] -> 0
-[INFO] explosion effect [3, 2] -> 1
-[INFO] card(3) appended at (650, 450)
-[INFO] card(3) appended at (740, 450)
-[INFO] card(3) appended at (830, 450)
-[INFO] card created ID 20
-[INFO] card(E) appended at (920, 450)
-[INFO] card(3) appended at (650, 540)
-[INFO] card(4) appended at (740, 540)
-[INFO] Mage fire ability remove top card used

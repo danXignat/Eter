@@ -645,3 +645,286 @@ color::ColorType MageCard::getColor() const {
 base::MageTypeAbility MageCard::getTypeAbility() const {
     return type;
 }
+
+///-------------------------
+
+PowerCard::PowerCard(uint16_t id, base::PowerCardType type, const QString& description, QGraphicsItem* parent) : QGraphicsItem(parent),
+type{ type },
+m_id{id},
+m_description{ description } {
+    card_image = QPixmap(QString("../pictures/elemental/") + base::typeToStrings(type).data() + ".png")
+        .scaled(SPECIAL_CARD_SIZE, SPECIAL_CARD_SIZE, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+
+    info_icon = QPixmap("../pictures/info_icon.png")
+        .scaled(INFO_ICON_SIZE, INFO_ICON_SIZE, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+
+    info_icon_tapped = QPixmap("../pictures/info_icon_tapped.png")
+        .scaled(INFO_ICON_SIZE, INFO_ICON_SIZE, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+
+    info_icon_rect = QRectF(
+        SPECIAL_CARD_SIZE / 2 - INFO_ICON_SIZE - 5,  // 5 pixels padding from edge
+        SPECIAL_CARD_SIZE / 2 - INFO_ICON_SIZE - 5,
+        INFO_ICON_SIZE,
+        INFO_ICON_SIZE
+    );
+
+    setAcceptHoverEvents(true);
+    setZValue(11);
+    setFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsMovable);
+    setPos(MAGE_POS);
+}
+
+void PowerCard::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) {
+    Q_UNUSED(option);
+    Q_UNUSED(widget);
+
+    painter->drawPixmap(-SPECIAL_CARD_SIZE / 2, -SPECIAL_CARD_SIZE / 2, card_image);
+
+    painter->drawPixmap(info_icon_rect.toRect(),
+        is_hovering_info ? info_icon_tapped : info_icon);
+}
+
+QRectF PowerCard::boundingRect() const {
+    return QRectF(-SPECIAL_CARD_SIZE / 2, -SPECIAL_CARD_SIZE / 2, SPECIAL_CARD_SIZE, SPECIAL_CARD_SIZE);
+}
+
+void PowerCard::mousePressEvent(QGraphicsSceneMouseEvent* event) {
+    QPointF pos = event->pos();
+    if (info_icon_rect.contains(pos)) {
+        showDescription();
+        event->accept();
+        return;
+    }
+
+    QGraphicsItem::mousePressEvent(event);
+}
+
+uint16_t  PowerCard::getId()const {
+    return m_id;
+}
+
+void PowerCard::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
+    if (m_zone->contains(this->pos())) {
+        m_zone->show();
+    }
+    else {
+        m_zone->hide();
+    }
+
+    QGraphicsItem::mouseMoveEvent(event);
+}
+
+void PowerCard::mouseReleaseEvent(QGraphicsSceneMouseEvent* event) {
+    if (m_zone->contains(this->pos())) {
+        m_zone->hide();
+
+        emit applyPowerCard(this);
+    }
+
+    qDebug() << pos();
+
+    QGraphicsItem::mouseReleaseEvent(event);
+}
+
+void PowerCard::hoverMoveEvent(QGraphicsSceneHoverEvent* event) {
+    bool wasHovering = is_hovering_info;
+    is_hovering_info = info_icon_rect.contains(event->pos());
+
+    if (wasHovering != is_hovering_info) {
+        update(info_icon_rect); // Only redraw the icon area
+    }
+}
+
+void PowerCard::hoverLeaveEvent(QGraphicsSceneHoverEvent* event) {
+    Q_UNUSED(event);
+    if (is_hovering_info) {
+        is_hovering_info = false;
+        update(info_icon_rect);
+    }
+}
+
+void PowerCard::showDescription() {
+    QPoint screenPos = scene()->views().first()->mapToGlobal(
+        scene()->views().first()->mapFromScene(pos() + QPointF(0, 70))
+    );
+
+    DescriptionPopup* popup = new DescriptionPopup{ m_description };
+    popup->showAtPosition(screenPos);
+}
+
+void PowerCard::setTargetZone(TargetZone* zone) {
+    m_zone = zone;
+}
+
+void PowerCard::setUsed(bool is_used) {
+    m_is_used = is_used;
+
+    if (is_used) {
+        hide();
+    }
+    else {
+        show();
+    }
+}
+
+bool PowerCard::isUsed() const {
+    return m_is_used;
+}
+
+base::PowerCardType PowerCard::getTypeAbility() const {
+    return type;
+}
+
+
+///-----------------------------------------TOURNAMENT---------------------------------
+
+Arena::Arena(base::GameSizeType mode, QGraphicsItem* parent)
+    : QGraphicsPixmapItem(parent),
+    game_size{mode},
+    m_board_size{ static_cast<int>(mode) },
+    m_cell_size{ static_cast<double>(ARENA_SIZE) / static_cast<int>(mode) } {
+    QString texturePath = "../pictures/tournament/arena_";
+    texturePath += (mode == base::GameSizeType::SMALL) ? "small.png" : "big.png";
+
+    originalPixmap.load(texturePath);
+    if (originalPixmap.isNull()) {
+        qDebug() << "Failed to load arena texture:" << texturePath;
+        return;
+    }
+
+    QPixmap scaledPixmap = originalPixmap.scaled(
+        ARENA_SIZE, ARENA_SIZE,
+        Qt::KeepAspectRatio,
+        Qt::SmoothTransformation
+    );
+
+    setPixmap(scaledPixmap);
+    setPos(ARENA_POS - QPointF(scaledPixmap.width() / 2.0, scaledPixmap.height() / 2.0));
+    setZValue(0);
+}
+
+QSizeF Arena::getSize() const {
+    return pixmap().size();
+}
+
+QPointF Arena::getPosition() const {
+    return pos();
+}
+
+void Arena::setArenaPosition(const QPointF& newPos) {
+    setPos(newPos - QPointF(pixmap().width() / 2.0, pixmap().height() / 2.0));
+}
+
+void Arena::setArenaSize(const QSizeF& newSize) {
+    QPixmap scaledPixmap = originalPixmap.scaled(
+        newSize.toSize(),
+        Qt::KeepAspectRatio,
+        Qt::SmoothTransformation
+    );
+
+    setPixmap(scaledPixmap);
+    // Maintain center position
+    setArenaPosition(pos() + QPointF(pixmap().width() / 2.0, pixmap().height() / 2.0));
+}
+
+QPointF Arena::mapEffectToCard(const QPointF& pos) {
+    QPointF swapped{ pos.y(), pos.x() };
+    QPointF translated{ swapped + ((m_board_size == 3) ? QPointF{-1, -1 } : QPointF{-double(3) / 2, -double(3) / 2}) };
+    QPointF scaled{ MARKER_SIZE * translated };
+
+    return QPointF{ scaled };
+}
+
+/// ----------------------------------------------------------------------
+
+Marker::Marker(color::ColorType color, QGraphicsItem* parent)
+    : QGraphicsPixmapItem(parent)
+    , m_color(color)
+{
+    QString imagePath;
+    if (color == color::ColorType::RED || color == color::ColorType::BLUE) {
+        imagePath = (color == color::ColorType::RED)
+            ? QString("../pictures/tournament/marker_red.png")
+            : QString("../pictures/tournament/marker_blue.png");
+    }
+    QPixmap pixmap(imagePath);
+    if (pixmap.isNull()) {
+        qWarning() << "Failed to load marker image:" << imagePath;
+    }
+
+    // Scale the pixmap to MARKER_SIZE while maintaining aspect ratio
+    pixmap = pixmap.scaled(MARKER_SIZE, MARKER_SIZE,
+        Qt::KeepAspectRatio,
+        Qt::SmoothTransformation);
+
+    setPixmap(pixmap);
+
+    // Make the item moveable
+    setFlag(QGraphicsItem::ItemIsMovable);
+    setFlag(QGraphicsItem::ItemIsSelectable);
+}
+
+color::ColorType Marker::getColor() const {
+    return m_color;
+}
+
+void Marker::setPos(const QPointF& pos) {
+    QGraphicsPixmapItem::setPos(pos - QPointF(MARKER_SIZE / 2.0, MARKER_SIZE / 2.0));
+}
+
+///-------------------------------------------------------------------
+
+VictoryScreen::VictoryScreen(QWidget* parent)
+    : QWidget(parent)
+{
+    setupUI();
+    hide();
+}
+
+void VictoryScreen::setupUI() {
+    setFixedSize(WINDOW_WIDTH, WINDOW_HEIGHT);
+
+    backgroundLabel = new QLabel(this);
+    backgroundLabel->setStyleSheet("background-color: rgba(0, 0, 0, 180);");
+    backgroundLabel->setFixedSize(WINDOW_WIDTH, WINDOW_HEIGHT);
+
+    victoryLabel = new QLabel(this);
+    victoryLabel->setFixedSize(VICTORY_IMAGE_WIDTH, VICTORY_IMAGE_HEIGHT);
+    
+    int imageX = (WINDOW_WIDTH - VICTORY_IMAGE_WIDTH) / 2;
+    int imageY = (WINDOW_HEIGHT - VICTORY_IMAGE_HEIGHT) / 2;
+    victoryLabel->move(imageX, imageY);
+
+    nextButton = new NextButton(this);
+    nextButton->setFixedSize(BUTTON_WIDTH, BUTTON_HEIGHT);
+    
+    nextButton->move(WINDOW_WIDTH - 385, WINDOW_HEIGHT - 122);
+
+    connect(nextButton, &QPushButton::clicked, this, [this]() {
+        hide();
+        emit nextRoundRequested();
+        });
+}
+
+void VictoryScreen::showVictory(TeamColor color) {
+    QString imagePath = (color == TeamColor::RED)
+        ? "../pictures/win/red_victory.png"
+        : "../pictures/win/blue_victory.png";
+
+    QPixmap pixmap(imagePath);
+    if (pixmap.isNull()) {
+        qDebug() << "Failed to load image:" << imagePath;
+        return;
+    }
+
+    QPixmap scaledPixmap = pixmap.scaled(
+        VICTORY_IMAGE_WIDTH,
+        VICTORY_IMAGE_HEIGHT,
+        Qt::KeepAspectRatio,
+        Qt::SmoothTransformation
+    );
+
+    victoryLabel->setPixmap(scaledPixmap);
+    show();
+    raise();
+}

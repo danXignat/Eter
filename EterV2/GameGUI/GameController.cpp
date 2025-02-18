@@ -158,6 +158,22 @@ void GameController::onUpdateCards() {
     _updateBoardView();
 }
 
+void GameController::onNextRound() {
+    model->nextRound();
+    for (Card* card : view->getAllCards()) {
+        card->setPlaced(false);
+    }
+
+    _updateBoardView();
+    view->switchToPlayer(model->getCurrPlayer());
+
+    if (auto* mode = dynamic_cast<base::TournamentMode*>(model.get())) {
+        auto [coord, color] { mode->getArenaService().getLastMarkerAdded()};
+
+        view->drawMarker(gui::utils::coordToQPointF(coord), color);
+    }
+}
+
 ///--------------------------------------------------------INIT-------------------------------------------------
 
 void GameController::_initConections() {
@@ -171,10 +187,18 @@ void GameController::_initConections() {
     connect(view, &GameView::explosionRotateLeft,   this, &GameController::onExplosionRotateLeft);
     connect(view, &GameView::explosionRotateRight,  this, &GameController::onExplosionRotateRight);
 
+    connect(view, &GameView::nextRound, this, &GameController::onNextRound);
+
     if (m_mage_controller) {
         connect(m_mage_controller, &MageController::switchPlayer, this, &GameController::onSwitchPlayer);
         connect(m_mage_controller, &MageController::updateCards, this, &GameController::onUpdateCards);
         connect(m_mage_controller, &MageController::cardAppend, this, &GameController::onCardAppend);
+    }
+
+    if (m_elemental_controller) {
+        connect(m_elemental_controller, &ElementalController::switchPlayer, this, &GameController::onSwitchPlayer);
+        connect(m_elemental_controller, &ElementalController::updateCards, this, &GameController::onUpdateCards);
+        //connect(m_elemental_controller, &ElementalController::cardAppend, this, &GameController::onCardAppend);
     }
 }
 

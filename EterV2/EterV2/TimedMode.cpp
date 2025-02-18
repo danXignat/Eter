@@ -148,7 +148,7 @@ namespace base {
         m_blue_timer = std::make_unique<Timer>(m_time_limit);
         m_red_timer->start();
 
-        while (!m_board.getWinCoord().has_value()) {
+        while (!m_board.getWinData().has_value()) {
             renderGameState();
 
             if (m_red_timer->hasTimeExpired() || m_blue_timer->hasTimeExpired()) {
@@ -181,10 +181,10 @@ namespace base {
         m_red_timer->stop();
         m_blue_timer->stop();
 
-        if (m_board.getWinCoord().has_value()) {
+        /*if (m_board.getWinCoord().has_value()) {
             std::cout << (m_curr_player.get().getColor() == color::ColorType::BLUE ?
                 "Player RED has won!\n" : "Player BLUE has won!\n");
-        }
+        }*/
 
         std::cin.get();
         std::cin.get();

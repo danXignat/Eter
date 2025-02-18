@@ -5,6 +5,7 @@
 GameView::GameView(const QString& name_red, const QString& name_blue, QWidget* parent) :
     QGraphicsView{ parent },
     scene{ new QGraphicsScene(this) },
+    victory_screen{ new VictoryScreen(this) },
     explosion{ nullptr },
     vortex{ nullptr },
     mage_card_red{ nullptr },
@@ -30,6 +31,8 @@ GameView::GameView(const QString& name_red, const QString& name_blue, QWidget* p
     target_zone = new TargetZone();
     scene->addItem(target_zone);
     target_zone->hide();
+
+    connect(victory_screen, &VictoryScreen::nextRoundRequested, this, &GameView::nextRound);
 }
 
 Card* GameView::_createCardAt(color::ColorType color, base::CombatCardType type, QPointF pos, uint16_t id) {
@@ -152,6 +155,34 @@ void GameView::drawMages(base::MageTypeAbility mage_red, const QString& desc_red
     scene->addItem(mage_card_blue);
 }
 
+void GameView::drawPowers(const std::pair<std::pair<uint16_t, base::PowerCardType>, std::pair<uint16_t, base::PowerCardType>>& data) {
+    auto [card1, card2] {data};
+
+    power_card1 = new PowerCard(card1.first, card1.second, QString(base::abilityToString(card1.second).data()));
+    power_card2 = new PowerCard(card2.first, card2.second, QString(base::abilityToString(card2.second).data()));
+
+    power_card1->setTargetZone(target_zone);
+    power_card2->setTargetZone(target_zone);
+
+    power_card1->setPos(POWER_POS1);
+    power_card2->setPos(POWER_POS2);
+
+    connect(power_card1, &PowerCard::applyPowerCard, this, &GameView::applyPowerCard);
+    connect(power_card2, &PowerCard::applyPowerCard, this, &GameView::applyPowerCard);
+
+    scene->addItem(power_card1);
+    scene->addItem(power_card2);
+}
+
+void GameView::drawMarker(const QPointF& point, color::ColorType color) {
+    Marker* marker = new Marker(color);
+
+    QPointF offset{ arena->mapEffectToCard(point) };
+
+    marker->setPos(ARENA_POS + offset);
+    scene->addItem(marker);
+}
+
 void GameView::keyPressEvent(QKeyEvent* event) {
     if (event->key() == Qt::Key_Left) {
         explosion->setRotation(explosion->rotation() - 90);
@@ -234,24 +265,11 @@ void GameView::drawHole(const QPointF& pos) {
 }
 
 void GameView::showWin(color::ColorType color) {
-    QString imagePath = (color == color::ColorType::RED)
-        ? "../pictures/win/red_victory.png"
-        : "../pictures/win/blue_victory.png";
-
-    QPixmap pixmap(imagePath);
-    if (pixmap.isNull()) {
-        qDebug() << "Failed to load image:" << imagePath;
-        return;
-    }
-
-    QSize labelSize(1000, 500); // Set desired dimensions
-    QPixmap scaledPixmap = pixmap.scaled(labelSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
-
-    // Set the pixmap on the QLabel
-    won_label->setPixmap(scaledPixmap);
-    won_label->setFixedSize(labelSize);
-    won_label->move(350, 180);
-    won_label->setVisible(true);
+    victory_screen->showVictory(
+        color == color::ColorType::RED ?
+        VictoryScreen::TeamColor::RED :
+        VictoryScreen::TeamColor::BLUE
+    );
 }
 
 QHash<uint16_t, Card*>& GameView::getAllCards() {

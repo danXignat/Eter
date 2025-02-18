@@ -13,13 +13,12 @@ class ElementalController : public QObject {
 signals:
     void switchPlayer();
     void updateCards();
-    void cardAppend(Card* card);
 
 public:
     ElementalController(QObject* parent, base::ElementalService& service, GameView* view);
 
-    /*void onMageCardApply(MageCard* card);
-    void selectMage(MageCard* card);*/
+    void selectPower(PowerCard* card);
+    void onPowerCardApply(PowerCard* card);
 
 private:
     base::ElementalService& m_service;

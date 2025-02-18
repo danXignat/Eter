@@ -1,5 +1,6 @@
 #pragma once
 #include "utils.h"
+#include "settings.h"
 #include "controls.h"
 #include "qt_includes.h"
 #include "..\EterV2\CombatCard.h"
@@ -236,58 +237,107 @@ private:
 
 ///---------------------------------------ELEMENTAL---------------------------------
 
+class PowerCard : public QObject, public QGraphicsItem {
+    Q_OBJECT
+signals:
+    void applyPowerCard(PowerCard* card);
+
+public:
+    explicit PowerCard(uint16_t id, base::PowerCardType type, const QString& description, QGraphicsItem* parent = nullptr);
+
+
+    void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = nullptr) override;
+    QRectF boundingRect() const override;
+
+    bool isUsed() const;
+
+    base::PowerCardType getTypeAbility() const;
+    void setTargetZone(TargetZone* zone);
+    void setUsed(bool is_used);
+    uint16_t getId()const;
+
+protected:
+
+    void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
+    void mouseMoveEvent(QGraphicsSceneMouseEvent* event) override;
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override;
+
+    void hoverMoveEvent(QGraphicsSceneHoverEvent* event) override;
+    void hoverLeaveEvent(QGraphicsSceneHoverEvent* event) override;
+
+private:
+    void showDescription();
+
+private:
+    QPixmap card_image;
+    QPixmap info_icon;
+    QPixmap info_icon_tapped;
+    bool is_hovering_info = false;
+    QRectF info_icon_rect;
+
+    QPointF start_pos;
+    QPointF last_mouse_position;
+    QPointF last_card_position;
+
+    TargetZone* m_zone;
+
+    QString m_description;
+    base::PowerCardType type;
+
+    uint16_t m_id;
+    bool m_is_used;
+};
+
 ///-----------------------------------------TOURNAMENT---------------------------------
 
 class Arena : public QGraphicsPixmapItem {
 public:
-    Arena(base::GameSizeType mode, QGraphicsItem* parent = nullptr)
-        : QGraphicsPixmapItem(parent) {
+    Arena(base::GameSizeType mode, QGraphicsItem* parent = nullptr);
 
-        QString texturePath = "../pictures/tournament/arena_";
-        texturePath += (mode == base::GameSizeType::SMALL) ? "small.png" : "big.png";
-
-        originalPixmap.load(texturePath);
-        if (originalPixmap.isNull()) {
-            qDebug() << "Failed to load arena texture:" << texturePath;
-            return;
-        }
-
-        QPixmap scaledPixmap = originalPixmap.scaled(
-            ARENA_SIZE, ARENA_SIZE,
-            Qt::KeepAspectRatio,
-            Qt::SmoothTransformation
-        );
-
-        setPixmap(scaledPixmap);
-
-        setPos(ARENA_POS - QPointF(scaledPixmap.width() / 2.0, scaledPixmap.height() / 2.0));
-
-        setZValue(0);
-    }
-
-    QSizeF getSize() const {
-        return pixmap().size();
-    }
-
-    QPointF getPosition() const {
-        return pos();
-    }
-
-    void setArenaPosition(const QPointF& newPos) {
-        setPos(newPos - QPointF(pixmap().width() / 2.0, pixmap().height() / 2.0));
-    }
-
-    void setArenaSize(const QSizeF& newSize) {
-        QPixmap scaledPixmap = originalPixmap.scaled(
-            newSize.toSize(),
-            Qt::KeepAspectRatio,
-            Qt::SmoothTransformation
-        );
-        setPixmap(scaledPixmap);
-        // Maintain center position
-        setArenaPosition(pos() + QPointF(pixmap().width() / 2.0, pixmap().height() / 2.0));
-    }
+    QSizeF getSize() const;
+    QPointF getPosition() const;
+    void setArenaPosition(const QPointF& newPos);
+    void setArenaSize(const QSizeF& newSize);
+    QPointF mapEffectToCard(const QPointF& coord);
 
 private:
     QPixmap originalPixmap;
+    base::GameSizeType game_size;
+    double m_cell_size;
+    int m_board_size;
+};
+
+class Marker : public QGraphicsPixmapItem {
+public:
+    explicit Marker(color::ColorType color, QGraphicsItem* parent = nullptr);
+    color::ColorType getColor() const;
+    void setPos(const QPointF& pos);
+
+private:
+    color::ColorType m_color;
+};
+
+
+///-----------------------------------------------
+
+class VictoryScreen : public QWidget {
+    Q_OBJECT
+
+public:
+    enum class TeamColor {
+        RED,
+        BLUE
+    };
+
+    explicit VictoryScreen(QWidget* parent = nullptr);
+    void showVictory(TeamColor color);
+
+signals:
+    void nextRoundRequested();
+
+private:
+    QLabel* backgroundLabel;
+    QLabel* victoryLabel;
+    QPushButton* nextButton;
+    void setupUI();
 };

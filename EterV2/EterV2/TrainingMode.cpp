@@ -18,7 +18,7 @@ namespace base {
 	void TrainingMode::run() {
 		this->render();
 
-		while (m_board.getWinCoord().has_value() == false) {
+		while (m_board.getWinData().has_value() == false) {
 			InputHandler input;
 			try {
 				input.read();								//asta da handle la inputu de la tastatura

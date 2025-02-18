@@ -45,7 +45,7 @@ namespace base {
 		Rock
 	};
  const std::unordered_map<PowerCardType, std::string_view> mapPowers = {
-		{PowerCardType::ControllerExplosion,"ControllerExplosion"},
+		{PowerCardType::ControllerExplosion,"ControlledExplosion"},
 		{PowerCardType::Destruction,"Destruction"},
 		{PowerCardType::Flame,"Flame"},
 		{PowerCardType::Fire,"Fire"},

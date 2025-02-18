@@ -1,39 +1,39 @@
 #include "PowerCards.h"
-//#include<set>
+#include<set>
 using namespace logger;
-//
+
 namespace base {
-    //
-    //    ////------------------------------------------ ControllerExplosion -------------------------------------------
-    //    ControllerExplosion::ControllerExplosion(Board& m_board, Player& red, Player& blue)
-    //        : PowerCard(m_board, red, blue) {
-    //        m_ability = PowerCardType::ControllerExplosion;
-    //    }
-    //
-    //    void ControllerExplosion::apply() { /// nu stiu cum functioneaza explozia daca poti sa o faci tu :( 
-    //        ExplosionService explosionService(m_board, m_player_red, m_player_red);
-    //
-    //        if (!explosionService.checkAvailability()) {
-    //            Logger::log(Level::WARNING, "No valid spaces for explosion");
-    //            return;
-    //        }
-    //
-    //        explosionService.setting();
-    //
-    //        auto effectCoords = explosionService.getEffectCoords();
-    //
-    //        /* if (!effectCoords.empty()) {
-    //             explosionService.renderExplosion();
-    //             explosionService.apply();
-    //
-    //             Logger::log(Level::INFO, "Controller Explosion power card was used succesfully");
-    //         }
-    //         else {
-    //             Logger::log(Level::WARNING, "No valid explosion effects to apply");
-    //         }*/
-    //    }
-    //
-    //    ////------------------------------------------ Destruction -------------------------------------------
+    
+        ////------------------------------------------ ControllerExplosion -------------------------------------------
+        ControllerExplosion::ControllerExplosion(Board& m_board, Player& red, Player& blue)
+            : PowerCard(m_board, red, blue) {
+            m_ability = PowerCardType::ControllerExplosion;
+        }
+    
+        void ControllerExplosion::apply() { /// nu stiu cum functioneaza explozia daca poti sa o faci tu :( 
+            ExplosionService explosionService(m_board, m_player_red, m_player_red);
+
+            if (!explosionService.checkAvailability()) {
+                Logger::log(Level::WARNING, "No valid spaces for explosion");
+                return;
+            }
+
+            explosionService.setting();
+
+            auto effectCoords = explosionService.getEffectCoords();
+
+            /* if (!effectCoords.empty()) {
+                 explosionService.renderExplosion();
+                 explosionService.apply();
+
+                 Logger::log(Level::INFO, "Controller Explosion power card was used succesfully");
+             }
+             else {
+                 Logger::log(Level::WARNING, "No valid explosion effects to apply");
+             }*/
+        }
+    
+        ////------------------------------------------ Destruction -------------------------------------------
     Destruction::Destruction(Board& m_board, Player& red, Player& blue)
         : PowerCard(m_board, red, blue) {
 
@@ -83,44 +83,44 @@ namespace base {
         Logger::log(Level::INFO, "Destruction power destroyed the last played card at ({}, {})",
             last_position.first, last_position.second);
     }
-    //
-    //    ///------------------------------------------ Flame -------------------------------------------
-    //    Flame::Flame(Board& m_board, Player& red, Player& blue):PowerCard(m_board, red, blue) {                               ///////////////// asta e cu iluzie, nu merge
-    //        m_ability = PowerCardType::Flame;
-    //    }
-    //
-    //    void Flame::apply() {
-    //        for (const auto& [coord, stack] : m_board) {
-    //            auto top_card = m_board.getTopCard(coord);
-    //            CombatCard& card = top_card->get();
-    //            if (card.getColor() != m_player_red.getColor() && card.isIllusion()) {
-    //                card.flip();
-    //                Logger::log(Level::INFO, "The opponent's Illusion has been revealed");
-    //            }
-    //
-    //            Logger::log(Level::INFO, "It's your turn, place a card");
-    //            Coord new_coord;
-    //            std::cin >> new_coord.first >> new_coord.second;
-    //            char card_type;
-    //            std::cin >> card_type;
-    //
-    //
-    //            auto selected_card = m_player_red.getCard(charToCombatCard(card_type));
-    //
-    //            if (m_board.isValidPlaceCard(new_coord, selected_card)) {
-    //                m_board.appendMove(new_coord, std::move(selected_card));
-    //                Logger::log(Level::INFO, "Flame power was used. Card placed at ({}, {})",
-    //                    new_coord.first, new_coord.second);
-    //                break;
-    //            }
-    //            else {
-    //                Logger::log(Level::WARNING, "Invalid move!");
-    //            }
-    //        }
-    //    }
-    //
-    //    ////------------------------------------------ Fire -------------------------------------------
-    //
+    
+        ///------------------------------------------ Flame -------------------------------------------
+        Flame::Flame(Board& m_board, Player& red, Player& blue):PowerCard(m_board, red, blue) {                               ///////////////// asta e cu iluzie, nu merge
+            m_ability = PowerCardType::Flame;
+        }
+    
+        void Flame::apply() {
+            for (const auto& [coord, stack] : m_board) {
+                auto top_card = m_board.getTopCard(coord);
+                CombatCard& card = top_card->get();
+                if (card.getColor() != m_player_red.getColor() && card.isIllusion()) {
+                    card.flip();
+                    Logger::log(Level::INFO, "The opponent's Illusion has been revealed");
+                }
+    
+                Logger::log(Level::INFO, "It's your turn, place a card");
+                Coord new_coord;
+                std::cin >> new_coord.first >> new_coord.second;
+                char card_type;
+                std::cin >> card_type;
+    
+    
+                auto selected_card = m_player_red.getCard(charToCombatCard(card_type));
+    
+                if (m_board.isValidPlaceCard(new_coord, selected_card)) {
+                    m_board.appendMove(new_coord, std::move(selected_card));
+                    Logger::log(Level::INFO, "Flame power was used. Card placed at ({}, {})",
+                        new_coord.first, new_coord.second);
+                    break;
+                }
+                else {
+                    Logger::log(Level::WARNING, "Invalid move!");
+                }
+            }
+        }
+    
+        ////------------------------------------------ Fire -------------------------------------------
+    
 
 
     Fire::Fire(Board& m_board, Player& red, Player& blue) : PowerCard(m_board, red, blue) {
@@ -711,52 +711,52 @@ namespace base {
         Logger::log(Level::INFO, "Gust power: Successfully moved card from ({}, {}) to ({}, {})",
             sourceCoord.first, sourceCoord.second, destCoord.first, destCoord.second);
     }
-    //    ////------------------------------------------ Mirrage -------------------------------------------
-    //    Mirrage::Mirrage(Board& m_board, Player& red, Player& blue):PowerCard(m_board, red, blue) {                                 /////////////// iluzie, nu merge
-    //        m_ability = PowerCardType::Mirrage;
-    //    }
-    //
-    //    void Mirrage::apply() {
-    //        if (getIllusion(m_board, m_player_red)) {
-    //            std::cout << "Choose the coordinates for the new illusion and the new illusion" << std::endl;
-    //            Coord coord;
-    //            std::cin >> coord.first >> coord.second;
-    //
-    //            char card_type;
-    //            std::cin >> card_type;
-    //            auto card = m_player_red.getCard(charToCombatCard(card_type));
-    //            //  if (m_board.isValidMove(coord, card)) {
-    //            card.flip();
-    //            m_board.appendMove(coord, std::move(card));
-    //            Logger::log(Level::INFO, "Mirrage power card was used");
-    //            // }
-    //        }
-    //    }
-    //
-    //    bool Mirrage::getIllusion(Board& m_board, Player& m_player_red) {
-    //        bool foundIllusion = false;
-    //        for (const auto& [coord, stack] : m_board) {
-    //            auto top_card = m_board.getTopCard(coord);
-    //            CombatCard& card = top_card->get();
-    //            if (card.isIllusion() && card.getColor() == player.getColor()) {
-    //                card.flip();
-    //                m_player_red.addCard(std::move(card));
-    //                CombatCard& card_value = card;
-    //                m_board.removeTopCardAt(coord);
-    //                m_board.availableSpaces();
-    //                Logger::log(Level::INFO, "You successfully received the illusion back");
-    //                foundIllusion = true;
-    //                break;
-    //            }
-    //        }
-    //        if (!foundIllusion) {
-    //            Logger::log(Level::INFO, "You don't have any illusion on the m_board");
-    //        }
-    //        return foundIllusion;
-    //    }
-    //
-    //
-    //    ////------------------------------------------ Storm -------------------------------------------
+        ////------------------------------------------ Mirrage -------------------------------------------
+        Mirrage::Mirrage(Board& m_board, Player& red, Player& blue):PowerCard(m_board, red, blue) {                                 /////////////// iluzie, nu merge
+            m_ability = PowerCardType::Mirrage;
+        }
+    
+        void Mirrage::apply() {
+            if (getIllusion(m_board, m_player_red)) {
+                std::cout << "Choose the coordinates for the new illusion and the new illusion" << std::endl;
+                Coord coord;
+                std::cin >> coord.first >> coord.second;
+    
+                char card_type;
+                std::cin >> card_type;
+                auto card = m_player_red.getCard(charToCombatCard(card_type));
+                //  if (m_board.isValidMove(coord, card)) {
+                card.flip();
+                m_board.appendMove(coord, std::move(card));
+                Logger::log(Level::INFO, "Mirrage power card was used");
+                // }
+            }
+        }
+    
+        bool Mirrage::getIllusion(Board& m_board, Player& m_player_red) {
+            bool foundIllusion = false;
+            for (const auto& [coord, stack] : m_board) {
+                auto top_card = m_board.getTopCard(coord);
+                CombatCard& card = top_card->get();
+                if (card.isIllusion() && card.getColor() == m_player_red.getColor()) {
+                    card.flip();
+                    m_player_red.addCard(std::move(card));
+                    CombatCard& card_value = card;
+                    m_board.removeTopCardAt(coord);
+                    m_board.availableSpaces();
+                    Logger::log(Level::INFO, "You successfully received the illusion back");
+                    foundIllusion = true;
+                    break;
+                }
+            }
+            if (!foundIllusion) {
+                Logger::log(Level::INFO, "You don't have any illusion on the m_board");
+            }
+            return foundIllusion;
+        }
+    
+    
+        ////------------------------------------------ Storm -------------------------------------------
     Storm::Storm(Board& m_board, Player& red, Player& blue) :PowerCard(m_board, red, blue) {
         m_ability = PowerCardType::Storm;
     }
@@ -867,39 +867,39 @@ namespace base {
             coord_from.first, coord_from.second, coord_to.first, coord_to.second);
     }
 
-    //
-    //    ////------------------------------------------ Mist -------------------------------------------
-    //    Mist::Mist(Board& m_board, Player& red, Player& blue):PowerCard(m_board, red, blue) { /////////////////////////////////////////////////////////joaca inca o iluzie, nu merge
-    //        m_ability = PowerCardType::Mist;
-    //
-    //    }
-    //
-    //    void Mist::apply() {
-    //
-    //    }
-    //    bool Mist::hasIllusion(Board& m_board, IllusionService& illusionService, Player& player) {
-    //        auto playerColor = player.getColor();
-    //        // if (illusionService.hasPlayerIllusion(playerColor)) {
-    //        Logger::log(Level::WARNING, "Player already has an illusion");
-    //        //      return false;
-    //        //  }
-    //       //   else {
-    //        Logger::log(Level::INFO, "You can play your illusion");
-    //
-    //        Coord coord;
-    //        std::cin >> coord.first >> coord.second;
-    //
-    //        char card_type;
-    //        std::cin >> card_type;
-    //        auto card = player.getCard(charToCombatCard(card_type));
-    //
-    //        //illusionService.placeIllusion(coord, std::move(card));
-    //        //  }
-    //        return true;
-    //    }
-    //
-    //
-    //    ////------------------------------------------ Wave -------------------------------------------
+    
+        ////------------------------------------------ Mist -------------------------------------------
+        Mist::Mist(Board& m_board, Player& red, Player& blue):PowerCard(m_board, red, blue) { 
+            m_ability = PowerCardType::Mist;
+    
+        }
+    
+        void Mist::apply() {
+    
+        }
+        bool Mist::hasIllusion(Board& m_board, IllusionService& illusionService, Player& player) {
+            auto playerColor = player.getColor();
+            // if (illusionService.hasPlayerIllusion(playerColor)) {
+            Logger::log(Level::WARNING, "Player already has an illusion");
+            //      return false;
+            //  }
+           //   else {
+            Logger::log(Level::INFO, "You can play your illusion");
+    
+            Coord coord;
+            std::cin >> coord.first >> coord.second;
+    
+            char card_type;
+            std::cin >> card_type;
+            auto card = player.getCard(charToCombatCard(card_type));
+    
+            //illusionService.placeIllusion(coord, std::move(card));
+            //  }
+            return true;
+        }
+    
+    
+        ////------------------------------------------ Wave -------------------------------------------
     Wave::Wave(Board& m_board, Player& red, Player& blue) :PowerCard(m_board, red, blue) {
         m_ability = PowerCardType::Wave;
     }
@@ -1833,45 +1833,45 @@ namespace base {
 
     //
     //    ////------------------------------------------ Rock -------------------------------------------
-    //    Rock::Rock(Board& m_board, Player& red, Player& blue):PowerCard(m_board, red, blue) {  ///////////////////////////////// foloseste iluzie, nu merge 
-    //        m_ability = PowerCardType::Rock;
-    //    }
-    //
-    //    void Rock::apply() {
-    //        std::vector<Coord>illusionCoord = getIllusionCoords(m_board);
-    //        if (!illusionCoord.empty() && player.hasCards()) {
-    //
-    //            std::cout << "Illusion coordinates: " << std::endl;
-    //
-    //            Coord coord;
-    //            std::cin >> coord.first >> coord.second;
-    //
-    //            if (std::find(illusionCoord.begin(), illusionCoord.end(), coord) == illusionCoord.end()) {
-    //                Logger::log(Level::WARNING, "No illusion at these coordinates");
-    //            }
-    //
-    //            std::cout << "Choose a card to cover the illusion" << std::endl;
-    //            char card_type;
-    //            std::cin >> card_type;
-    //            auto card = player.getCard(charToCombatCard(card_type));
-    //
-    //            m_board.appendMove(coord, std::move(card));
-    //        }
-    //        Logger::log(Level::INFO, "Rock power card was used");
-    //    }
-    //
-    //    std::vector<Coord>Rock::getIllusionCoords(const Board& m_board) const {
-    //        std::vector<Coord>illusionCoords;
-    //        for (const auto& [coord, stack] : m_board) {
-    //            if (!stack.empty() && stack.back().isIllusion()) {
-    //                Logger::log(Level::INFO, "Illusion card at ({}, {})", coord.first, coord.second);
-    //                illusionCoords.emplace_back(coord);
-    //            }
-    //            else {
-    //                Logger::log(Level::WARNING, "No illusions on the m_board");
-    //            }
-    //        }
-    //        return illusionCoords;
-    //    }
-    //
-    //}
+        Rock::Rock(Board& m_board, Player& red, Player& blue):PowerCard(m_board, red, blue) {  ///////////////////////////////// foloseste iluzie, nu merge 
+            m_ability = PowerCardType::Rock;
+        }
+    
+        void Rock::apply() {
+            std::vector<Coord>illusionCoord = getIllusionCoords(m_board);
+            if (!illusionCoord.empty() && m_player_red.hasCards()) {
+    
+                std::cout << "Illusion coordinates: " << std::endl;
+    
+                Coord coord;
+                std::cin >> coord.first >> coord.second;
+    
+                if (std::find(illusionCoord.begin(), illusionCoord.end(), coord) == illusionCoord.end()) {
+                    Logger::log(Level::WARNING, "No illusion at these coordinates");
+                }
+    
+                std::cout << "Choose a card to cover the illusion" << std::endl;
+                char card_type;
+                std::cin >> card_type;
+                auto card = m_player_red.getCard(charToCombatCard(card_type));
+    
+                m_board.appendMove(coord, std::move(card));
+            }
+            Logger::log(Level::INFO, "Rock power card was used");
+        }
+    
+        std::vector<Coord>Rock::getIllusionCoords(const Board& m_board) const {
+            std::vector<Coord>illusionCoords;
+            for (const auto& [coord, stack] : m_board) {
+                if (!stack.empty() && stack.back().isIllusion()) {
+                    Logger::log(Level::INFO, "Illusion card at ({}, {})", coord.first, coord.second);
+                    illusionCoords.emplace_back(coord);
+                }
+                else {
+                    Logger::log(Level::WARNING, "No illusions on the m_board");
+                }
+            }
+            return illusionCoords;
+        }
+    
+}

@@ -13,7 +13,9 @@ namespace base {
 		m_player_blue{ player_names.second, color::ColorType::BLUE, game_size },
 		m_board{ game_size, m_player_red, m_player_blue },
 		m_curr_player{ m_player_red },
-		m_game_size_type{game_size} {
+		m_game_size_type{game_size},
+		m_current_round{0},
+		m_round_count{ (game_size == GameSizeType::SMALL) ? uint16_t(3) : uint16_t(5) } {
 
 		for (ServiceType service : services) {
 			switch (service) {
@@ -53,8 +55,8 @@ namespace base {
 	}
 
 	std::optional<color::ColorType> BaseGameMode::getWinningColor() const {
-		if (auto win_coord = m_board.getWinCoord(); win_coord.has_value()) {
-			return m_board[*win_coord].back().getColor();
+		if (auto win_data = m_board.getWinData(); win_data.has_value()) {
+			return win_data->second;
 		}
 
 		return std::nullopt;
@@ -137,4 +139,38 @@ namespace base {
 
 	}
 
+	void BaseGameMode::nextRound() {
+		auto win_data{ m_board.getWinData() };
+		if (!win_data.has_value()) {
+			throw std::runtime_error("no one has won");
+		}
+
+		if (win_data->second == color::ColorType::RED) {
+			m_score.red++;
+		}
+		else if (win_data->second == color::ColorType::BLUE) {
+			m_score.blue++;
+		}
+
+		if (m_current_round < m_round_count) {
+			m_board.reset();
+			m_player_red.reset();
+			m_player_blue.reset();
+		}
+
+		m_current_round++;
+	}
+
+	uint16_t BaseGameMode::getScore(color::ColorType color) const {
+		if (color == color::ColorType::RED) {
+			return m_score.red;
+		}
+		else if (color == color::ColorType::BLUE) {
+			return m_score.blue;
+		}
+	}
+
+	uint16_t BaseGameMode::getCurrRound() {
+		return m_current_round;
+	}
 }

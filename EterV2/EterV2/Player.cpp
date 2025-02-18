@@ -53,6 +53,11 @@ namespace base {
 
     //---------------------------------------Setters Getters---------------------------------------
 
+    void Player::reset() {
+        m_cards.insert(std::make_move_iterator(m_used_cards.begin()), std::make_move_iterator(m_used_cards.end()));
+        m_used_cards.clear();
+    }
+
     std::string Player::getName() const {
         return m_name;
     }

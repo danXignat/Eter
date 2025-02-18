@@ -4,14 +4,16 @@
 #include "PowerCard.h"
 #include"IllusionService.h"
 #include"BaseGameMode.h"
-
-#include<memory>
 #include"typedefs.h"
 #include "logger.h"
-#include<ranges> 
+
+#include <memory>
+#include <vector>
+#include <ranges> 
 #include <algorithm>
-#include<map>
-#include<set>
+#include <map>
+#include <set>
+
 namespace base {
 
 	class ControllerExplosion :public PowerCard {

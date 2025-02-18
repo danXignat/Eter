@@ -13,6 +13,21 @@ namespace base {
         const std::pair<std::string, std::string>& player_names)
         : BaseGameMode(GameSizeType::BIG, player_names, services),
         m_arena_service{ GameSizeType::BIG, m_board, m_player_red, m_player_blue } {
+
+        for (ServiceType service : services) {
+            switch (service) {
+            case base::ServiceType::MAGE:
+                m_mage_service.emplace(m_board, m_player_red, m_player_blue);
+                break;
+
+            case base::ServiceType::ELEMENTAL:
+                m_elemental_service.emplace(m_board, m_player_red, m_player_blue);
+                break;
+
+            default:
+                break;
+            }
+        }
     }
 
     void TournamentMode::run() {
@@ -89,5 +104,23 @@ namespace base {
         }*/
     }
 
-    
+    std::optional<ElementalService>& TournamentMode::getElementalService() {
+        return m_elemental_service;
+    }
+
+    std::optional<MageService>& TournamentMode::getMageService() {
+        return m_mage_service;
+    }
+
+    ArenaService& TournamentMode::getArenaService() {
+        return m_arena_service;
+    }
+
+    void TournamentMode::nextRound() {
+        auto win_data{ m_board.getWinData() };
+
+        m_arena_service.addMarker(win_data->first, win_data->second);
+
+        BaseGameMode::nextRound();
+    }
 }

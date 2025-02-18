@@ -14,6 +14,8 @@ namespace base {
 		virtual ~PowerCard() = default;
 
 		std::string_view getAbilityName() const;
+		PowerCardType getType() const;
+		uint16_t getId() const;
 
 		virtual void apply() = 0;
 
@@ -23,5 +25,6 @@ namespace base {
 		Player& m_player_blue;
 
 		PowerCardType m_ability;
+		uint16_t m_id;
 	};
 }

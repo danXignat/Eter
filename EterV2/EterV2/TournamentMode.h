@@ -3,12 +3,10 @@
 #include <optional>
 
 #include "BaseGameMode.h"
-#include "WinManager.h"
-#include "ExplosionService.h"
-#include "ElementalService.h"
-#include "ElementalMode.h"
-#include "ServiceType.h"
 #include "GameModeType.h"
+#include "ServiceType.h"
+#include "MageService.h"
+#include "ElementalService.h"
 #include "ArenaService.h"
 
 namespace base {
@@ -18,16 +16,19 @@ namespace base {
 
 		void run() override;
 		void render();
-		
+		void nextRound() override;
+
+		std::optional<MageService>& getMageService();
+		std::optional<ElementalService>& getElementalService();
+		ArenaService& getArenaService();
 
 	private:
 		
 
 	private:
-		ArenaService m_arena_service;
-		
 		std::optional<MageService> m_mage_service;
 		std::optional<ElementalService> m_elemental_service;
+		ArenaService m_arena_service;
 	};
 
 }

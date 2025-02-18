@@ -11,16 +11,24 @@ constexpr const int SPECIAL_CARD_SIZE	{ 145 };
 constexpr const int EFFECT_SIZE			{ 37 };
 constexpr const int INFO_ICON_SIZE		{ 37 };
 constexpr const int VORTEX_SIZE			{ 250 };
-constexpr const int ARENA_SIZE			{ 300 };
+constexpr const int ARENA_SIZE			{ 225 };
+constexpr const int MARKER_SIZE			{ 40 };
 constexpr const int VERTEX_RANGE		{ 100 };
 
-const QPointF		VORTEX_POS		{ 1000, 200 };
-const QPointF		EXPLOSION_POS	{ 1119, 450 };
-const QPointF		MAGE_POS		{ 1148, 713 };
-const QPointF		ARENA_POS		{ 200, 713 };
+const QPointF VORTEX_POS		{ 1000, 200 };
+const QPointF EXPLOSION_POS		{ 1119, 450 };
+const QPointF MAGE_POS			{ 1148, 713 };
+const QPointF POWER_POS1		{ 167,341 };
+const QPointF POWER_POS2		{ 167,557 };
+const QPointF ARENA_POS			{ 160, 125 };
 
 constexpr const int WINDOW_WIDTH	{ 1300 };
 constexpr const int WINDOW_HEIGHT	{ 900 };
+
+constexpr const int VICTORY_IMAGE_WIDTH = 300;
+constexpr const int VICTORY_IMAGE_HEIGHT = 300;
+constexpr const int BUTTON_WIDTH = 300;
+constexpr const int BUTTON_HEIGHT = 300;
 
 constexpr const char* const MAGE_PATH			{ "../pictures/mages/%1" };
 constexpr const char* const CURSOR_PATH			{ "../pictures/estetics/custom_cursor.png" };

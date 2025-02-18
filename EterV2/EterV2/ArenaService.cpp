@@ -12,9 +12,12 @@ namespace base {
         : m_size{ static_cast<uint16_t>((size ==  GameSizeType::SMALL) ? 3 : 4) },
         m_player_red{ player1 },
         m_player_blue{ player2 },
-        m_board{board},
-        m_markers{ m_size, std::vector<color::ColorType>(m_size, color::ColorType::DEFAULT) } {
+        m_board{board} {
 
+        m_markers.resize(m_size);
+        for (auto& row : m_markers) {
+            row.resize(m_size, color::ColorType::DEFAULT);
+        }
     }
     
     void ArenaService::addMarker(const Coord& board_coord, color::ColorType color) {
@@ -40,6 +43,9 @@ namespace base {
             || abs(diag1) == m_size || abs(diag2) == m_size) {
             m_win_data.emplace(mapped, color);
         }
+
+        m_last_marker_added.reset();
+        m_last_marker_added.emplace(mapped, color);
     }
 
     std::vector<std::vector<color::ColorType>> ArenaService::getMarkerCoords() const {
@@ -48,5 +54,9 @@ namespace base {
 
     std::optional<std::pair<Coord, color::ColorType>> ArenaService::getWinPos() const {
         return m_win_data;
+    }
+
+    std::pair<Coord, color::ColorType> ArenaService::getLastMarkerAdded() const {
+        return *m_last_marker_added;
     }
 }

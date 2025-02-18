@@ -55,10 +55,9 @@ namespace base {
 		Coord getBottomMostOnColumn(int16_t x) const;
 		std::vector<Coord> getCoordsOnRow(int16_t row_index) const;
 		std::vector<Coord> getCoordsOnColumn(int16_t col_index) const;
-		std::optional<Coord> getWinCoord() const;
+		std::optional<std::pair<Coord, color::ColorType>> getWinData() const;
 		void shift(const Coord&);
-
-
+		void reset();
 
 		void returnUsedCardToHand(CombatCardType card);
 		void returnCardToHand(CombatCard&& card, color::ColorType owner);
@@ -148,7 +147,7 @@ namespace base {
 	private:
 		Player& m_player1, & m_player2;
 
-		std::optional<Coord> m_win_pos;
+		std::optional<std::pair<Coord, color::ColorType>> m_win_data;
 		uint16_t m_size;
 		BoundingRect m_bounding_rect;
 

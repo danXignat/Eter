@@ -13,6 +13,7 @@ namespace base {
         
         std::vector<std::vector<color::ColorType>> getMarkerCoords() const;
         std::optional<std::pair<Coord, color::ColorType>> getWinPos() const;
+        std::pair<Coord, color::ColorType> getLastMarkerAdded() const;
 
     private:
 
@@ -29,6 +30,8 @@ namespace base {
         Board& m_board;
 
         std::optional<std::pair<Coord, color::ColorType>> m_win_data;
+
+        std::optional<std::pair<Coord, color::ColorType>> m_last_marker_added;
     };
 
 } 
