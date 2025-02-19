@@ -775,6 +775,14 @@ base::PowerCardType PowerCard::getTypeAbility() const {
     return type;
 }
 
+void PowerCard::setStartPoint(const QPointF& point) {
+    start_point = point;
+}
+
+void PowerCard::goBack() {
+    setPos(start_point);
+}
+
 
 ///-----------------------------------------TOURNAMENT---------------------------------
 

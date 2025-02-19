@@ -42,6 +42,7 @@ namespace base {
 		void switchPlayer();
 		void tryShiftBoard();
 		void removeExplosion();
+		void addExplosion();
 	
 		bool placeCombatCard(const InputHandler&);
 		bool placeIllusion(const InputHandler&);

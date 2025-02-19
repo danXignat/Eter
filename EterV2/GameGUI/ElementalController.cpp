@@ -17,136 +17,159 @@ void ElementalController::onPowerCardApply(PowerCard* card) {
 }
 
 void ElementalController::selectPower(PowerCard* card) {
-    std::vector<std::function<void(uint16_t)>> choices{
-        [this](uint16_t id) { this->handleControllerExplosion(id); },
-        [this](uint16_t id) { this->handleDestruction(id); },
-        [this](uint16_t id) { this->handleFlame(id); },
-        [this](uint16_t id) { this->handleFire(id); },
-        [this](uint16_t id) { this->handleAsh(id); },
-        [this](uint16_t id) { this->handleSpark(id); },
-        [this](uint16_t id) { this->handleSquall(id); },
-        [this](uint16_t id) { this->handleGale(id); },
-        [this](uint16_t id) { this->handleHurricane(id); },
-        [this](uint16_t id) { this->handleGust(id); },
-        [this](uint16_t id) { this->handleMirrage(id); },
-        [this](uint16_t id) { this->handleStorm(id); },
-        [this](uint16_t id) { this->handleTide(id); },
-        [this](uint16_t id) { this->handleMist(id); },
-        [this](uint16_t id) { this->handleWave(id); },
-        [this](uint16_t id) { this->handleWhirlpool(id); },
-        [this](uint16_t id) { this->handleBlizzard(id); },
-        [this](uint16_t id) { this->handleWaterfall(id); },
-        [this](uint16_t id) { this->handleSupport(id); },
-        [this](uint16_t id) { this->handleEarthquake(id); },
-        [this](uint16_t id) { this->handleCrumble(id); },
-        [this](uint16_t id) { this->handleBorder(id); },
-        [this](uint16_t id) { this->handleAvalanche(id); },
-        [this](uint16_t id) { this->handleRock(id); }
+    std::vector<std::function<void(PowerCard*)>> choices{
+        [this](PowerCard* power_card_view) { this->handleControllerExplosion(power_card_view); },
+        [this](PowerCard* power_card_view) { this->handleDestruction(power_card_view); },
+        [this](PowerCard* power_card_view) { this->handleFlame(power_card_view); },
+        [this](PowerCard* power_card_view) { this->handleFire(power_card_view); },
+        [this](PowerCard* power_card_view) { this->handleAsh(power_card_view); },
+        [this](PowerCard* power_card_view) { this->handleSpark(power_card_view); },
+        [this](PowerCard* power_card_view) { this->handleSquall(power_card_view); },
+        [this](PowerCard* power_card_view) { this->handleGale(power_card_view); },
+        [this](PowerCard* power_card_view) { this->handleHurricane(power_card_view); },
+        [this](PowerCard* power_card_view) { this->handleGust(power_card_view); },
+        [this](PowerCard* power_card_view) { this->handleMirrage(power_card_view); },
+        [this](PowerCard* power_card_view) { this->handleStorm(power_card_view); },
+        [this](PowerCard* power_card_view) { this->handleTide(power_card_view); },
+        [this](PowerCard* power_card_view) { this->handleMist(power_card_view); },
+        [this](PowerCard* power_card_view) { this->handleWave(power_card_view); },
+        [this](PowerCard* power_card_view) { this->handleWhirlpool(power_card_view); },
+        [this](PowerCard* power_card_view) { this->handleBlizzard(power_card_view); },
+        [this](PowerCard* power_card_view) { this->handleWaterfall(power_card_view); },
+        [this](PowerCard* power_card_view) { this->handleSupport(power_card_view); },
+        [this](PowerCard* power_card_view) { this->handleEarthquake(power_card_view); },
+        [this](PowerCard* power_card_view) { this->handleCrumble(power_card_view); },
+        [this](PowerCard* power_card_view) { this->handleBorder(power_card_view); },
+        [this](PowerCard* power_card_view) { this->handleAvalanche(power_card_view); },
+        [this](PowerCard* power_card_view) { this->handleRock(power_card_view); }
     };
 
     int index{ static_cast<uint16_t>(card->getTypeAbility()) };
-    choices[index](card->getId());
+    choices[index](card);
 }
 
-void ElementalController::handleControllerExplosion(uint16_t id) {
-    auto* power_card = m_service.getElementalCard<base::ControllerExplosion>(id);
+void ElementalController::handleControllerExplosion(PowerCard* power_card_view) {
+    auto* power_card = m_service.getElementalCard<base::ControllerExplosion>(power_card_view->getId());
+
 
     if (power_card->apply()) {
-        m_view->drawExplosion(power_card->getExplosionService(), power_card->getExplosionService().size(), EXPLOSION_POS);
+        emit addExplosion();
+        m_view->setExplosionActive();
     }
     else{
-
+        power_card_view->goBack();
+        power_card_view->show();
     }
 }
 
-void ElementalController::handleDestruction(uint16_t id) {
-    auto* power_card = m_service.getElementalCard<base::Destruction>(id);
+void ElementalController::handleDestruction(PowerCard* power_card_view) {
+    auto* power_card = m_service.getElementalCard<base::Destruction>(power_card_view->getId());
+
+    color::ColorType color{color::ColorType::DEFAULT};
+
+    emit getCurrPlayer(color);
+
+    power_card->setColor(color);
+
+    if (!power_card->apply()) {
+        power_card_view->goBack();
+        power_card_view->show();
+    }
+
+    emit updateCards();
+    emit switchPlayer();
 }
 
-void ElementalController::handleFlame(uint16_t id) {
-    auto* power_card = m_service.getElementalCard<base::Flame>(id);
+void ElementalController::handleFlame(PowerCard* power_card_view) {
+    auto* power_card = m_service.getElementalCard<base::Flame>(power_card_view->getId());
+
+    color::ColorType color{ color::ColorType::DEFAULT };
+
+    emit getCurrPlayer(color);
+
+    power_card->setColor(color);
 }
 
-void ElementalController::handleFire(uint16_t id) {
-    auto* power_card = m_service.getElementalCard<base::Fire>(id);
+void ElementalController::handleFire(PowerCard* power_card_view) {
+    auto* power_card = m_service.getElementalCard<base::Fire>(power_card_view->getId());
 }
 
-void ElementalController::handleAsh(uint16_t id) {
-    auto* power_card = m_service.getElementalCard<base::Ash>(id);
+void ElementalController::handleAsh(PowerCard* power_card_view) {
+    auto* power_card = m_service.getElementalCard<base::Ash>(power_card_view->getId());
 }
 
-void ElementalController::handleSpark(uint16_t id) {
-    auto* power_card = m_service.getElementalCard<base::Spark>(id);
+void ElementalController::handleSpark(PowerCard* power_card_view) {
+    auto* power_card = m_service.getElementalCard<base::Spark>(power_card_view->getId());
 }
 
-void ElementalController::handleSquall(uint16_t id) {
-    auto* power_card = m_service.getElementalCard<base::Squall>(id);
+void ElementalController::handleSquall(PowerCard* power_card_view) {
+    auto* power_card = m_service.getElementalCard<base::Squall>(power_card_view->getId());
 }
 
-void ElementalController::handleGale(uint16_t id) {
-    auto* power_card = m_service.getElementalCard<base::Gale>(id);
+void ElementalController::handleGale(PowerCard* power_card_view) {
+    auto* power_card = m_service.getElementalCard<base::Gale>(power_card_view->getId());
 }
 
-void ElementalController::handleHurricane(uint16_t id) {
-    auto* power_card = m_service.getElementalCard<base::Hurricane>(id);
+void ElementalController::handleHurricane(PowerCard* power_card_view) {
+    auto* power_card = m_service.getElementalCard<base::Hurricane>(power_card_view->getId());
 }
 
-void ElementalController::handleGust(uint16_t id) {
-    auto* power_card = m_service.getElementalCard<base::Gust>(id);
+void ElementalController::handleGust(PowerCard* power_card_view) {
+    auto* power_card = m_service.getElementalCard<base::Gust>(power_card_view->getId());
 }
 
-void ElementalController::handleMirrage(uint16_t id) {
-    auto* power_card = m_service.getElementalCard<base::Mirrage>(id);
+void ElementalController::handleMirrage(PowerCard* power_card_view) {
+    auto* power_card = m_service.getElementalCard<base::Mirrage>(power_card_view->getId());
 }
 
-void ElementalController::handleStorm(uint16_t id) {
-    auto* power_card = m_service.getElementalCard<base::Storm>(id);
+void ElementalController::handleStorm(PowerCard* power_card_view) {
+    auto* power_card = m_service.getElementalCard<base::Storm>(power_card_view->getId());
 }
 
-void ElementalController::handleTide(uint16_t id) {
-    auto* power_card = m_service.getElementalCard<base::Tide>(id);
+void ElementalController::handleTide(PowerCard* power_card_view) {
+    auto* power_card = m_service.getElementalCard<base::Tide>(power_card_view->getId());
 }
 
-void ElementalController::handleMist(uint16_t id) {
-    auto* power_card = m_service.getElementalCard<base::Mist>(id);
+void ElementalController::handleMist(PowerCard* power_card_view) {
+    auto* power_card = m_service.getElementalCard<base::Mist>(power_card_view->getId());
 }
 
-void ElementalController::handleWave(uint16_t id) {
-    auto* power_card = m_service.getElementalCard<base::Wave>(id);
+void ElementalController::handleWave(PowerCard* power_card_view) {
+    auto* power_card = m_service.getElementalCard<base::Wave>(power_card_view->getId());
 }
 
-void ElementalController::handleWhirlpool(uint16_t id) {
-    auto* power_card = m_service.getElementalCard<base::Whirlpool>(id);
+void ElementalController::handleWhirlpool(PowerCard* power_card_view) {
+    auto* power_card = m_service.getElementalCard<base::Whirlpool>(power_card_view->getId());
 }
 
-void ElementalController::handleBlizzard(uint16_t id) {
-    auto* power_card = m_service.getElementalCard<base::Blizzard>(id);
+void ElementalController::handleBlizzard(PowerCard* power_card_view) {
+    auto* power_card = m_service.getElementalCard<base::Blizzard>(power_card_view->getId());
 }
 
-void ElementalController::handleWaterfall(uint16_t id) {
-    auto* power_card = m_service.getElementalCard<base::Waterfall>(id);
+void ElementalController::handleWaterfall(PowerCard* power_card_view) {
+    auto* power_card = m_service.getElementalCard<base::Waterfall>(power_card_view->getId());
 }
 
-void ElementalController::handleSupport(uint16_t id) {
-    auto* power_card = m_service.getElementalCard<base::Support>(id);
+void ElementalController::handleSupport(PowerCard* power_card_view) {
+    auto* power_card = m_service.getElementalCard<base::Support>(power_card_view->getId());
 }
 
-void ElementalController::handleEarthquake(uint16_t id) {
-    auto* power_card = m_service.getElementalCard<base::Earthquake>(id);
+void ElementalController::handleEarthquake(PowerCard* power_card_view) {
+    auto* power_card = m_service.getElementalCard<base::Earthquake>(power_card_view->getId());
 }
 
-void ElementalController::handleCrumble(uint16_t id) {
-    auto* power_card = m_service.getElementalCard<base::Crumble>(id);
+void ElementalController::handleCrumble(PowerCard* power_card_view) {
+    auto* power_card = m_service.getElementalCard<base::Crumble>(power_card_view->getId());
 }
 
-void ElementalController::handleBorder(uint16_t id) {
-    auto* power_card = m_service.getElementalCard<base::Border>(id);
+void ElementalController::handleBorder(PowerCard* power_card_view) {
+    auto* power_card = m_service.getElementalCard<base::Border>(power_card_view->getId());
 }
 
-void ElementalController::handleAvalanche(uint16_t id) {
-    auto* power_card = m_service.getElementalCard<base::Avalanche>(id);
+void ElementalController::handleAvalanche(PowerCard* power_card_view) {
+    auto* power_card = m_service.getElementalCard<base::Avalanche>(power_card_view->getId());
 }
 
-void ElementalController::handleRock(uint16_t id) {
-    auto* power_card = m_service.getElementalCard<base::Rock>(id);
+void ElementalController::handleRock(PowerCard* power_card_view) {
+    auto* power_card = m_service.getElementalCard<base::Rock>(power_card_view->getId());
 }

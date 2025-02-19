@@ -49,4 +49,6 @@ public slots:
     void onUpdateCards();
 
     void onNextRound();
+    void onAddExplosion();
+    void onGettingCurrPlayer(color::ColorType& color);
 };
