@@ -19,6 +19,7 @@ private slots:
     void onGameModeSelected(const QString& gameMode);
     void onModeSelected(const std::string& mode);
     void onSpecialPlaysCompleted(const std::string& special_plays);
+    void onTournamentPlaysCompleted(const std::string& tournament_plays);
 
     void onResumeGame();
     void onGameRematch();
@@ -27,6 +28,7 @@ private slots:
 private:
     QStackedWidget*     stackedWidget;
     SpecialPlaysScene*  specialPlaysScene;
+    TournamentPlaysScene* tournamentPlaysScene;
     RequestNameScene*   requestNameScene;
     SelectModeScene*    selectModeScene;
     PauseMenuScene*     pauseMenuScene;

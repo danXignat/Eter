@@ -1,8 +1,7 @@
 #include "GameView.h"
-
 #include "settings.h"
 
-GameView::GameView(const QString& name_red, const QString& name_blue, QWidget* parent) :
+GameView::GameView(const QString& name_red, const QString& name_blue, const std::string& mode, QWidget* parent) :
     QGraphicsView{ parent },
     scene{ new QGraphicsScene(this) },
     victory_screen{ new VictoryScreen(this) },
@@ -14,12 +13,7 @@ GameView::GameView(const QString& name_red, const QString& name_blue, QWidget* p
     setScene(scene);
     setFixedSize(WINDOW_WIDTH, WINDOW_HEIGHT);
     scene->setSceneRect(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
-
-    QPixmap backgroundPixmap("../pictures/backround_v2.png");
-    QPixmap scaledPixmap = backgroundPixmap.scaled(WINDOW_WIDTH, WINDOW_HEIGHT,
-        Qt::IgnoreAspectRatio,
-        Qt::SmoothTransformation);
-    scene->setBackgroundBrush(QBrush(scaledPixmap));
+    loadBackground(mode);
 
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -33,6 +27,79 @@ GameView::GameView(const QString& name_red, const QString& name_blue, QWidget* p
     target_zone->hide();
 
     connect(victory_screen, &VictoryScreen::nextRoundRequested, this, &GameView::nextRound);
+}
+
+void GameView::loadBackground(const std::string& mode) {
+    if (mode == "100" || mode == "110") {
+        QPixmap backgroundPixmap("../pictures/training.png");
+        QPixmap scaledPixmap = backgroundPixmap.scaled(WINDOW_WIDTH, WINDOW_HEIGHT,
+            Qt::IgnoreAspectRatio,
+            Qt::SmoothTransformation);
+        scene->setBackgroundBrush(QBrush(scaledPixmap));
+    }
+    else if (mode == "102" || mode == "112") {
+        QPixmap backgroundPixmap("../pictures/training_explosion.png");
+        QPixmap scaledPixmap = backgroundPixmap.scaled(WINDOW_WIDTH, WINDOW_HEIGHT,
+            Qt::IgnoreAspectRatio,
+            Qt::SmoothTransformation);
+        scene->setBackgroundBrush(QBrush(scaledPixmap));
+    }
+    else if (mode == "200" || mode == "210" || mode == "40030" || mode == "41030") {
+        QPixmap backgroundPixmap("../pictures/mage.png");
+        QPixmap scaledPixmap = backgroundPixmap.scaled(WINDOW_WIDTH, WINDOW_HEIGHT,
+            Qt::IgnoreAspectRatio,
+            Qt::SmoothTransformation);
+        scene->setBackgroundBrush(QBrush(scaledPixmap));
+    }
+    else if (mode == "202" || mode == "212" || mode == "40230" || mode == "41230") {
+        QPixmap backgroundPixmap("../pictures/mage_explosion.png");
+        QPixmap scaledPixmap = backgroundPixmap.scaled(WINDOW_WIDTH, WINDOW_HEIGHT,
+            Qt::IgnoreAspectRatio,
+            Qt::SmoothTransformation);
+        scene->setBackgroundBrush(QBrush(scaledPixmap));
+    }
+    else if (mode == "300" || mode == "310" || mode == "40004" || mode == "41004") {
+        QPixmap backgroundPixmap("../pictures/elemental.png");
+        QPixmap scaledPixmap = backgroundPixmap.scaled(WINDOW_WIDTH, WINDOW_HEIGHT,
+            Qt::IgnoreAspectRatio,
+            Qt::SmoothTransformation);
+        scene->setBackgroundBrush(QBrush(scaledPixmap));
+    }
+    else if (mode == "302" || mode == "312" || mode == "40204" || mode == "41204") {
+        QPixmap backgroundPixmap("../pictures/elemental_explosion.png");
+        QPixmap scaledPixmap = backgroundPixmap.scaled(WINDOW_WIDTH, WINDOW_HEIGHT,
+            Qt::IgnoreAspectRatio,
+            Qt::SmoothTransformation);
+        scene->setBackgroundBrush(QBrush(scaledPixmap));
+    }
+    else if (mode == "40000" || mode == "41000") {
+        QPixmap backgroundPixmap("../pictures/tournament.png");
+        QPixmap scaledPixmap = backgroundPixmap.scaled(WINDOW_WIDTH, WINDOW_HEIGHT,
+            Qt::IgnoreAspectRatio,
+            Qt::SmoothTransformation);
+        scene->setBackgroundBrush(QBrush(scaledPixmap));
+    }
+    else if (mode == "40200" || mode == "41200") {
+        QPixmap backgroundPixmap("../pictures/tournament_explosion.png");
+        QPixmap scaledPixmap = backgroundPixmap.scaled(WINDOW_WIDTH, WINDOW_HEIGHT,
+            Qt::IgnoreAspectRatio,
+            Qt::SmoothTransformation);
+        scene->setBackgroundBrush(QBrush(scaledPixmap));
+    }
+    else if (mode == "40234" || mode == "41234") {
+        QPixmap backgroundPixmap("../pictures/tournament_full.png");
+        QPixmap scaledPixmap = backgroundPixmap.scaled(WINDOW_WIDTH, WINDOW_HEIGHT,
+            Qt::IgnoreAspectRatio,
+            Qt::SmoothTransformation);
+        scene->setBackgroundBrush(QBrush(scaledPixmap));
+    }
+    else if (mode == "40034" || mode == "41034") {
+        QPixmap backgroundPixmap("../pictures/tournament_full-explosion.png");
+        QPixmap scaledPixmap = backgroundPixmap.scaled(WINDOW_WIDTH, WINDOW_HEIGHT,
+            Qt::IgnoreAspectRatio,
+            Qt::SmoothTransformation);
+        scene->setBackgroundBrush(QBrush(scaledPixmap));
+    }
 }
 
 Card* GameView::_createCardAt(color::ColorType color, base::CombatCardType type, QPointF pos, uint16_t id) {

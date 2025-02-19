@@ -27,7 +27,7 @@ signals:
     void nextRound();
 
 public:
-    GameView(const QString& name_red, const QString& name_blue, QWidget* parent = nullptr);
+    GameView(const QString& name_red, const QString& name_blue, const std::string& mode, QWidget* parent = nullptr);
 
     void drawPlayerCards(const base::Player& player, QPointF start_point);
     void drawAvailablePositions(const base::Board& board);
@@ -37,7 +37,7 @@ public:
     void drawArena      (base::GameSizeType game_size);
     void drawMarker(const QPointF& point, color::ColorType color);
     void drawPowers(const std::pair<std::pair<uint16_t, base::PowerCardType>, std::pair<uint16_t, base::PowerCardType>>& data);
-
+    void loadBackground(const std::string& mode);
     void cardAppendBoard    (Card* card);
     void setExplosionActive ();
     void eraseExplosion     ();

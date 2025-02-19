@@ -71,6 +71,30 @@ private:
     QLabel* infoLabel;
     QPixmap background;
 };
+///-------------------------------------------------------------------
+
+class TournamentPlaysScene : public QWidget {
+    Q_OBJECT
+
+public:
+    explicit TournamentPlaysScene(QWidget* parent = nullptr);
+    void paintEvent(QPaintEvent* event) override;
+
+signals:
+    void continueToGame(const std::string&);
+
+private slots:
+    void onNextClicked();
+
+private:
+    QPushButton* nextButton;
+    QCheckBox* illusions;
+    QCheckBox* explosions;
+    QCheckBox* mage;
+    QCheckBox* elemental;
+    QLabel* infoLabel;
+    QPixmap background;
+};
 
 ///-------------------------------------------------------------------
 

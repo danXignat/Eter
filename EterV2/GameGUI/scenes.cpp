@@ -9,15 +9,15 @@ RequestNameScene::RequestNameScene(QWidget* parent) : QWidget(parent) {
     playerRedNameInput->setPlaceholderText("Enter Player 2 Name");
     playerRedNameInput->setText("Player RED");
     playerRedNameInput->setFixedSize(300, 50);
+    playerRedNameInput->setGeometry(500, 250, 200, 90);
     playerRedNameInput->setStyleSheet("font-size: 18px;");
-    layout->addWidget(playerRedNameInput, 0, Qt::AlignCenter);
 
     playerBlueNameInput = new QLineEdit(this);
     playerBlueNameInput->setPlaceholderText("Enter Player 1 Name");
     playerBlueNameInput->setText("Player BLUE");
     playerBlueNameInput->setFixedSize(300, 50);
+    playerBlueNameInput->setGeometry(500, 450, 200, 90);
     playerBlueNameInput->setStyleSheet("font-size: 18px;");
-    layout->addWidget(playerBlueNameInput, 0, Qt::AlignCenter);
 
     background.load("../pictures/estetics/name_select.png");
     NextButton* nextButton = new NextButton(this);
@@ -46,33 +46,33 @@ void RequestNameScene::onNextClicked() {
 SelectModeScene::SelectModeScene(QWidget* parent) : QWidget(parent) {
     QVBoxLayout* layout = new QVBoxLayout(this);
 
-    trainingButton = new QPushButton("Training", this);
-    trainingButton->setFixedSize(200, 50);
+    trainingButton = new QPushButton(" ", this);
+    trainingButton->setFixedSize(200, 90);
     trainingButton->setObjectName("myCustomButton");
     trainingButton->setStyleSheet(
         "QPushButton#myCustomButton {"
-        "    background-image: url('../pictures/estetics/button.png');"
+        "    background-image: url('../pictures/estetics/trainingButton.png');"
         "    background-repeat: no-repeat;"
         "    background-position: center;"
         "    border: 2px solid #5a5a5a;"
         "    border-radius: 10px;"
-        "    font-size: 18px;"
+        "    font-size: 0px;"
         "}"
         "QPushButton#myCustomButton:hover {"
-        "    background-image: url('../pictures/estetics/button_hover.png');"
+        "    background-image: url('../pictures/estetics/trainingButton_hover.png');"
         "}"
         "QPushButton#myCustomButton:pressed {"
-        "    background-image: url('../pictures/estetics/button_clicked.png');"
+        "    background-image: url('../pictures/estetics/trainingButton_clicked.png');"
         "}"
     );
     layout->addWidget(trainingButton, 0, Qt::AlignCenter);
 
-    mageDuelButton = new QPushButton("Mage-Duel", this);
-    mageDuelButton->setFixedSize(200, 50);
+    mageDuelButton = new QPushButton(" ", this);
+    mageDuelButton->setFixedSize(200, 90);
     mageDuelButton->setObjectName("myCustomButton");
     mageDuelButton->setStyleSheet(
         "QPushButton#myCustomButton {"
-        "    background-image: url('../pictures/estetics/button.png');"
+        "    background-image: url('../pictures/estetics/mageduelButton.png');"
         "    background-repeat: no-repeat;"
         "    background-position: center;"
         "    border: 2px solid #5a5a5a;"
@@ -80,20 +80,20 @@ SelectModeScene::SelectModeScene(QWidget* parent) : QWidget(parent) {
         "    font-size: 18px;"
         "}"
         "QPushButton#myCustomButton:hover {"
-        "    background-image: url('../pictures/estetics/button_hover.png');"
+        "    background-image: url('../pictures/estetics/mageduelButton_hover.png');"
         "}"
         "QPushButton#myCustomButton:pressed {"
-        "    background-image: url('../pictures/estetics/button_clicked.png');"
+        "    background-image: url('../pictures/estetics/mageduelButton_pressed.png');"
         "}"
     );
     layout->addWidget(mageDuelButton, 0, Qt::AlignCenter);
 
-    elementalBattleButton = new QPushButton("Elemental Battle", this);
-    elementalBattleButton->setFixedSize(200, 50);
+    elementalBattleButton = new QPushButton(" ", this);
+    elementalBattleButton->setFixedSize(200, 90);
     elementalBattleButton->setObjectName("myCustomButton");
     elementalBattleButton->setStyleSheet(
         "QPushButton#myCustomButton {"
-        "    background-image: url('../pictures/estetics/button.png');"
+        "    background-image: url('../pictures/estetics/elementalButton.png');"
         "    background-repeat: no-repeat;"
         "    background-position: center;"
         "    border: 2px solid #5a5a5a;"
@@ -101,20 +101,20 @@ SelectModeScene::SelectModeScene(QWidget* parent) : QWidget(parent) {
         "    font-size: 18px;"
         "}"
         "QPushButton#myCustomButton:hover {"
-        "    background-image: url('../pictures/estetics/button_hover.png');"
+        "    background-image: url('../pictures/estetics/elementalButton_hover.png');"
         "}"
         "QPushButton#myCustomButton:pressed {"
-        "    background-image: url('../pictures/estetics/button_clicked.png');"
+        "    background-image: url('../pictures/estetics/elementalButton_pressed.png');"
         "}"
     );
     layout->addWidget(elementalBattleButton, 0, Qt::AlignCenter);
 
-    tournamentModeButton = new QPushButton("Tournament Battle", this);
-    tournamentModeButton->setFixedSize(200, 50);
+    tournamentModeButton = new QPushButton(" ", this);
+    tournamentModeButton->setFixedSize(200, 90);
     tournamentModeButton->setObjectName("myCustomButton");
     tournamentModeButton->setStyleSheet(
         "QPushButton#myCustomButton {"
-        "    background-image: url('../pictures/estetics/button.png');"
+        "    background-image: url('../pictures/estetics/tournamentButton.png');"
         "    background-repeat: no-repeat;"
         "    background-position: center;"
         "    border: 2px solid #5a5a5a;"
@@ -122,20 +122,20 @@ SelectModeScene::SelectModeScene(QWidget* parent) : QWidget(parent) {
         "    font-size: 18px;"
         "}"
         "QPushButton#myCustomButton:hover {"
-        "    background-image: url('../pictures/estetics/button_hover.png');"
+        "    background-image: url('../pictures/estetics/tournamentButton_hover.png');"
         "}"
         "QPushButton#myCustomButton:pressed {"
-        "    background-image: url('../pictures/estetics/button_clicked.png');"
+        "    background-image: url('../pictures/estetics/tournamentButton_pressed.png');"
         "}"
     );
     layout->addWidget(tournamentModeButton, 0, Qt::AlignCenter);
 
-    timedModeButton = new QPushButton("Timed Battle", this);
-    timedModeButton->setFixedSize(200, 50);
+    timedModeButton = new QPushButton(" ", this);
+    timedModeButton->setFixedSize(200, 90);
     timedModeButton->setObjectName("myCustomButton");
     timedModeButton->setStyleSheet(
         "QPushButton#myCustomButton {"
-        "    background-image: url('../pictures/estetics/button.png');"
+        "    background-image: url('../pictures/estetics/timedButton.png');"
         "    background-repeat: no-repeat;"
         "    background-position: center;"
         "    border: 2px solid #5a5a5a;"
@@ -143,10 +143,10 @@ SelectModeScene::SelectModeScene(QWidget* parent) : QWidget(parent) {
         "    font-size: 18px;"
         "}"
         "QPushButton#myCustomButton:hover {"
-        "    background-image: url('../pictures/estetics/button_hover.png');"
+        "    background-image: url('../pictures/estetics/timedButton_hover.png');"
         "}"
         "QPushButton#myCustomButton:pressed {"
-        "    background-image: url('../pictures/estetics/button_clicked.png');"
+        "    background-image: url('../pictures/estetics/timedButton_pressed.png');"
         "}"
     );
     layout->addWidget(timedModeButton, 0, Qt::AlignCenter);
@@ -155,7 +155,8 @@ SelectModeScene::SelectModeScene(QWidget* parent) : QWidget(parent) {
     connect(trainingButton, &QPushButton::clicked, this, [=]() { emit gameModeSelected("1"); });
     connect(mageDuelButton, &QPushButton::clicked, this, [=]() { emit gameModeSelected("2"); });
     connect(elementalBattleButton, &QPushButton::clicked, this, [=]() { emit gameModeSelected("3"); });
-
+    connect(tournamentModeButton, &QPushButton::clicked, this, [=]() {emit gameModeSelected("4"); });
+    connect(timedModeButton, &QPushButton::clicked, this, [=]() {emit gameModeSelected("5"); });
 }
 
 void SelectModeScene::paintEvent(QPaintEvent* event) {
@@ -179,47 +180,54 @@ SpecialPlaysScene::SpecialPlaysScene(QWidget* parent)
     mainLayout->addWidget(infoLabel, 0, Qt::AlignTop | Qt::AlignCenter);
 
     QVBoxLayout* checkBoxLayout = new QVBoxLayout();
-    illusions = new QCheckBox("Enable illusions", this);
+    illusions = new QCheckBox(" ", this);
     illusions->setStyleSheet(
         "QCheckBox {"
-        "    background-color: #1b3d50;"
+        "    background-image: url('../pictures/estetics/illusions.png');"
+        "    background-repeat: no-repeat;"
+        "    background-position: center;"
         "    border: 1px solid #1b444b;"
         "    border-radius: 3px;"
-        "    padding: 2px;"
         "    font-size: 14px;"
         "}"
         "QCheckBox:hover {"
-        "    background-color: #466876;"
+        "    background-image: url('../pictures/estetics/illusions_hover.png');"
         "}"
         "QCheckBox:checked {"
-        "    background-color: #466876;"
+        "    background-image: url('../pictures/estetics/illusions_clicked.png');"
         "}"
     );
-    illusions->setGeometry(530, 300, 150, 50);
+    illusions->setGeometry(530, 300, 200, 90);
 
-    explosions = new QCheckBox("Enable explosions", this);
+    explosions = new QCheckBox(" ", this);
     explosions->setStyleSheet(
         "QCheckBox {"
-        "    background-color: #1b3d50;"
+        "    background-image: url('../pictures/estetics/explosions.png');"
+        "    background-repeat: no-repeat;"
+        "    background-position: center;"
         "    border: 1px solid #1b444b;"
         "    border-radius: 3px;"
-        "    padding: 2px;"
         "    font-size: 14px;"
         "}"
         "QCheckBox:hover {"
-        "    background-color: #466876;"
+        "    background-image: url('../pictures/estetics/explosions_hover.png');"
         "}"
         "QCheckBox:checked {"
-        "    background-color: #466876;"
+        "    background-image: url('../pictures/estetics/explosions_clicked.png');"
         "}"
     );
-    explosions->setGeometry(530, 400, 150, 50);
+
+
+    explosions->setGeometry(530, 500, 200, 90);
+
 
     nextButton = new NextButton(this);
     nextButton->setFixedSize(365, 92);
     nextButton->move(WINDOW_WIDTH - 385, WINDOW_HEIGHT - 122);
     background.load("../pictures/estetics/name_select.png");
 
+
+    
     connect(nextButton, &QPushButton::clicked, this, &SpecialPlaysScene::onNextClicked);
 }
 
@@ -236,7 +244,132 @@ void SpecialPlaysScene::onNextClicked() {
 
     special_modes += illusions->isChecked() ? '1' : '0';
     special_modes += explosions->isChecked() ? '2' : '0';
+    qDebug() << "Full mode selected:" << special_modes;
 
+    emit continueToGame(special_modes);
+}
+///-------------------------------------------------------------------
+
+
+TournamentPlaysScene::TournamentPlaysScene(QWidget* parent)
+    : QWidget(parent) {
+
+    QVBoxLayout* mainLayout = new QVBoxLayout(this);
+
+    infoLabel = new QLabel("Choose your special play options:", this);
+    infoLabel->setAlignment(Qt::AlignCenter);
+    infoLabel->setStyleSheet("font-size: 48px; font-weight: bold;");
+    mainLayout->addWidget(infoLabel, 0, Qt::AlignTop | Qt::AlignCenter);
+
+    QVBoxLayout* checkBoxLayout = new QVBoxLayout();
+    illusions = new QCheckBox(" ", this);
+    illusions->setStyleSheet(
+        "QCheckBox {"
+        "    background-image: url('../pictures/estetics/illusions.png');"
+        "    background-repeat: no-repeat;"
+        "    background-position: center;"
+        "    border: 1px solid #1b444b;"
+        "    border-radius: 3px;"
+        "    font-size: 14px;"
+        "}"
+        "QCheckBox:hover {"
+        "    background-image: url('../pictures/estetics/illusions_hover.png');"
+        "}"
+        "QCheckBox:checked {"
+        "    background-image: url('../pictures/estetics/illusions_clicked.png');"
+        "}"
+    );
+    illusions->setGeometry(530, 200, 200, 90);
+
+    explosions = new QCheckBox(" ", this);
+    explosions->setStyleSheet(
+        "QCheckBox {"
+        "    background-image: url('../pictures/estetics/explosions.png');"
+        "    background-repeat: no-repeat;"
+        "    background-position: center;"
+        "    border: 1px solid #1b444b;"
+        "    border-radius: 3px;"
+        "    font-size: 14px;"
+        "}"
+        "QCheckBox:hover {"
+        "    background-image: url('../pictures/estetics/explosions_hover.png');"
+        "}"
+        "QCheckBox:checked {"
+        "    background-image: url('../pictures/estetics/explosions_clicked.png');"
+        "}"
+    );
+
+
+    explosions->setGeometry(530, 350, 200, 90);
+
+
+
+
+    mage = new QCheckBox(" ", this);
+    mage->setStyleSheet(
+        "QCheckBox {"
+        "    background-image: url('../pictures/estetics/mageduelButton.png');"
+        "    background-repeat: no-repeat;"
+        "    background-position: center;"
+        "    border: 1px solid #1b444b;"
+        "    border-radius: 3px;"
+        "    font-size: 14px;"
+        "}"
+        "QCheckBox:hover {"
+        "    background-image: url('../pictures/estetics/mageduelButton_hover.png');"
+        "}"
+        "QCheckBox:checked {"
+        "    background-image: url('../pictures/estetics/mageduelButton_pressed.png');"
+        "}"
+    );
+    mage->setGeometry(530, 500, 200, 90);
+
+    elemental = new QCheckBox(" ", this);
+    elemental->setStyleSheet(
+        "QCheckBox {"
+        "    background-image: url('../pictures/estetics/elementalButton.png');"
+        "    background-repeat: no-repeat;"
+        "    background-position: center;"
+        "    border: 1px solid #1b444b;"
+        "    border-radius: 3px;"
+        "    font-size: 14px;"
+        "}"
+        "QCheckBox:hover {"
+        "    background-image: url('../pictures/estetics/elementalButton_hover.png');"
+        "}"
+        "QCheckBox:checked {"
+        "    background-image: url('../pictures/estetics/elementalButton_pressed.png');"
+        "}"
+    );
+    elemental->setGeometry(530, 650, 200, 90);
+
+
+
+    nextButton = new NextButton(this);
+    nextButton->setFixedSize(365, 92);
+    nextButton->move(WINDOW_WIDTH - 385, WINDOW_HEIGHT - 122);
+    background.load("../pictures/estetics/name_select.png");
+
+
+
+    connect(nextButton, &QPushButton::clicked, this, &TournamentPlaysScene::onNextClicked);
+}
+
+void TournamentPlaysScene::paintEvent(QPaintEvent* event) {
+    QPainter painter(this);
+
+    painter.drawPixmap(0, 0, width(), height(), background);
+
+    QWidget::paintEvent(event);
+}
+
+void TournamentPlaysScene::onNextClicked() {
+    std::string special_modes;
+
+    special_modes += illusions->isChecked() ? '1' : '0';
+    special_modes += explosions->isChecked() ? '2' : '0';
+    special_modes += mage->isChecked() ? '3' : '0';
+    special_modes += elemental->isChecked() ? '4' : '0';
     qDebug() << "Full mode selected:" << special_modes;
 
     emit continueToGame(special_modes);

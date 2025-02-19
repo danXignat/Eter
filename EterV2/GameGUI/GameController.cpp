@@ -11,7 +11,7 @@ GameController::GameController(
     const QString& name_red, const QString& name_blue
 ) : QObject{ parent },
     model{ base::GameModeFactory::get(mode, {name_red.toStdString(), name_blue.toStdString()}) },
-    view{ new GameView(name_red, name_blue, parent) },
+    view{ new GameView(name_red, name_blue, mode, parent) },
     m_mage_controller{ nullptr } {
 
     if (auto* mode = dynamic_cast<base::MageMode*>(model.get())) {
