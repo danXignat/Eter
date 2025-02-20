@@ -191,6 +191,24 @@ void GameController::onNextRound() {
     _updateBoardView();
     view->switchToPlayer(model->getCurrPlayer());
 
+
+    auto* elemental_mode = dynamic_cast<base::ElementalMode*>(model.get());
+    auto* tournament_mode = dynamic_cast<base::TournamentMode*>(model.get());
+    auto* timed_mode = dynamic_cast<base::TimedMode*>(model.get());
+
+    if (elemental_mode) {
+        elemental_mode->getElementalService().pickRandomCards();
+        view->drawPowers(elemental_mode->getElementalService().getCardsData());
+    }
+    else if (tournament_mode && tournament_mode->getElementalService().has_value()) {
+        tournament_mode->getElementalService()->pickRandomCards();
+        view->drawPowers(tournament_mode->getElementalService()->getCardsData());
+    }
+    else if (timed_mode && timed_mode->getElementalService().has_value()) {
+        timed_mode->getElementalService()->pickRandomCards();
+        view->drawPowers(timed_mode->getElementalService()->getCardsData());
+    }
+
     if (auto* mode = dynamic_cast<base::TournamentMode*>(model.get())) {
         auto [coord, color] { mode->getArenaService().getLastMarkerAdded()};
 

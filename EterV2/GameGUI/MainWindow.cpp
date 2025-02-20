@@ -33,15 +33,15 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
     connect(specialPlaysScene,  &SpecialPlaysScene::backClicked,        this, &MainWindow::onSpecialPlaysBack);
 
 
-    playerBlueNameGlobal = "BLUE";
+    /*playerBlueNameGlobal = "BLUE";
     playerRedNameGlobal = "RED";
     selectedMode = "3";
     GameModeConfig config;
-    config.id = selectedMode;
+    config.id = selectedMode;*/
 
-    gameScene = new GameScene(playerBlueNameGlobal, playerRedNameGlobal, config);
+    /*gameScene = new GameScene(playerBlueNameGlobal, playerRedNameGlobal, config);
     stackedWidget->addWidget(gameScene);
-    stackedWidget->setCurrentWidget(gameScene);
+    stackedWidget->setCurrentWidget(gameScene);*/
 }
 
 void MainWindow::onGameModeSelectionBack() {

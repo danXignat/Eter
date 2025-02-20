@@ -91,6 +91,9 @@ private:
     Card* _createCardAt(color::ColorType color, base::CombatCardType type, QPointF pos, uint16_t id);
 
 private:
+    QString player_red_name;
+    QString player_blue_name;
+
     QVBoxLayout*    layout;
     QLabel*         infoLabel;
     QLabel*         red_name_label;

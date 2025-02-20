@@ -5,10 +5,14 @@ GameView::GameView(const QString& name_red, const QString& name_blue, const Game
     QGraphicsView{ parent },
     scene{ new QGraphicsScene(this) },
     victory_screen{ new VictoryScreen(name_red, name_blue, this) },
+    player_red_name{name_red},
+    player_blue_name{name_blue},
     explosion{ nullptr },
     vortex{ nullptr },
     mage_card_red{ nullptr },
-    mage_card_blue{ nullptr } {
+    mage_card_blue{ nullptr },
+    power_card1{nullptr},
+    power_card2{nullptr} {
 
     setScene(scene);
     setFixedSize(WINDOW_WIDTH, WINDOW_HEIGHT);
@@ -228,6 +232,20 @@ void GameView::drawMages(base::MageTypeAbility mage_red, const QString& desc_red
 }
 
 void GameView::drawPowers(const std::pair<std::pair<uint16_t, base::PowerCardType>, std::pair<uint16_t, base::PowerCardType>>& data) {
+    if (power_card1) {
+        power_card1->disconnect();
+        scene->removeItem(power_card1);
+        delete power_card1;
+        power_card1 = nullptr;
+    }
+
+    if (power_card2) {
+        power_card2->disconnect();
+        scene->removeItem(power_card2);
+        delete power_card2;
+        power_card2 = nullptr;
+    }
+
     auto [card1, card2] {data};
 
     power_card1 = new PowerCard(card1.first, card1.second, QString(base::abilityToString(card1.second).data()));
@@ -259,8 +277,8 @@ void GameView::drawMarker(const QPointF& point, color::ColorType color) {
 }
 
 void GameView::drawTimers(uint16_t time) {
-    red_timer = new VisualTimer(red_name_label->text(), int(time), color::ColorType::RED);
-    blue_timer = new VisualTimer(blue_name_label->text(), int(time), color::ColorType::BLUE);
+    red_timer = new VisualTimer(player_red_name, int(time), color::ColorType::RED);
+    blue_timer = new VisualTimer(player_blue_name, int(time), color::ColorType::BLUE);
 
     red_timer->reset();
     blue_timer->reset();
@@ -308,20 +326,7 @@ void GameView::keyPressEvent(QKeyEvent* event) {
 
 void GameView::mousePressEvent(QMouseEvent* event)
 {
-    if (event->button() == Qt::RightButton) {
-        QPointF scenePos = mapToScene(event->pos());
-
-        if (!m_currentArrow) {
-            // Start new arrow
-            m_currentArrow = new ArrowItem(scenePos);
-            scene->addItem(m_currentArrow);
-        }
-        else if (m_currentArrow->isDrawing()) {
-            // Finish current arrow
-            m_currentArrow->setDrawing(false);
-            m_currentArrow = nullptr;
-        }
-    }
+    
 
     QGraphicsView::mousePressEvent(event);
 }
