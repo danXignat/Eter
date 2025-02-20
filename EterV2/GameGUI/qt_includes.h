@@ -12,6 +12,7 @@
 #include <QPen>
 #include <qstackedwidget.h>
 #include <qboxlayout.h>
+#include <QGraphicsProxyWidget>
 #include <qlineedit.h>
 #include <qlabel.h>
 #include <QDebug>
@@ -25,7 +26,11 @@
 #include <QDialog>
 #include <QEnterEvent>
 #include <QCheckBox>
+#include <QProgressBar>
 #include <qtimer.h>
 #include <qmenu.h>
+#include <QComboBox>
 #include <qwidgetaction.h>
+#include <QGraphicsDropShadowEffect>
+#include <QTime>
 #endif // GRAPHICS_INCLUDES_H

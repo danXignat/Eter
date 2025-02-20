@@ -18,23 +18,24 @@ private slots:
     void onNameEntered(const QString& playerBlueName, const QString& playerRedName);
     void onGameModeSelected(const QString& gameMode);
     void onModeSelected(const std::string& mode);
-    void onSpecialPlaysCompleted(const std::string& special_plays);
-    void onTournamentPlaysCompleted(const std::string& tournament_plays);
+    void onSpecialPlaysCompleted(GameModeConfig config);
 
     void onResumeGame();
     void onGameRematch();
     void onMainMenuSwitch();
+    void onSpecialPlaysBack();
+    void onGameModeSelectionBack();
 
 private:
     QStackedWidget*     stackedWidget;
     SpecialPlaysScene*  specialPlaysScene;
-    TournamentPlaysScene* tournamentPlaysScene;
     RequestNameScene*   requestNameScene;
     SelectModeScene*    selectModeScene;
     PauseMenuScene*     pauseMenuScene;
 
     GameScene*          gameScene = nullptr;
     QWidget*            lastScene = nullptr;
+    GameModeConfig m_curr_game_config;
 
     QString         playerBlueNameGlobal;
     QString         playerRedNameGlobal;

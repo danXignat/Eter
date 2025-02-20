@@ -14,7 +14,7 @@ namespace base {
 		m_board{ game_size, m_player_red, m_player_blue },
 		m_curr_player{ m_player_red },
 		m_game_size_type{game_size},
-		m_current_round{0},
+		m_current_round{1},
 		m_round_count{ (game_size == GameSizeType::SMALL) ? uint16_t(3) : uint16_t(5) } {
 
 		for (ServiceType service : services) {
@@ -177,5 +177,9 @@ namespace base {
 
 	uint16_t BaseGameMode::getCurrRound() {
 		return m_current_round;
+	}
+
+	bool BaseGameMode::isFinalRound() const {
+		return m_current_round == m_round_count;
 	}
 }

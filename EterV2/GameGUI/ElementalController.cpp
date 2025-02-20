@@ -84,34 +84,268 @@ void ElementalController::handleFlame(PowerCard* power_card_view) {
     auto* power_card = m_service.getElementalCard<base::Flame>(power_card_view->getId());
 
     color::ColorType color{ color::ColorType::DEFAULT };
-
     emit getCurrPlayer(color);
-
     power_card->setColor(color);
+
+    auto cardAppend = [this, power_card](Card* card) {
+        if (power_card->placeCard(gui::utils::qPointFToCoord(card->pos()), card->getID())) {
+            card->setPlaced(true);
+
+            m_view->resetCardHighlight();
+            m_view->connectCards();
+
+            emit updateCards();
+            emit switchPlayer();
+        }
+        else {
+            card->moveCardBack();
+        }
+    };
+
+    for (Card* card : m_view->getAllCards()) {
+        card->disconnect();
+
+        connect(card, &Card::cardAppend, this, cardAppend);
+    }
+
+    if (power_card->apply()) {
+        auto card_views{ m_view->getAllCards() };
+
+        uint16_t flipped_card_id{power_card->getAppliedId().value()};
+
+        card_views[flipped_card_id]->flipCard();
+
+        auto choices{ power_card->getCardChoices() };
+        m_view->highlightCards(choices, CardState::AVAILABLE, CardState::RESTRICTED);
+    }
+    else {
+        power_card_view->goBack();
+        power_card_view->show();
+
+        m_view->connectCards();
+    }
 }
 
 void ElementalController::handleFire(PowerCard* power_card_view) {
     auto* power_card = m_service.getElementalCard<base::Fire>(power_card_view->getId());
+    auto choices{ power_card->getVisibleCardIDs() };
+
+    m_view->highlightCards(choices, CardState::ABOUT_TO_HAND, CardState::RESTRICTED);
+    m_view->hideAllAvailableSpaces();
+
+    auto onHoverRemoveEnter = [this, power_card](Card* card) {
+        auto remove_choices{ power_card->getCardIDsOfType(card->getType()) };
+        auto card_views{ m_view->getAllCards() };
+
+        for (uint16_t id : remove_choices) {
+            card_views[id]->setState(CardState::HAND);
+        }
+        };
+
+    auto onHoverRemoveLeave = [this, power_card](Card* card) {
+        auto remove_choices{ power_card->getCardIDsOfType(card->getType()) };
+        auto card_views{ m_view->getAllCards() };
+
+        for (uint16_t id : remove_choices) {
+            card_views[id]->setState(CardState::ABOUT_TO_HAND);
+        }
+        };
+
+    auto onClickRemove = [this, power_card](Card* card) {
+        power_card->setChosenCard(card->getType());
+
+        if (power_card->apply()) {
+            m_view->resetCardHighlight();
+            m_view->showAllAvailableSpaces();
+            m_view->connectCards();
+
+            emit updateCards();
+            emit switchPlayer();
+        }
+        };
+
+    for (Card* card : m_view->getAllCards()) {
+        card->disconnect();
+
+        connect(card, &Card::hoverRemoveEnter, this, onHoverRemoveEnter);
+        connect(card, &Card::hoverRemoveLeave, this, onHoverRemoveLeave);
+        connect(card, &Card::clickedOnRemove, this, onClickRemove);
+    }
 }
 
 void ElementalController::handleAsh(PowerCard* power_card_view) {
     auto* power_card = m_service.getElementalCard<base::Ash>(power_card_view->getId());
+
+    color::ColorType color{ color::ColorType::DEFAULT };
+    emit getCurrPlayer(color);
+    power_card->setColor(color);
+
+    auto card_views{ m_view->getAllCards() };
+    auto choices{ power_card->getUsedCardIDs(color) };
+
+    int x{ WINDOW_WIDTH / 2 - (int(choices.size()) - 1) * (CARD_SIZE + 10) / 2};
+    for (uint16_t id : choices) {
+        card_views[id]->show();
+        card_views[id]->setPos(x, 700);
+        x += CARD_SIZE + 10;
+    }
+
+    auto localCardAppend = [this, power_card](Card* card) {
+        power_card->setSelectionByID(gui::utils::qPointFToCoord(card->pos()), card->getID());
+        power_card->setType(card->getType());
+
+        if (power_card->apply()) {
+            card->setPlaced(true);
+            m_view->connectCards();
+
+            emit updateCards();
+            emit switchPlayer();
+        }
+        else {
+            card->moveCardBack();
+        }
+        };
+
+    for (Card* card : m_view->getAllCards()) {
+        disconnect(card, &Card::cardAppend, nullptr, nullptr);
+
+        connect(card, &Card::cardAppend, this, localCardAppend);
+    }
 }
 
 void ElementalController::handleSpark(PowerCard* power_card_view) {
     auto* power_card = m_service.getElementalCard<base::Spark>(power_card_view->getId());
+
+    color::ColorType color{ color::ColorType::DEFAULT };
+    emit getCurrPlayer(color);
+    power_card->setColor(color);
+
+    auto card_views{ m_view->getAllCards() };
+    auto choices{ power_card->getCoveredCardIDs() };
+
+    int x{ WINDOW_WIDTH / 2 - (int(choices.size()) - 1) * (CARD_SIZE + 10) / 2 };
+    for (uint16_t id : choices) {
+        card_views[id]->show();
+        card_views[id]->setPlaced(false);
+        card_views[id]->setPos(x, 700);
+        card_views[id]->saved_pos = card_views[id]->pos();
+        x += CARD_SIZE + 10;
+    }
+
+    auto localCardAppend = [this, power_card, choices](Card* card) {
+        power_card->setSelectionByID(card->getID());
+        power_card->setMoveDestination(gui::utils::qPointFToCoord(card->pos()));
+        power_card->setId(card->getID());
+
+        if (power_card->apply()) {
+            card->setPlaced(true);
+            m_view->connectCards();
+
+            emit updateCards();
+            emit switchPlayer();
+        }
+        else {
+            card->setPos(card->saved_pos);
+        }
+        };
+
+    for (Card* card : m_view->getAllCards()) {
+        disconnect(card, &Card::cardAppend, nullptr, nullptr);
+
+        connect(card, &Card::cardAppend, this, localCardAppend);
+    }
 }
 
 void ElementalController::handleSquall(PowerCard* power_card_view) {
     auto* power_card = m_service.getElementalCard<base::Squall>(power_card_view->getId());
+
+    color::ColorType color{ color::ColorType::DEFAULT };
+    emit getCurrPlayer(color);
+    power_card->setColor(color);
+
+    auto choices{ power_card->getVisibleCardsIDs() };
+
+    m_view->highlightCards(choices, CardState::ABOUT_TO_HAND, CardState::RESTRICTED);
+    m_view->hideAllAvailableSpaces();
+
+    auto onHoverRemoveEnter = [this, power_card](Card* card) {
+        
+        };
+
+    auto onHoverRemoveLeave = [this, power_card](Card* card) {
+        
+        };
+
+    auto onClickRemove = [this, power_card](Card* card) {
+        power_card->setSelectedCardID(card->getID());
+        power_card->setSelectedCardCoord(gui::utils::qPointFToCoord(card->pos()));
+
+        if (power_card->apply()) {
+            m_view->resetCardHighlight();
+            m_view->showAllAvailableSpaces();
+            m_view->connectCards();
+
+            emit updateCards();
+            emit switchPlayer();
+        }
+        };
+
+    for (Card* card : m_view->getAllCards()) {
+        card->disconnect();
+
+        connect(card, &Card::hoverRemoveEnter, this, onHoverRemoveEnter);
+        connect(card, &Card::hoverRemoveLeave, this, onHoverRemoveLeave);
+        connect(card, &Card::clickedOnRemove, this, onClickRemove);
+    }
 }
 
 void ElementalController::handleGale(PowerCard* power_card_view) {
     auto* power_card = m_service.getElementalCard<base::Gale>(power_card_view->getId());
+
+    if (power_card->apply()) {
+        emit updateCards();
+        emit switchPlayer();
+    }
+    else {
+        power_card_view->goBack();
+        power_card_view->show();
+    }
 }
 
 void ElementalController::handleHurricane(PowerCard* power_card_view) {
     auto* power_card = m_service.getElementalCard<base::Hurricane>(power_card_view->getId());
+    auto card_views{ m_view->getAllCards() };
+    for (auto* card : card_views) {
+        card->setState(CardState::ABOUT_TO_CHECK);
+    }
+    
+    auto onHoverRemoveEnter = [this, power_card](Card* card) {
+
+        };
+
+    auto onHoverRemoveLeave = [this, power_card](Card* card) {
+
+        };
+
+    auto onClickRemove = [this, power_card](Card* card) {
+        
+
+        if (power_card->apply()) {
+            m_view->resetCardHighlight();
+            m_view->showAllAvailableSpaces();
+            m_view->connectCards();
+
+            emit updateCards();
+            emit switchPlayer();
+        }
+        };
+
+    for (Card* card : m_view->getAllCards()) {
+        card->disconnect();
+
+        connect(card, &Card::hoverRemoveLeave, this, onHoverRemoveLeave);
+        connect(card, &Card::clickedOnRemove, this, onClickRemove);
+    }
 }
 
 void ElementalController::handleGust(PowerCard* power_card_view) {

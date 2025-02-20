@@ -26,6 +26,30 @@ private:
 };
 
 
+class BackButton : public QPushButton {
+    Q_OBJECT
+public:
+
+    explicit BackButton(QWidget* parent = nullptr);
+
+protected:
+
+    void paintEvent(QPaintEvent* event) override;
+
+    void enterEvent(QEnterEvent* event) override;
+
+    void leaveEvent(QEvent* event);
+
+    void mousePressEvent(QMouseEvent* event) override;
+
+    void mouseReleaseEvent(QMouseEvent* event) override;
+
+    bool event(QEvent* event);
+
+private:
+    QPixmap currentPixmap;
+};
+
 class DescriptionPopup : public QMenu {
     Q_OBJECT
 public:

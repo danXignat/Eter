@@ -1,6 +1,5 @@
 #pragma once
 #include "qt_includes.h"
-#include "CardTypes.h"
 #include "..\EterV2\GameModeFactory.h"
 
 namespace gui {
@@ -23,3 +22,9 @@ namespace std {
         }
     };
 }
+
+struct GameModeConfig {
+    std::string id;
+    std::optional<uint16_t> time;
+    std::optional<base::GameSizeType> size_type;
+};

@@ -3,6 +3,7 @@
 
 #include "controls.h"
 #include "GameController.h"
+#include "utils.h"
 
 class RequestNameScene : public QWidget {
     Q_OBJECT
@@ -20,6 +21,8 @@ protected:
     void paintEvent(QPaintEvent* event) override;
 
 private:
+    static QString lineEditStyle;
+
     QLineEdit* playerBlueNameInput;
     QLineEdit* playerRedNameInput;
     NextButton nextButton;
@@ -38,6 +41,8 @@ public:
 signals:
     void modeSelected(const std::string& mode);
     void gameModeSelected(const QString& gameMode);
+    void backClicked();
+
 private slots:
 
 private:
@@ -46,6 +51,8 @@ private:
     QPushButton* elementalBattleButton;
     QPushButton* tournamentModeButton;
     QPushButton* timedModeButton;
+
+    QPushButton* backButton;
     QPixmap background;
 };
 
@@ -57,41 +64,32 @@ class SpecialPlaysScene : public QWidget {
 public:
     explicit SpecialPlaysScene(QWidget* parent = nullptr);
     void paintEvent(QPaintEvent* event) override;
+    void setSelectedGameMode(const QString& gamemode);
+    void resetFields();
 
 signals:
-    void continueToGame(const std::string&);
+    void continueToGame(GameModeConfig config);
+    void backClicked();
 
 private slots:
     void onNextClicked();
 
 private:
+    static QString checkBoxStyle;
+    static QString comboBoxStyle;
+    QString m_selected_gamemode;
+
     QPushButton* nextButton;
-    QCheckBox* illusions;
-    QCheckBox* explosions;
-    QLabel* infoLabel;
-    QPixmap background;
-};
-///-------------------------------------------------------------------
+    QPushButton* backButton;
 
-class TournamentPlaysScene : public QWidget {
-    Q_OBJECT
+    QCheckBox* illusion_check_box;
+    QCheckBox* explosion_check_box;
+    QCheckBox* mage_check_box;
+    QCheckBox* elemental_check_box;
+    QCheckBox* arena_check_box;
+    QComboBox* gameSizeCombo;
+    QComboBox* gameTimeCombo;
 
-public:
-    explicit TournamentPlaysScene(QWidget* parent = nullptr);
-    void paintEvent(QPaintEvent* event) override;
-
-signals:
-    void continueToGame(const std::string&);
-
-private slots:
-    void onNextClicked();
-
-private:
-    QPushButton* nextButton;
-    QCheckBox* illusions;
-    QCheckBox* explosions;
-    QCheckBox* mage;
-    QCheckBox* elemental;
     QLabel* infoLabel;
     QPixmap background;
 };
@@ -100,17 +98,20 @@ private:
 
 class GameScene : public QWidget {
     Q_OBJECT
+
+signals:
+    void mainMenu();
+
 private:
     bool isIllusionEnabled = false;
     QPushButton* toggleButton;
 public:
-    explicit GameScene(const std::string& mode, const QString& playerBlueName, const QString& playerRedName, QWidget* parent = nullptr);
+    explicit GameScene(const QString& playerBlueName, const QString& playerRedName,
+        const GameModeConfig& config,  QWidget* parent = nullptr);
 
 private:
-    GameController controller;
+    GameController* controller;
 
-private slots:
-    void toggleIllusion();
 };
 
 ///-------------------------------------------------------------------

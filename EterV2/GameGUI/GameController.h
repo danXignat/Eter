@@ -8,24 +8,28 @@
 #include "settings.h"
 #include "items.h"
 #include "utils.h"
-
 #include "MageController.h"
 #include "ElementalController.h"
 
 class GameController : public QObject {
     Q_OBJECT
 
+signals:
+    void mainMenuRequested();
+
 public:
     GameController(QWidget* parent,
-        const std::string& mode,
-        const QString& name_red, const QString& name_blue);
+        const QString& name_red, const QString& name_blue,
+        const GameModeConfig& config);
 private:
     void _updateBoardView();
     void _updatePlayerCards(const base::Player& player, QHash<uint16_t, Card*>& card_views, bool hide);
     void _updateBoardCards(const base::Board& board,    QHash<uint16_t, Card*>& card_views);
     void _initVisuals();
     void _initConections();
+    void _initServices();
     void _updateTargetZone();
+    void _handleWin(color::ColorType color);
 
 private:
     base::GameModePtr model;
@@ -51,4 +55,5 @@ public slots:
     void onNextRound();
     void onAddExplosion();
     void onGettingCurrPlayer(color::ColorType& color);
+    void onTimedUp(color::ColorType color);
 };

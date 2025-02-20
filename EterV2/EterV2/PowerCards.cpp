@@ -88,17 +88,75 @@ namespace base {
         void Flame::setColor(color::ColorType colorPlayer) {
             m_color = colorPlayer;
         }
-    
-        bool Flame::apply() {
-            Player& enemy_player{ (m_color == color::ColorType::RED) ? m_player_blue : m_player_red };
 
-            if (m_illusion_service.hasIllusion(enemy_player)) {
+        std::optional<uint16_t> Flame::getAppliedId() const {
+            return m_applied_id;
+        }
+        
+        void Flame::setSelectedCoord(const Coord& coord) {
+            m_selectedCoord = coord;
+            m_hasUserSelected = true;
+        }
+
+        void Flame::setSelectedCard(uint16_t id) {
+            m_selectedId = id;
+            m_hasCardTypeSelected = true;
+        }
+
+        std::unordered_set<uint16_t> Flame::getCardChoices() {
+            std::unordered_set<uint16_t> ids;
+
+            for (const auto& [coord, stack] : m_board) {
+                if (stack.back().getType() != CombatCardType::ETER &&
+                    stack.back().getType() != CombatCardType::HOLE &&
+                    !stack.back().isIllusion() ) {
+                    ids.insert(stack.back().getID());
+                }
+            }
+
+            return ids;
+        }
+
+        std::unordered_set<Coord, utils::CoordFunctor> Flame::getAvailableSpaceChoices() {
+            return m_board.availableSpaces();
+        }
+
+        bool Flame::apply() {
+            color::ColorType enemy_color{ (m_color == color::ColorType::RED) ? color::ColorType::BLUE : color::ColorType::RED };
+
+            auto illusion_coord{ m_illusion_service.getIllusionCoord(enemy_color) };
+
+            if (!illusion_coord.has_value()) {
                 return false;
             }
             
 
+            ///illusion
+            CombatCard& illusion{ m_board[*illusion_coord].back() };
 
-            return false;
+            illusion.flip();
+            m_applied_id.emplace(illusion.getID());
+
+
+            return true;
+        }
+
+        bool Flame::placeCard(const Coord& coord, uint16_t id) {
+            ///placing
+            if (!m_board.availableSpaces().contains(coord) && !m_board.getCombatCards().contains(coord)) {
+                return false;
+            }
+
+            if(m_color == color::ColorType::RED) {
+                CombatCard card = m_player_red.getCardByID(id);
+
+                m_board.appendSpecialCard(coord, std::move(card));
+            }
+            else {
+                CombatCard card = m_player_blue.getCardByID(id);
+
+                m_board.appendSpecialCard(coord, std::move(card));
+            }
         }
     
         ////------------------------------------------ Fire -------------------------------------------
@@ -193,14 +251,17 @@ namespace base {
     }
 
     std::unordered_set<uint16_t> Fire::getVisibleCardIDs() const {
-        std::unordered_set<uint16_t> card_ids;
-        auto visible_cards = getVisibleCards();
+        std::unordered_set<uint16_t> ids;
 
-        for (const auto& [coord, _] : visible_cards) {
-            const auto& stack = m_board[coord];
-            card_ids.insert(stack.back().getID());
+        for (const auto& [coord, stack] : m_board) {
+            if (stack.back().getType() != CombatCardType::ETER &&
+                stack.back().getType() != CombatCardType::HOLE &&
+                !stack.back().isIllusion()) {
+                ids.insert(stack.back().getID());
+            }
         }
-        return card_ids;
+
+        return ids;
     }
 
     std::unordered_set<uint16_t> Fire::getCardIDsOfType(CombatCardType type) const {
@@ -229,27 +290,13 @@ namespace base {
     }
 
     bool Fire::apply() {
-        if (!canUseAbility()) {
-            Logger::log(Level::WARNING, getErrorMessage());
-            return false;
-        }
-
-        auto valid_choices = getValidChoices();
-
         if (!m_has_choice) {
-            Logger::log(Level::WARNING, "No card type was chosen");
-            return false;
-        }
-
-        if (!isValidChoice(m_chosen_card, valid_choices)) {
-            Logger::log(Level::WARNING, "Invalid choice");
             return false;
         }
 
         applyEffect(m_chosen_card);
-        m_has_choice = false;
 
-        return false;
+        return true;
     }
     ////------------------------------------------ Ash -------------------------------------------
     Ash::Ash(Board& m_board, Player& red, Player& blue) : PowerCard(m_board, red, blue) {
@@ -261,6 +308,17 @@ namespace base {
             return m_player_blue.hasUsedCards();
         }
         return m_player_red.hasUsedCards();
+    }
+
+    void Ash::moveCardInInventory(uint16_t id) {
+        if (m_color == color::ColorType::RED) {
+            CombatCard card = std::move(m_player_red.getCardByID(id));
+            m_player_red.addCard(std::move(card));
+        }
+        else {
+            CombatCard card = std::move(m_player_blue.getCardByID(id));
+            m_player_blue.addCard(std::move(card));
+        }
     }
 
     std::unordered_set<uint16_t>Ash::getUsedCardIDs(color::ColorType colorPlayer) const {
@@ -332,6 +390,10 @@ namespace base {
         return "";
     }
 
+    void Ash::setType(CombatCardType type) {
+        m_selected_card = type;
+    }
+
     void Ash::setSelection(const Coord& coordinates, CombatCardType card_type) {
         m_selected_coord = coordinates;
         m_selected_card = card_type;
@@ -349,20 +411,39 @@ namespace base {
             return false;
         }
         if (m_color == color::ColorType::BLUE) {
-            auto card = m_player_blue.getUsedCard(m_selected_card);
-            m_board.appendMove(m_selected_coord, std::move(card));
+            InputHandler input;
+            input.color = color::ColorType::RED;
+            input.coord = m_selected_coord;
+            input.card_type = m_selected_card;
 
-            Logger::log(Level::INFO, "Ash power card was used");
+            if (m_board.isValidPlaceCard(input)) {
+                auto card = m_player_blue.getUsedCard(m_selected_card);
+                m_board.appendMove(m_selected_coord, std::move(card));
+            }
+            else {
+                return false;
+            }
         }
+
         if (m_color == color::ColorType::RED) {
-            auto card = m_player_red.getUsedCard(m_selected_card);
-            m_board.appendMove(m_selected_coord, std::move(card));
+            InputHandler input;
+            input.color = color::ColorType::RED;
+            input.coord = m_selected_coord;
+            input.card_type = m_selected_card;
+
+            if (m_board.isValidPlaceCard(input)) {
+                auto card = m_player_red.getUsedCard(m_selected_card);
+                m_board.appendMove(m_selected_coord, std::move(card));
+            }
+            else {
+                return false;
+            }
 
             Logger::log(Level::INFO, "Ash power card was used");
         }
 
         m_has_selection = false;
-        return false;
+        return true;
     }
 
     void Ash::setColor(color::ColorType colorPlayer) {
@@ -455,6 +536,10 @@ namespace base {
         return std::nullopt;
     }
 
+    void Spark::setId(uint16_t id) {
+        m_id.emplace(id);
+    }
+
     bool Spark::apply() {
         auto choices = coverCards();
         setAvailableChoices(choices);
@@ -492,18 +577,31 @@ namespace base {
             return false;
         }
 
-        CombatCard card(*getSelectedCardType(), m_player_red.getColor());
+        InputHandler input;
+        input.color = m_color;
+        input.card_type = *selectedCardType;
+        input.coord = *moveDestination;
 
-        if (!m_board.isValidPlaceCard(*getMoveDestination(), card)) {
+        if (!m_board.isValidPlaceCard(input)) {
             Logger::log(Level::WARNING, "You can't move the card to this position!");
             return false;
         }
 
-        m_board.removeCardFromStackAt(*getSelectedFromCoord(), card);
-        m_board.appendMove(*getMoveDestination(), std::move(card));
+        for (auto& [coord, stack] : m_board) {
+            auto it = std::find_if(stack.begin(), stack.end(), [this](CombatCard& element) {
+                return element.getID() == *m_id;
+                }
+            );
+
+            if (it != stack.end()) {
+                m_board.appendMove(input.coord, std::move(*it));
+                stack.erase(it);
+                break;
+            }
+        }
 
         Logger::log(Level::INFO, "Card successfully moved!");
-        return false;
+        return true;
     }
 
     std::vector<std::pair<Coord, CombatCardType>> Spark::coverCards() {
@@ -581,6 +679,7 @@ namespace base {
 
     std::unordered_set<uint16_t> Squall::getVisibleCardsIDs() const {
         std::unordered_set<uint16_t> visible_cards_ids;
+
         for (const auto& [coord, stack] : m_board) {
             if (!stack.empty()) {
                 const CombatCard& top_card = stack.back();
@@ -592,6 +691,10 @@ namespace base {
         return visible_cards_ids;
     }
 
+    void Squall::setType(CombatCardType type) {
+        m_type = type;
+    }
+
     bool Squall::apply() {
         auto visible_cards = getVisibleCards();
         setVisibleCards(visible_cards);
@@ -601,27 +704,11 @@ namespace base {
             return false;
         }
 
-        if (!getSelectedCardCoord()) {
-            Logger::log(Level::WARNING, "No card selected!");
-            return false;
-        }
-
-        auto it = std::find_if(visible_cards.begin(), visible_cards.end(),
-            [this](const auto& pair) { return pair.first == *getSelectedCardCoord(); });
-
-        if (it == visible_cards.end()) {
-            Logger::log(Level::WARNING, "Invalid coordinates! No opponent card there.");
-            return false;
-        }
-        if (m_color == color::ColorType::RED) {
-            m_player_red.addCard(m_board.popTopCardAt(*getSelectedCardCoord()));
-        }
-        else {
-            m_player_blue.addCard(m_board.popTopCardAt(*getSelectedCardCoord()));
-        }
+        m_board.removeTopCardAt(*selectedCardCoord);
+        m_board.returnUsedCardToHand(m_type);
 
         Logger::log(Level::INFO, "Card successfully returned to opponent's hand!");
-        return false;
+        return true;
     }
 
     //    ////------------------------------------------ Gale -------------------------------------------
@@ -630,26 +717,26 @@ namespace base {
     }
 
     bool Gale::apply() {
-        std::vector<std::pair<Coord, CombatCardType>> cards_to_remove;
+        bool ok = false;
 
+        for (auto& [coord, stack] : m_board) {
+            while (stack.size() >= 2) {
+                CombatCard card = std::move(stack.front());
+                stack.erase(stack.begin());
 
-        for (const auto& [coord, stack] : m_board) {
-            if (stack.size() <= 1) {
-                continue;
+                if (card.getColor() == color::ColorType::RED) {
+                    m_player_red.addCard(std::move(card));
+                }
+                else {
+                    m_player_blue.addCard(std::move(card));
+                }
+
+                ok = true;
             }
-
-            for (size_t i = 0; i < stack.size() - 1; i++) {
-                cards_to_remove.emplace_back(coord, stack[i].getType());
-            }
-        }
-
-        for (const auto& [coord, card_type] : cards_to_remove) {
-            m_board.removeCardFromStackAt(coord, CombatCard(card_type, m_color));
-            m_board.returnUsedCardToHand(card_type);
         }
 
         Logger::log(Level::INFO, "Gale power card effect completed");
-        return false;
+        return ok;
     }
 
     void Gale::setColor(color::ColorType colorPlayer) {
@@ -2266,5 +2353,7 @@ namespace base {
             }
             return illusionCoords;
         }
-    
+        
+
+
     }

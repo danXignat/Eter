@@ -98,6 +98,7 @@ namespace base {
 
 		void removeTopCardAt(const Coord& coord);
 		void removeCardFromStackAt(const Coord& coord, const CombatCard& card_to_remove);
+		void removeCardFromStackAt(uint16_t id);
 		void removeStack(const Coord& coord);
 		void removeRow(uint16_t y);
 		void removeColumn(uint16_t x);
@@ -170,9 +171,13 @@ namespace base {
 		using ValueType = std::vector<CombatCard>;
 		using MapType = std::unordered_map<KeyType, ValueType>;
 
+		using iterator = MapType::iterator;
 		using const_iterator = MapType::const_iterator;
 
 		const_iterator begin() const;
 		const_iterator end() const;
+
+		iterator begin();
+		iterator end();
 	};
 }

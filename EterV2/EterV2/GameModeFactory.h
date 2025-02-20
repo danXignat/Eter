@@ -19,6 +19,8 @@ namespace base {
 
 		static GameModeType getGameModeType(const std::string& id);
 
+		static GameModePtr getTimedMode(const std::string& id, const std::pair<std::string, std::string>& player_names, uint16_t time_limit, GameSizeType size_tye);
+
 		static std::vector<ServiceType> getServiceConfig(const std::string& id);
 	};
 }

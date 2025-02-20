@@ -46,6 +46,15 @@ namespace base {
 
 		m_board.appendMove(input.coord, std::move(card));
 
+		if (input.color == color::ColorType::RED) {
+			m_p1_illusion_coord.emplace(input.coord);
+			m_p1_has_illusion = false;
+		}
+		else {
+			m_p2_illusion_coord.emplace(input.coord);
+			m_p2_has_illusion = false;
+		}
+
 		return true;
 	}
 
@@ -65,6 +74,13 @@ namespace base {
 			curr_player.addUsedCard(std::move(card));
 		}
 
+		if (input.color == color::ColorType::RED) {
+			m_p1_illusion_coord.reset();
+		}
+		else {
+			m_p2_illusion_coord.reset();
+		}
+
 		m_board[input.coord].front().flip();
 	}
 
@@ -74,6 +90,15 @@ namespace base {
 		}
 		else {
 			m_p2_has_illusion = true;
+		}
+	}
+
+	std::optional<Coord> IllusionService::getIllusionCoord(color::ColorType color) {
+		if (color == color::ColorType::RED) {
+			return m_p1_illusion_coord;
+		}
+		else if (color == color::ColorType::BLUE){
+			return m_p2_illusion_coord;
 		}
 	}
 }

@@ -25,7 +25,7 @@ namespace base {
 		m_illusion_service{ illusion_service }, m_explosion_service{explosion_service},
 		type_card1{ PowerCardType::None }, type_card2{PowerCardType::None} {
 
-		std::array<uint16_t, ElementalService::power_number> choices;
+		std::array<uint16_t, 8> choices;
 		std::iota(choices.begin(), choices.end(), 0);
 		m_choices.insert(choices.begin(), choices.end());
 
@@ -57,8 +57,8 @@ namespace base {
 		type_card1 = static_cast<PowerCardType>(choices[0]);
 		type_card2 = static_cast<PowerCardType>(choices[1]);
 
-		type_card1 = static_cast<PowerCardType>(2);
-		type_card2 = static_cast<PowerCardType>(3);
+		/*type_card1 = static_cast<PowerCardType>(8);
+		type_card2 = static_cast<PowerCardType>(9);*/
 
 		card1 = _factory(type_card1);
 		card2 = _factory(type_card2);

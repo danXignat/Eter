@@ -36,6 +36,7 @@ namespace base {
         CombatCard&& getCard(CombatCardType);
         CombatCard&& getCardByID(uint16_t);
         CombatCard&& getUsedCard(CombatCardType);
+        CombatCard&& getUsedCardByID(uint16_t);
         const CombatCard& viewCard(CombatCardType);
         void addCard(CombatCard&&);
         void addUsedCard(CombatCard&&);

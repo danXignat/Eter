@@ -30,6 +30,7 @@ namespace base {
 		GameSizeType getGameSizeType() const;
 		uint16_t getScore(color::ColorType) const;
 		uint16_t getCurrRound();
+		bool isFinalRound() const;
 
 		std::unordered_set<uint16_t> getAvailableIds(InputHandler&);
 		std::unordered_set<uint16_t> getRestrictedIds(InputHandler&);

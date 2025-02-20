@@ -6,6 +6,7 @@
 #include"BaseGameMode.h"
 #include"typedefs.h"
 #include "logger.h"
+#include "utils.h"
 
 #include <memory>
 #include <vector>
@@ -50,12 +51,27 @@ namespace base {
 	public:
 		Flame(Board& board, Player& red, Player& blue, IllusionService& illusion_service);
 
+		std::optional<uint16_t> getAppliedId() const;
+		std::unordered_set<uint16_t> getCardChoices();
+		std::unordered_set<Coord, utils::CoordFunctor> getAvailableSpaceChoices();
+
 		void setColor(color::ColorType colorPlayer);
+		void setSelectedCoord(const Coord& coord);
+		void setSelectedCard(uint16_t id);
+
 		bool apply() override;
+		bool placeCard(const Coord& coord, uint16_t id);
 
 	private:
 		IllusionService& m_illusion_service;
 		color::ColorType m_color = color::ColorType::DEFAULT;
+		std::optional<uint16_t> m_applied_id;
+
+		Coord m_selectedCoord;
+		uint16_t m_selectedId;
+
+		bool m_hasUserSelected = false;
+		bool m_hasCardTypeSelected = false;
 	};
 
 	class Fire :public PowerCard {
@@ -77,13 +93,12 @@ namespace base {
 
 		void applyEffect(CombatCardType chosen_type); 
 		bool apply() override;
-		
+
+
 
 	private:
 		CombatCardType m_chosen_card;
 		bool m_has_choice{ false };
-
-
 	};
 
 	class Ash :public PowerCard {
@@ -107,7 +122,9 @@ namespace base {
 		void setSelectionByID(const Coord& coordinates, uint16_t card_id);
 		void setSelection(const Coord& coordinates, CombatCardType card_type);
 		void setColor(color::ColorType colorPlayer);
-
+		void setType(CombatCardType type);
+		void moveCardInInventory(uint16_t id);
+		bool validMove(const Coord& coord, CombatCardType type);
 		bool apply() override; 
 
 	private:
@@ -141,6 +158,7 @@ namespace base {
 		void setSelectedCardType(CombatCardType type);
 		void setMoveDestination(Coord coord);
 		void setColor(color::ColorType colorPlayer);
+		void setId(uint16_t id);
 
 		bool apply() override;
 
@@ -151,6 +169,7 @@ namespace base {
 		std::optional<Coord> selectedFromCoord;
 		std::optional<CombatCardType> selectedCardType;
 		std::optional<Coord> moveDestination;
+		std::optional<uint16_t> m_id;
 	};
 
 
@@ -171,7 +190,7 @@ namespace base {
 		void setVisibleCards(const std::vector<std::pair<Coord, CombatCardType>>& cards);
 		std::optional<Coord> getSelectedCardCoord() const;
 		void setSelectedCardCoord(Coord coord);
-
+		void setType(CombatCardType type);
 		void setColor(color::ColorType colorPlayer);
 
 	private:
@@ -179,7 +198,7 @@ namespace base {
 		std::vector<std::pair<Coord, CombatCardType>> visibleCards;
 		std::optional<Coord> selectedCardCoord;
 		std::optional<uint16_t> m_selected_card_id;
-
+		CombatCardType m_type;
 
 	};
 
@@ -208,6 +227,14 @@ namespace base {
 		std::unordered_map<Orientation, std::vector<uint16_t>> getOptions() const;
 		std::optional<std::tuple<Orientation, uint16_t>> getUserSelection() const;
 		std::optional<MoveDirection> getUserDirection() const;
+
+		std::unordered_set<uint16_t> getChoices(const Coord& coord);
+
+
+	public:
+		std::unordered_map <Coord, std::vector <uint16_t>, utils::CoordFunctor> moving_cards_buffer;
+		uint16_t moving_line;
+
 	private:
 		std::unordered_map<Orientation, std::vector<uint16_t>> options;
 		std::optional<std::tuple<Orientation, uint16_t>> userSelection;
@@ -236,7 +263,6 @@ namespace base {
 		void setSelectedDestinationID(uint16_t card_id);
 		void setSelectedSourceID(uint16_t card_id);
 		void setSelectedDestination(Coord coord);
-		
 
 	private:
 		std::vector<Coord> validSourceCards;

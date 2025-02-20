@@ -20,6 +20,7 @@ namespace base {
 		bool hasIllusion(color::ColorType);
 		void getNewIllusion(const CombatCard& card);
 		void handleIllusionAttack(const InputHandler& input);
+		std::optional<Coord> getIllusionCoord(color::ColorType color);
 
 	private:
 		Board&  m_board;

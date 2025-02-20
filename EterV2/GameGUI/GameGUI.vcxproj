@@ -131,7 +131,6 @@
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="items.h" />
-    <ClInclude Include="CardTypes.h" />
     <QtMoc Include="GameController.h" />
     <QtMoc Include="GameView.h" />
     <QtMoc Include="scenes.h" />

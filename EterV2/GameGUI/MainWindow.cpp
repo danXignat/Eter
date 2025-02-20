@@ -14,36 +14,47 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
     requestNameScene    = new RequestNameScene();
     selectModeScene     = new SelectModeScene();
     specialPlaysScene = new SpecialPlaysScene(this);
-    tournamentPlaysScene = new TournamentPlaysScene(this);
     pauseMenuScene      = new PauseMenuScene(this);
     pauseMenuScene->hide();
 
     stackedWidget->addWidget(requestNameScene);
     stackedWidget->addWidget(selectModeScene);
     stackedWidget->addWidget(specialPlaysScene);
-    stackedWidget->addWidget(tournamentPlaysScene);
 
     setCentralWidget(stackedWidget);
 
     connect(requestNameScene,   &RequestNameScene::nameEntered,         this, &MainWindow::onNameEntered);
     connect(selectModeScene,    &SelectModeScene::gameModeSelected,     this, &MainWindow::onGameModeSelected);
+    connect(selectModeScene,    &SelectModeScene::backClicked,          this, &MainWindow::onGameModeSelectionBack);
     connect(pauseMenuScene,     &PauseMenuScene::continueGameRequested, this, &MainWindow::onResumeGame);
     connect(pauseMenuScene,     &PauseMenuScene::gameRematch,           this, &MainWindow::onGameRematch);
     connect(pauseMenuScene,     &PauseMenuScene::mainMenu,              this, &MainWindow::onMainMenuSwitch);
     connect(specialPlaysScene,  &SpecialPlaysScene::continueToGame,     this, &MainWindow::onSpecialPlaysCompleted);
-    connect(tournamentPlaysScene, &TournamentPlaysScene::continueToGame, this, &MainWindow::onTournamentPlaysCompleted);
+    connect(specialPlaysScene,  &SpecialPlaysScene::backClicked,        this, &MainWindow::onSpecialPlaysBack);
 
 
-    //playerBlueNameGlobal = "BLUE";
-    //playerRedNameGlobal = "RED";
-    //selectedMode = "212";
-    //gameScene = new GameScene(selectedMode, playerBlueNameGlobal, playerRedNameGlobal);
-    //stackedWidget->addWidget(gameScene);
-    //stackedWidget->setCurrentWidget(gameScene);
+    playerBlueNameGlobal = "BLUE";
+    playerRedNameGlobal = "RED";
+    selectedMode = "3";
+    GameModeConfig config;
+    config.id = selectedMode;
+
+    gameScene = new GameScene(playerBlueNameGlobal, playerRedNameGlobal, config);
+    stackedWidget->addWidget(gameScene);
+    stackedWidget->setCurrentWidget(gameScene);
+}
+
+void MainWindow::onGameModeSelectionBack() {
+    stackedWidget->setCurrentWidget(requestNameScene);
+}
+
+void MainWindow::onSpecialPlaysBack() {
+    stackedWidget->setCurrentWidget(selectModeScene);
 }
 
 void MainWindow::onMainMenuSwitch() {
     if (gameScene != nullptr) {
+        gameScene->disconnect();
         stackedWidget->removeWidget(gameScene);
         delete gameScene;
         gameScene = nullptr;
@@ -55,13 +66,15 @@ void MainWindow::onMainMenuSwitch() {
 
 void MainWindow::onGameRematch() {
     if (gameScene != nullptr) {
+        gameScene->disconnect();
         stackedWidget->removeWidget(gameScene);
         delete gameScene;
         gameScene = nullptr;
     }
 
     pauseMenuScene->hide();
-    gameScene = new GameScene(selectedMode, playerBlueNameGlobal, playerRedNameGlobal);
+    gameScene = new GameScene(playerBlueNameGlobal, playerRedNameGlobal, m_curr_game_config);
+    connect(gameScene, &GameScene::mainMenu, this, &MainWindow::onMainMenuSwitch);
     stackedWidget->addWidget(gameScene);
     stackedWidget->setCurrentWidget(gameScene);
 }
@@ -82,39 +95,29 @@ void MainWindow::onNameEntered(const QString& playerBlueName, const QString& pla
 
 
 void MainWindow::onModeSelected(const std::string& mode) {
-    selectedMode = mode;
-    qDebug() << "MODUL SELECTAT ESTE: ",selectedMode;
-    stackedWidget->addWidget(tournamentPlaysScene);
-
-    stackedWidget->setCurrentWidget(tournamentPlaysScene);
-    qDebug() << "Switched to GameScene with mode:" << QString::fromStdString(mode);
+    
     
 }
 
-void MainWindow::onSpecialPlaysCompleted(const std::string& special_plays) {
+void MainWindow::onSpecialPlaysCompleted(GameModeConfig config) {
     if (gameScene != nullptr) {
+        gameScene->disconnect();
         stackedWidget->removeWidget(gameScene);
         delete gameScene;
         gameScene = nullptr;
     }
 
-    selectedMode += special_plays;
-    gameScene = new GameScene(selectedMode, playerRedNameGlobal, playerBlueNameGlobal);
-    stackedWidget->addWidget(gameScene);
-    stackedWidget->setCurrentWidget(gameScene);
-}
-void MainWindow::onTournamentPlaysCompleted(const std::string& tournament_plays) {
-    if (gameScene != nullptr) {
-        stackedWidget->removeWidget(gameScene);
-        delete gameScene;
-        gameScene = nullptr;
-    }
+    m_curr_game_config = config;
 
-    selectedMode += tournament_plays;
-    gameScene = new GameScene(selectedMode, playerRedNameGlobal, playerBlueNameGlobal);
+
+    gameScene = new GameScene(playerRedNameGlobal, playerBlueNameGlobal, config);
+
+    connect(gameScene, &GameScene::mainMenu, this, &MainWindow::onMainMenuSwitch);
+
     stackedWidget->addWidget(gameScene);
     stackedWidget->setCurrentWidget(gameScene);
 }
+
 
 void MainWindow::onResumeGame() {
     if (pauseMenuScene->isVisible()) {
@@ -133,23 +136,11 @@ void MainWindow::onResumeGame() {
 
 void MainWindow::onGameModeSelected(const QString& gameMode) {
     selectedMode = gameMode.toStdString();
-    if (selectedMode != "4") {
-        if (stackedWidget->indexOf(specialPlaysScene) == -1) {
-            stackedWidget->addWidget(specialPlaysScene);
-        }
 
-        stackedWidget->setCurrentWidget(specialPlaysScene);
+    specialPlaysScene->resetFields();
+    specialPlaysScene->setSelectedGameMode(gameMode);
 
-        qDebug() << "Game mode selected:" << gameMode;
-        qDebug() << "Switched to SpecialPlaysScene.";
-    }
-    else {
-        if (stackedWidget->indexOf(tournamentPlaysScene) == -1) {
-            stackedWidget->addWidget(tournamentPlaysScene);
-        }
-
-        stackedWidget->setCurrentWidget(tournamentPlaysScene);
-    }
+    stackedWidget->setCurrentWidget(specialPlaysScene);
 }
 
 void MainWindow::keyPressEvent(QKeyEvent* event) {

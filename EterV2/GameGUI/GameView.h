@@ -25,25 +25,29 @@ signals:
     void applyPowerCard(PowerCard* card);
 
     void nextRound();
+    void mainMenuRequested();
 
 public:
-    GameView(const QString& name_red, const QString& name_blue, const std::string& mode, QWidget* parent = nullptr);
+    GameView(const QString& name_red, const QString& name_blue, const GameModeConfig& config, QWidget* parent = nullptr);
 
-    void drawPlayerCards(const base::Player& player, QPointF start_point);
-    void drawAvailablePositions(const base::Board& board);
+    void drawPlayerCards        (const base::Player& player, QPointF start_point);
+    void drawAvailablePositions (const base::Board& board);
     void drawExplosion          (const base::ExplosionService& effect, uint16_t, QPointF start_point);
-    void drawHole       (const QPointF& pos);
-    void drawMages      (base::MageTypeAbility mage_red, const QString& desc_red, base::MageTypeAbility mage_blue, const QString& desc_blue);
-    void drawArena      (base::GameSizeType game_size);
-    void drawMarker(const QPointF& point, color::ColorType color);
-    void drawPowers(const std::pair<std::pair<uint16_t, base::PowerCardType>, std::pair<uint16_t, base::PowerCardType>>& data);
-    void loadBackground(const std::string& mode);
+    void drawHole               (const QPointF& pos);
+    void drawMages              (base::MageTypeAbility mage_red, const QString& desc_red, base::MageTypeAbility mage_blue, const QString& desc_blue);
+    void drawArena              (base::GameSizeType game_size);
+    void drawMarker             (const QPointF& point, color::ColorType color);
+    void drawPowers             (const std::pair<std::pair<uint16_t, base::PowerCardType>, std::pair<uint16_t, base::PowerCardType>>& data);
+    void drawTimers             (uint16_t time);
+    void drawArrow              (Arrow::Direction direction);
+
+    void loadBackground     (const GameModeConfig& config);
     void cardAppendBoard    (Card* card);
     void setExplosionActive ();
     void eraseExplosion     ();
 
-    void switchToPlayer(const base::Player& player);
-    void showWin(color::ColorType color);
+    void switchToPlayer (const base::Player& player);
+    void showWin        (color::ColorType color);
 
     QHash<uint16_t, Card*>& getAllCards();
     QHash<QPointF, QList<Card*>>& getAllCardsByPos();
@@ -55,6 +59,7 @@ public:
     void keyPressEvent      (QKeyEvent* event);
 
     void highlightCards         (const std::unordered_set<uint16_t>& valid_choices, CardState state1, CardState state2);
+    void blockDeckCards         (color::ColorType color, bool block);
     void resetCardHighlight     ();
     void showCards              (std::function<bool(Card*)> condition);
     void hideCards              (std::function<bool(Card*)> condition);
@@ -76,14 +81,16 @@ public:
     QGraphicsScene* scene;
     TargetZone* target_zone;
 
+    VisualTimer* red_timer;
+    VisualTimer* blue_timer;
+    VictoryScreen* victory_screen;
+
 private:
     void _drawSquareAt(QPointF pos);
     void _initLabels(const QString& name_red, const QString& name_blue);
     Card* _createCardAt(color::ColorType color, base::CombatCardType type, QPointF pos, uint16_t id);
 
 private:
-    VictoryScreen* victory_screen;
-
     QVBoxLayout*    layout;
     QLabel*         infoLabel;
     QLabel*         red_name_label;
@@ -108,4 +115,8 @@ private:
 
     Arena* arena;
     QList<Marker*> markers;
+
+    QList<Arrow*> arrows;
+
+    ArrowItem* m_currentArrow;
 };

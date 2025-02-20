@@ -55,6 +55,65 @@ bool NextButton::event(QEvent* event) {
 
 ///-------------------------
 
+BackButton::BackButton(QWidget* parent)
+    : QPushButton(parent), currentPixmap("../pictures/estetics/back_normal.png") {
+    setFixedSize(currentPixmap.size());
+}
+
+void BackButton::paintEvent(QPaintEvent* event) {
+    QPainter painter(this);
+    currentPixmap = currentPixmap.scaled(width(), height(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    painter.drawPixmap(0, 0, currentPixmap);
+}
+
+void BackButton::enterEvent(QEnterEvent* event) {
+    qDebug() << "Hover started";
+
+    currentPixmap.load("../pictures/estetics/back_hover.png");
+    currentPixmap = currentPixmap.scaled(width(), height(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    qDebug() << currentPixmap.size();
+    update();
+    QPushButton::enterEvent(event);
+}
+
+void BackButton::leaveEvent(QEvent* event) {
+    qDebug() << "Hover ended";
+    currentPixmap.load("../pictures/estetics/back_normal.png");
+    currentPixmap = currentPixmap.scaled(width(), height(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    update();
+    QPushButton::leaveEvent(event);
+}
+
+void BackButton::mousePressEvent(QMouseEvent* event) {
+
+    currentPixmap.load("../pictures/estetics/back_click.png");
+    currentPixmap = currentPixmap.scaled(width(), height(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    update();
+    QPushButton::mousePressEvent(event);
+}
+
+void BackButton::mouseReleaseEvent(QMouseEvent* event) {
+
+    currentPixmap.load("../pictures/estetics/back_normal.png");
+    currentPixmap = currentPixmap.scaled(width(), height(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+
+    update();
+    QPushButton::mouseReleaseEvent(event);
+}
+bool BackButton::event(QEvent* event) {
+    if (event->type() == QEvent::Leave) {
+        qDebug() << "Generic Leave event detected";
+    }
+    return QPushButton::event(event); // Pass to the base class
+}
+
+
+
+/// <summary>
+/// -------------
+/// </summary>
+/// <param name="description"></param>
+/// <param name="parent"></param>
 
 DescriptionPopup::DescriptionPopup(const QString& description, QWidget* parent)
     : QMenu(parent) {

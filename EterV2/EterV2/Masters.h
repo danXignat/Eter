@@ -76,8 +76,8 @@ namespace base {
 
 	private:
 		std::unordered_set<uint16_t>m_availableChoices;
-		Coord m_selectedCoord;
 		CombatCardType m_selectedCardType;
+		Coord m_selectedCoord;
 		uint16_t m_selectedId;
 
 		bool m_hasUserSelected = false; // pt coordonata

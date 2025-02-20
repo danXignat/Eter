@@ -9,36 +9,83 @@ using namespace logger;
 
 namespace base {
 
-    TimedMode::TimedMode(const std::vector<ServiceType>& services,
-        const std::pair<std::string, std::string>& player_names,
-        int time_limit_seconds,
-        std::unique_ptr<BaseGameMode> base_mode)
-        : BaseGameMode(base_mode->getBoard().getSize() == 3 ? GameSizeType::SMALL : GameSizeType::BIG,
-            player_names, services)
-        , m_time_limit(time_limit_seconds)
-        , m_base_mode(std::move(base_mode))
-    {
+    TimedMode::TimedMode(GameSizeType size_type, const std::vector<ServiceType>& services,
+        const std::pair<std::string, std::string>& player_names, uint16_t time_limit)
+        : BaseGameMode(size_type, player_names, services),
+        m_time_limit{time_limit} {
+        for (ServiceType service : services) {
+            switch (service) {
+            case base::ServiceType::MAGE:
+                m_mage_service.emplace(m_board, m_player_red, m_player_blue);
+                break;
+
+            case base::ServiceType::ELEMENTAL:
+                m_elemental_service.emplace(m_board, m_player_red, m_player_blue, m_illusion_service, m_explosion_service);
+                break;
+
+            case base::ServiceType::ARENA:
+                m_arena_service.emplace(size_type, m_board, m_player_red, m_player_blue);
+                break;
+
+            default:
+                break;
+            }
+        }
     }
     
-    TimedMode::TimedMode(const std::vector<ServiceType>& services,
-        const std::pair<std::string, std::string>& player_names,
-        int time_limit_seconds)
-        : BaseGameMode(GameSizeType::BIG, player_names, services)
-        , m_time_limit(time_limit_seconds)
-    {
-    
-        for (const auto& service : services) {
-            if (service == ServiceType::MAGE) {
-                //m_mage_service = std::make_unique<MageService>(m_board);
+    std::optional<ElementalService>& TimedMode::getElementalService() {
+        return m_elemental_service;
+    }
+
+    std::optional<MageService>& TimedMode::getMageService() {
+        return m_mage_service;
+    }
+
+    std::optional <ArenaService>& TimedMode::getArenaService() {
+        return m_arena_service;
+    }
+
+    uint16_t TimedMode::getTime() const {
+        return m_time_limit;
+    }
+
+    void TimedMode::setLostOnTime(color::ColorType color) {
+        lost_on_time = true;
+        lost_on_time_color = color;
+    }
+
+    void TimedMode::nextRound() {
+        if (m_arena_service.has_value() && !lost_on_time) {
+            auto win_data{ m_board.getWinData() };
+
+            m_arena_service->addMarker(win_data->first, win_data->second);
+        }
+
+        if (lost_on_time) {
+            if (lost_on_time_color == color::ColorType::RED) {
+                m_score.blue++;
             }
-            else if (service == ServiceType::ELEMENTAL) {
-                //m_elemental_service = std::make_unique<ElementalService>(m_board, m_player_red, m_player_blue);
+            else if (lost_on_time_color == color::ColorType::BLUE) {
+                m_score.red++;
             }
+
+            if (m_current_round < m_round_count) {
+                m_board.reset();
+                m_player_red.reset();
+                m_player_blue.reset();
+            }
+
+            m_current_round++;
+
+            lost_on_time = false;
+        }
+        else {
+            BaseGameMode::nextRound();
         }
     }
 
     void TimedMode::renderGameState() {
-        system("cls");
+        /*system("cls");
 
         if (auto* trainingMode = dynamic_cast<TrainingMode*>(m_base_mode.get())) {
             trainingMode->render();
@@ -72,122 +119,123 @@ namespace base {
 
         if (m_explosion_service) {
             m_explosion_service->render();
-        }
+        }*/
     }
 
     bool TimedMode::processGameInput(const InputHandler& input) {
-        bool action_succeeded = false;
+        //bool action_succeeded = false;
 
-        if (m_base_mode) {
-           
-            switch (input.event_type) {
-            case EventType::PlaceCombatCard:
-            case EventType::PlaceIllusion:
-                action_succeeded = m_base_mode->placeCombatCard(input);
-                break;
-            default:
-                break;
-            }
-        }
-        else {
-            
-            switch (input.event_type) {
-            case EventType::UseMage:
-                if (m_mage_service) {
-                    //action_succeeded = m_mage_service->apply(m_curr_player.get());
-                }
-                break;
+        //if (m_base_mode) {
+        //   
+        //    switch (input.event_type) {
+        //    case EventType::PlaceCombatCard:
+        //    case EventType::PlaceIllusion:
+        //        action_succeeded = m_base_mode->placeCombatCard(input);
+        //        break;
+        //    default:
+        //        break;
+        //    }
+        //}
+        //else {
+        //    
+        //    switch (input.event_type) {
+        //    case EventType::UseMage:
+        //        if (m_mage_service) {
+        //            //action_succeeded = m_mage_service->apply(m_curr_player.get());
+        //        }
+        //        break;
 
-            case EventType::UsePower:
-                if (m_elemental_service) {
-                    char choice;
-                    std::cin >> choice;
-                    m_elemental_service->apply(choice, m_curr_player.get());
-                    action_succeeded = true;
-                }
-                break;
+        //    case EventType::UsePower:
+        //        if (m_elemental_service) {
+        //            char choice;
+        //            std::cin >> choice;
+        //            m_elemental_service->apply(choice, m_curr_player.get());
+        //            action_succeeded = true;
+        //        }
+        //        break;
 
-            case EventType::PlaceCombatCard:
-                action_succeeded = placeCombatCard(input);
-                break;
+        //    case EventType::PlaceCombatCard:
+        //        action_succeeded = placeCombatCard(input);
+        //        break;
 
-            case EventType::PlaceIllusion:
-                //action_succeeded = placeIllusion(input);
-                break;
+        //    case EventType::PlaceIllusion:
+        //        //action_succeeded = placeIllusion(input);
+        //        break;
 
-            default:
-                break;
-            }
-        }
+        //    default:
+        //        break;
+        //    }
+        //}
 
-        return action_succeeded;
+        //return action_succeeded;
+        return true;
     }
 
     void TimedMode::run() {
-        displayTimeSelection();
-        int choice;
-        std::cin >> choice;
+        //displayTimeSelection();
+        //int choice;
+        //std::cin >> choice;
 
-        switch (choice) {
-        case 1:
-            m_time_limit = 60;
-            break;
-        case 2:
-            m_time_limit = 90;
-            break;
-        case 3:
-            m_time_limit = 120;
-            break;
-        default:
-            std::cout << "Invalid choice, defaulting to 60 seconds\n";
-            m_time_limit = 60;
-            break;
-        }
+        //switch (choice) {
+        //case 1:
+        //    m_time_limit = 60;
+        //    break;
+        //case 2:
+        //    m_time_limit = 90;
+        //    break;
+        //case 3:
+        //    m_time_limit = 120;
+        //    break;
+        //default:
+        //    std::cout << "Invalid choice, defaulting to 60 seconds\n";
+        //    m_time_limit = 60;
+        //    break;
+        //}
 
-        m_red_timer = std::make_unique<Timer>(m_time_limit);
-        m_blue_timer = std::make_unique<Timer>(m_time_limit);
-        m_red_timer->start();
+        //m_red_timer = std::make_unique<Timer>(m_time_limit);
+        //m_blue_timer = std::make_unique<Timer>(m_time_limit);
+        //m_red_timer->start();
 
-        while (!m_board.getWinData().has_value()) {
-            renderGameState();
+        //while (!m_board.getWinData().has_value()) {
+        //    renderGameState();
 
-            if (m_red_timer->hasTimeExpired() || m_blue_timer->hasTimeExpired()) {
-                system("cls");
-                std::cout << (m_red_timer->hasTimeExpired() ?
-                    "RED player's time has expired! BLUE wins!\n" :
-                    "BLUE player's time has expired! RED wins!\n");
-                break;
-            }
+        //    if (m_red_timer->hasTimeExpired() || m_blue_timer->hasTimeExpired()) {
+        //        system("cls");
+        //        std::cout << (m_red_timer->hasTimeExpired() ?
+        //            "RED player's time has expired! BLUE wins!\n" :
+        //            "BLUE player's time has expired! RED wins!\n");
+        //        break;
+        //    }
 
-            if (_kbhit()) {
-                InputHandler input;
-                try {
-                    input.read();
-                    bool action_succeeded = processGameInput(input);
-                    if (action_succeeded) {
-                        switchTimers();
-                        switchPlayer();
-                    }
-                }
-                catch (const std::runtime_error& err) {
-                    Logger::log(Level::ERROR, err.what());
-                    continue;
-                }
-            }
+        //    if (_kbhit()) {
+        //        InputHandler input;
+        //        try {
+        //            input.read();
+        //            bool action_succeeded = processGameInput(input);
+        //            if (action_succeeded) {
+        //                switchTimers();
+        //                switchPlayer();
+        //            }
+        //        }
+        //        catch (const std::runtime_error& err) {
+        //            Logger::log(Level::ERROR, err.what());
+        //            continue;
+        //        }
+        //    }
 
-            std::this_thread::sleep_for(std::chrono::milliseconds(100));
-        }
+        //    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        //}
 
-        m_red_timer->stop();
-        m_blue_timer->stop();
+        //m_red_timer->stop();
+        //m_blue_timer->stop();
 
-        /*if (m_board.getWinCoord().has_value()) {
-            std::cout << (m_curr_player.get().getColor() == color::ColorType::BLUE ?
-                "Player RED has won!\n" : "Player BLUE has won!\n");
-        }*/
+        ///*if (m_board.getWinCoord().has_value()) {
+        //    std::cout << (m_curr_player.get().getColor() == color::ColorType::BLUE ?
+        //        "Player RED has won!\n" : "Player BLUE has won!\n");
+        //}*/
 
-        std::cin.get();
-        std::cin.get();
+        //std::cin.get();
+        //std::cin.get();
     }
 
     void TimedMode::render() {
@@ -195,7 +243,7 @@ namespace base {
     }
 
     void TimedMode::renderTimers() {
-        utils::printAtCoordinate("Time remaining:", { 50, 2 });
+        /*utils::printAtCoordinate("Time remaining:", { 50, 2 });
 
         std::cout << color::to_string(color::ColorType::RED);
         utils::printAtCoordinate("RED: " + std::to_string(m_red_timer->getRemainingTime()) + "s", { 50, 3 });
@@ -203,11 +251,11 @@ namespace base {
 
         std::cout << color::to_string(color::ColorType::BLUE);
         utils::printAtCoordinate("BLUE: " + std::to_string(m_blue_timer->getRemainingTime()) + "s", { 50, 4 });
-        std::cout << color::to_string(color::ColorType::DEFAULT);
+        std::cout << color::to_string(color::ColorType::DEFAULT);*/
     }
 
     void TimedMode::switchTimers() {
-        if (m_curr_player.get().getColor() == color::ColorType::RED) {
+       /* if (m_curr_player.get().getColor() == color::ColorType::RED) {
             m_red_timer->stop();
             m_blue_timer->reset();
             m_blue_timer->start();
@@ -216,15 +264,15 @@ namespace base {
             m_blue_timer->stop();
             m_red_timer->reset();
             m_red_timer->start();
-        }
+        }*/
     }
 
     void TimedMode::displayTimeSelection() {
-        system("cls");
+        /*system("cls");
         std::cout << "\nSelect time limit per round (seconds):\n";
         std::cout << "1. 60 seconds\n";
         std::cout << "2. 90 seconds\n";
         std::cout << "3. 120 seconds\n";
-        std::cout << "Choose an option (1-3): ";
+        std::cout << "Choose an option (1-3): ";*/
     }
 }

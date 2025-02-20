@@ -1461,4 +1461,11 @@ namespace base {
 		return m_combat_cards.end();
 	}
 
+	Board::iterator Board::begin() {
+		return m_combat_cards.begin();
+	}
+
+	Board::iterator Board::end() {
+		return m_combat_cards.end();
+	}
 }

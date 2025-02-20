@@ -10,8 +10,12 @@ enum class CardState : uint16_t {
     DEFAULT,
     AVAILABLE,
     RESTRICTED,
+    ABOUT_TO_REMOVE,
     REMOVE,
-    ABOUT_TO_REMOVE
+    ABOUT_TO_HAND,
+    HAND,
+    ABOUT_TO_CHECK,
+    CHECK
 };
 
 /// -----------------------------------------------------------BOARD----------------------------------------------
@@ -56,6 +60,7 @@ public:
     void flipCard();
     bool isIllusion();
 
+    QPointF saved_pos;
 
 protected:
     
@@ -72,6 +77,8 @@ private:
     QPixmap cardImage;
     QPixmap cardBack;
     QPixmap red_x;
+    QPixmap hand;
+    QPixmap check;
 
     QPointF start_pos;
     QPointF lastMousePosition;
@@ -325,22 +332,127 @@ private:
 
 class VictoryScreen : public QWidget {
     Q_OBJECT
-
 public:
-    enum class TeamColor {
-        RED,
-        BLUE
-    };
-
-    explicit VictoryScreen(QWidget* parent = nullptr);
-    void showVictory(TeamColor color);
+    explicit VictoryScreen(const QString& redPlayerName, const QString& bluePlayerName, QWidget* parent = nullptr);
+    void showVictory(color::ColorType color, int redScore, int blueScore);
+    void switchToMainMenu();
 
 signals:
     void nextRoundRequested();
+    void mainMenuRequested();
+    void scoreChanged(color::ColorType team, int newScore);
 
 private:
     QLabel* backgroundLabel;
     QLabel* victoryLabel;
     QPushButton* nextButton;
+    QPushButton* mainMenuButton;
+    QLabel* redScoreLabel;
+    QLabel* blueScoreLabel;
+    QString redName;
+    QString blueName;
+
+    static QString buttonStyle;
+
+    /*int redScore;
+    int blueScore;*/
     void setupUI();
+};
+
+///----------------------------------------
+
+class VisualTimer : public QObject, public QGraphicsItem {
+    Q_OBJECT
+
+signals:
+    void timedUp(color::ColorType color);
+
+public:
+    explicit VisualTimer(const QString& playerName, int initialSeconds, color::ColorType color, QGraphicsItem* parent = nullptr);
+
+    QRectF boundingRect() const override;
+    void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = nullptr) override;
+
+    void setTotalTime(int seconds);
+    void start();
+    void pause();
+    void reset();
+    int remainingTime() const { return currentSeconds; }
+
+    static const int WIDTH = 150;
+    static const int HEIGHT = 100;
+
+private:
+    void updateTimer();
+    void updateDisplay();
+    QString formatTime(int seconds) const;
+    void createWidgets();
+
+    QGraphicsProxyWidget* progressBarProxy;
+    QGraphicsProxyWidget* timeLabelProxy;
+    QGraphicsProxyWidget* nameLabelProxy;
+
+    QProgressBar* progressBar;
+    QLabel* timeLabel;
+    QLabel* nameLabel;
+    QTimer* timer;
+
+    int totalSeconds;
+    int currentSeconds;
+    bool isActive;
+
+    color::ColorType colorType;
+    QString primaryColor;
+};
+
+
+///---------------------------------------------------
+
+class Arrow : public QObject, public QGraphicsItem {
+    Q_OBJECT 
+public:
+    enum Direction {
+        LEFT,
+        RIGHT,
+        UP,
+        DOWN
+    };
+
+    explicit Arrow(Direction direction, QGraphicsItem* parent = nullptr);
+
+    QRectF boundingRect() const override;
+    void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = nullptr) override;
+
+signals:
+    void clicked();
+
+protected:
+    void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override;
+    void hoverEnterEvent(QGraphicsSceneHoverEvent* event) override;
+    void hoverLeaveEvent(QGraphicsSceneHoverEvent* event) override;
+
+private:
+    Direction m_direction;
+    QPixmap m_pixmap;
+    bool m_isPressed;
+    bool m_isHovered;
+};
+
+///-----------------------------------------------------------------------------
+
+class ArrowItem : public QGraphicsLineItem {
+public:
+    ArrowItem(const QPointF& startPoint, QGraphicsItem* parent = nullptr);
+
+    // Override paint to add arrow head
+    void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = nullptr) override;
+
+    // Arrow state
+    void setDrawing(bool drawing) { m_isDrawing = drawing; }
+    bool isDrawing() const { return m_isDrawing; }
+
+private:
+    bool m_isDrawing;
+    qreal m_arrowSize;
 };

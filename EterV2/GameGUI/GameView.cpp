@@ -1,10 +1,10 @@
 #include "GameView.h"
 #include "settings.h"
 
-GameView::GameView(const QString& name_red, const QString& name_blue, const std::string& mode, QWidget* parent) :
+GameView::GameView(const QString& name_red, const QString& name_blue, const GameModeConfig& config, QWidget* parent) :
     QGraphicsView{ parent },
     scene{ new QGraphicsScene(this) },
-    victory_screen{ new VictoryScreen(this) },
+    victory_screen{ new VictoryScreen(name_red, name_blue, this) },
     explosion{ nullptr },
     vortex{ nullptr },
     mage_card_red{ nullptr },
@@ -13,87 +13,92 @@ GameView::GameView(const QString& name_red, const QString& name_blue, const std:
     setScene(scene);
     setFixedSize(WINDOW_WIDTH, WINDOW_HEIGHT);
     scene->setSceneRect(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
-    loadBackground(mode);
+    loadBackground(config);
 
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setSceneRect(scene->sceneRect());
     setRenderHint(QPainter::Antialiasing);
     setInteractive(true);
-    _initLabels(name_red, name_blue);
+    //_initLabels(name_red, name_blue);
 
     target_zone = new TargetZone();
     scene->addItem(target_zone);
     target_zone->hide();
 
     connect(victory_screen, &VictoryScreen::nextRoundRequested, this, &GameView::nextRound);
+    connect(victory_screen, &VictoryScreen::mainMenuRequested, this, &GameView::mainMenuRequested);
 }
 
-void GameView::loadBackground(const std::string& mode) {
-    if (mode == "100" || mode == "110") {
+void GameView::loadBackground(const GameModeConfig& config) {
+    QString mode{ QString::fromStdString(config.id) };
+
+    bool is_small{ config.size_type == base::GameSizeType::SMALL };
+
+    if (mode == "1" || mode == "11") {
         QPixmap backgroundPixmap("../pictures/training.png");
         QPixmap scaledPixmap = backgroundPixmap.scaled(WINDOW_WIDTH, WINDOW_HEIGHT,
             Qt::IgnoreAspectRatio,
             Qt::SmoothTransformation);
         scene->setBackgroundBrush(QBrush(scaledPixmap));
     }
-    else if (mode == "102" || mode == "112") {
+    else if (mode == "12" || mode == "112" || is_small && (mode.front() == "5")) {
         QPixmap backgroundPixmap("../pictures/training_explosion.png");
         QPixmap scaledPixmap = backgroundPixmap.scaled(WINDOW_WIDTH, WINDOW_HEIGHT,
             Qt::IgnoreAspectRatio,
             Qt::SmoothTransformation);
         scene->setBackgroundBrush(QBrush(scaledPixmap));
     }
-    else if (mode == "200" || mode == "210" || mode == "40030" || mode == "41030") {
+    else if (mode == "2" || mode == "21" || mode == "43" || mode == "413") {
         QPixmap backgroundPixmap("../pictures/mage.png");
         QPixmap scaledPixmap = backgroundPixmap.scaled(WINDOW_WIDTH, WINDOW_HEIGHT,
             Qt::IgnoreAspectRatio,
             Qt::SmoothTransformation);
         scene->setBackgroundBrush(QBrush(scaledPixmap));
     }
-    else if (mode == "202" || mode == "212" || mode == "40230" || mode == "41230") {
+    else if (mode == "22" || mode == "212" || mode == "423" || mode == "4123") {
         QPixmap backgroundPixmap("../pictures/mage_explosion.png");
         QPixmap scaledPixmap = backgroundPixmap.scaled(WINDOW_WIDTH, WINDOW_HEIGHT,
             Qt::IgnoreAspectRatio,
             Qt::SmoothTransformation);
         scene->setBackgroundBrush(QBrush(scaledPixmap));
     }
-    else if (mode == "300" || mode == "310" || mode == "40004" || mode == "41004") {
+    else if (mode == "3" || mode == "310" || mode == "44" || mode == "414") {
         QPixmap backgroundPixmap("../pictures/elemental.png");
         QPixmap scaledPixmap = backgroundPixmap.scaled(WINDOW_WIDTH, WINDOW_HEIGHT,
             Qt::IgnoreAspectRatio,
             Qt::SmoothTransformation);
         scene->setBackgroundBrush(QBrush(scaledPixmap));
     }
-    else if (mode == "302" || mode == "312" || mode == "40204" || mode == "41204") {
+    else if (mode == "32" || mode == "312" || mode == "424" || mode == "4124") {
         QPixmap backgroundPixmap("../pictures/elemental_explosion.png");
         QPixmap scaledPixmap = backgroundPixmap.scaled(WINDOW_WIDTH, WINDOW_HEIGHT,
             Qt::IgnoreAspectRatio,
             Qt::SmoothTransformation);
         scene->setBackgroundBrush(QBrush(scaledPixmap));
     }
-    else if (mode == "40000" || mode == "41000") {
+    else if (mode == "4" || mode == "41" || !is_small && (mode == "5" || mode == "51" || mode == "515")) {
         QPixmap backgroundPixmap("../pictures/tournament.png");
         QPixmap scaledPixmap = backgroundPixmap.scaled(WINDOW_WIDTH, WINDOW_HEIGHT,
             Qt::IgnoreAspectRatio,
             Qt::SmoothTransformation);
         scene->setBackgroundBrush(QBrush(scaledPixmap));
     }
-    else if (mode == "40200" || mode == "41200") {
+    else if (mode == "42" || mode == "412" || !is_small && (mode == "52" || mode == "512" || mode == "5125")) {
         QPixmap backgroundPixmap("../pictures/tournament_explosion.png");
         QPixmap scaledPixmap = backgroundPixmap.scaled(WINDOW_WIDTH, WINDOW_HEIGHT,
             Qt::IgnoreAspectRatio,
             Qt::SmoothTransformation);
         scene->setBackgroundBrush(QBrush(scaledPixmap));
     }
-    else if (mode == "40234" || mode == "41234") {
+    else if (mode == "4234" || mode == "41234" || !is_small && (mode == "5234" || mode == "51234" || mode == "512345")) {
         QPixmap backgroundPixmap("../pictures/tournament_full.png");
         QPixmap scaledPixmap = backgroundPixmap.scaled(WINDOW_WIDTH, WINDOW_HEIGHT,
             Qt::IgnoreAspectRatio,
             Qt::SmoothTransformation);
         scene->setBackgroundBrush(QBrush(scaledPixmap));
     }
-    else if (mode == "40034" || mode == "41034") {
+    else if (mode == "434" || mode == "4134" || !is_small && (mode == "534" || mode == "5134" || mode == "51345")) {
         QPixmap backgroundPixmap("../pictures/tournament_full-explosion.png");
         QPixmap scaledPixmap = backgroundPixmap.scaled(WINDOW_WIDTH, WINDOW_HEIGHT,
             Qt::IgnoreAspectRatio,
@@ -116,13 +121,13 @@ Card* GameView::_createCardAt(color::ColorType color, base::CombatCardType type,
 
 void GameView::_initLabels(const QString& name_red, const QString& name_blue) {
     red_name_label = new QLabel(this);
-    red_name_label->setText(name_red + "'s cards:");
+    red_name_label->setText(name_red);
     red_name_label->setStyleSheet("font-size: 18px; font-weight: bold;");
     red_name_label->move(70, WINDOW_HEIGHT - 150);
     red_name_label->resize(200, 30);
 
     blue_name_label = new QLabel(this);
-    blue_name_label->setText(name_blue + "'s cards:");
+    blue_name_label->setText(name_blue);
     blue_name_label->setStyleSheet("font-size: 18px; font-weight: bold;");
     blue_name_label->move(70, WINDOW_HEIGHT - 150);
     blue_name_label->resize(200, 30);
@@ -253,6 +258,40 @@ void GameView::drawMarker(const QPointF& point, color::ColorType color) {
     scene->addItem(marker);
 }
 
+void GameView::drawTimers(uint16_t time) {
+    red_timer = new VisualTimer(red_name_label->text(), int(time), color::ColorType::RED);
+    blue_timer = new VisualTimer(blue_name_label->text(), int(time), color::ColorType::BLUE);
+
+    red_timer->reset();
+    blue_timer->reset();
+
+    int padding{ 10 };
+    red_timer->setPos(padding, WINDOW_HEIGHT - 2 * (VisualTimer::HEIGHT + padding));
+    blue_timer->setPos(padding, WINDOW_HEIGHT - (VisualTimer::HEIGHT + padding));
+
+    red_timer->start();
+
+    scene->addItem(red_timer);
+    scene->addItem(blue_timer);
+}
+
+void GameView::drawArrow(Arrow::Direction direction) {
+    Arrow* arrow_left = new Arrow(Arrow::LEFT);
+    Arrow* arrow_right = new Arrow(Arrow::RIGHT);
+
+    arrow_left->setPos(WINDOW_WIDTH / 2 - 50, 700);
+    arrow_right->setPos(WINDOW_WIDTH / 2 + 50, 700);
+
+    connect(arrow_left, &Arrow::clicked, this, []() { qDebug() << "miau";  });
+    connect(arrow_right, &Arrow::clicked, this, []() { qDebug() << "hau";  });
+
+    scene->addItem(arrow_left);
+    scene->addItem(arrow_right);
+
+    arrows.append(arrow_left);
+    arrows.append(arrow_right);
+}
+
 void GameView::keyPressEvent(QKeyEvent* event) {
     if (event->key() == Qt::Key_Left) {
         explosion->setRotation(explosion->rotation() - 90);
@@ -269,11 +308,32 @@ void GameView::keyPressEvent(QKeyEvent* event) {
 
 void GameView::mousePressEvent(QMouseEvent* event)
 {
+    if (event->button() == Qt::RightButton) {
+        QPointF scenePos = mapToScene(event->pos());
+
+        if (!m_currentArrow) {
+            // Start new arrow
+            m_currentArrow = new ArrowItem(scenePos);
+            scene->addItem(m_currentArrow);
+        }
+        else if (m_currentArrow->isDrawing()) {
+            // Finish current arrow
+            m_currentArrow->setDrawing(false);
+            m_currentArrow = nullptr;
+        }
+    }
+
     QGraphicsView::mousePressEvent(event);
 }
 
 void GameView::mouseMoveEvent(QMouseEvent* event)
 {
+    if (m_currentArrow && m_currentArrow->isDrawing()) {
+        QLineF line = m_currentArrow->line();
+        line.setP2(mapToScene(event->pos()));
+        m_currentArrow->setLine(line);
+    }
+
     QGraphicsView::mouseMoveEvent(event);
 }
 
@@ -286,14 +346,14 @@ void GameView::switchToPlayer(const base::Player& player) {
     color::ColorType color = player.getColor();
 
     auto change_visibility = [&](bool visible) {
-        red_name_label->setVisible(visible);
+        //red_name_label->setVisible(visible);
         for (auto card : red_deck) {
             if (card->isPlaced() == false && card->isUsed() == false) {
                 card->setVisible(visible);
             }
         }
 
-        blue_name_label->setVisible(!visible);
+        //blue_name_label->setVisible(!visible);
         for (auto card : blue_deck) {
             if (card->isPlaced() == false && card->isUsed() == false) {
                 card->setVisible(!visible);
@@ -326,7 +386,9 @@ void GameView::setExplosionActive() {
 
 void GameView::eraseExplosion() {
     explosion->deleteLater();
-    vortex->deleteLater();
+    if (vortex) {
+        vortex->deleteLater();
+    }
 }
 
 void GameView::drawHole(const QPointF& pos) {
@@ -335,11 +397,11 @@ void GameView::drawHole(const QPointF& pos) {
 }
 
 void GameView::showWin(color::ColorType color) {
-    victory_screen->showVictory(
+    /*victory_screen->showVictory(
         color == color::ColorType::RED ?
-        VictoryScreen::TeamColor::RED :
-        VictoryScreen::TeamColor::BLUE
-    );
+        color::ColorType::RED :
+        color::ColorType::BLUE
+    );*/
 }
 
 QHash<uint16_t, Card*>& GameView::getAllCards() {
@@ -472,4 +534,27 @@ void GameView::hideCards(std::function<bool(Card*)> condition) {
 void GameView::drawArena(base::GameSizeType game_size) {
     arena = new Arena(game_size);
     scene->addItem(arena);
+}
+
+void GameView::blockDeckCards(color::ColorType color, bool block) {
+    if (color == color::ColorType::RED) {
+        for (Card* card : red_deck) {
+            if (block) {
+                card->setState(CardState::RESTRICTED);
+            }
+            else {
+                card->setState(CardState::DEFAULT);
+            }
+        }
+    }
+    else if (color == color::ColorType::BLUE) {
+        for (Card* card : blue_deck) {
+            if (block) {
+                card->setState(CardState::RESTRICTED);
+            }
+            else {
+                card->setState(CardState::DEFAULT);
+            }
+        }
+    }
 }

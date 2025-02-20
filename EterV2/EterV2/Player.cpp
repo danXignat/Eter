@@ -122,6 +122,18 @@ namespace base {
         return std::move(card);
     }
 
+    CombatCard&& Player::getUsedCardByID(uint16_t id) {
+        auto it = std::find_if(m_cards.begin(), m_used_cards.end(),
+            [id](const std::pair<const CombatCardType, CombatCard>& pair) {
+                return (pair.second.getID() == id);
+            });
+
+        CombatCard card = std::move(it->second);
+        m_cards.erase(it);
+
+        return std::move(card);
+    }
+
     const std::unordered_multimap<CombatCardType, CombatCard>& Player::getCards() const {
         return m_cards;
     }

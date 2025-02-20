@@ -18,13 +18,20 @@ namespace base {
         case GameModeType::TournamentMode:
             return std::make_unique<TournamentMode>  (services, player_names);
 
-        /*case GameModeType::TimedMode:
-            return std::make_unique<TimedMode>      (services, player_names);*/
+        case GameModeType::TimedMode:
 
         default:
             return nullptr;
         }
 
+    }
+
+    GameModePtr GameModeFactory::getTimedMode(const std::string& id, 
+        const std::pair<std::string, std::string>& player_names, 
+        uint16_t time_limit, GameSizeType size_tye) {
+        auto services = GameModeFactory::getServiceConfig(id);
+
+        return std::make_unique<TimedMode>(size_tye, services, player_names, time_limit);
     }
 
     GameModeType GameModeFactory::getGameModeType(const std::string& id) { 

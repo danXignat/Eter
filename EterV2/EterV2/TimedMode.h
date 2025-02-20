@@ -6,24 +6,26 @@
 #include "Timer.h"
 #include "MageService.h"
 #include "ElementalService.h"
+#include "ArenaService.h"
 #include "TrainingMode.h"
 
 namespace base {
     class TimedMode : public BaseGameMode {
     public:
         // constructor pt training
-        TimedMode(const std::vector<ServiceType>& services,
+        TimedMode(GameSizeType size_type, const std::vector<ServiceType>& services,
             const std::pair<std::string, std::string>& player_names,
-            int time_limit_seconds,
-            std::unique_ptr<BaseGameMode> base_mode);
-
-        // constructor pt mage/elemental
-        TimedMode(const std::vector<ServiceType>& services,
-            const std::pair<std::string, std::string>& player_names,
-            int time_limit_seconds = 60);
+            uint16_t time_limit);
 
         void run() override;
         void render();
+        void setLostOnTime(color::ColorType color);
+        void nextRound() override;
+
+        std::optional <MageService>& getMageService();
+        std::optional <ElementalService>& getElementalService();
+        std::optional <ArenaService>& getArenaService();
+        uint16_t getTime() const;
 
     private:
         void renderTimers();
@@ -32,11 +34,14 @@ namespace base {
         void renderGameState();
         bool processGameInput(const InputHandler& input);
 
-        std::unique_ptr<Timer> m_red_timer;
-        std::unique_ptr<Timer> m_blue_timer;
-        std::unique_ptr<MageService> m_mage_service;
-        std::unique_ptr<ElementalService> m_elemental_service;
-        std::unique_ptr<BaseGameMode> m_base_mode; 
-        int m_time_limit;
+    private:
+        uint16_t m_time_limit;
+
+        color::ColorType lost_on_time_color = color::ColorType::DEFAULT;
+        bool lost_on_time = false;
+
+        std::optional<MageService> m_mage_service;
+        std::optional<ElementalService> m_elemental_service;
+        std::optional<ArenaService> m_arena_service;
     };
 }

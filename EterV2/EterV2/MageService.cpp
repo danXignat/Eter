@@ -19,8 +19,8 @@ namespace base {
 		MageTypeAbility choice_p1 = static_cast<MageTypeAbility>(choices[0]);
 		MageTypeAbility choice_p2 = static_cast<MageTypeAbility>(choices[1]);
 
-		/*MageTypeAbility choice_p1 = static_cast<MageTypeAbility>(3);
-		MageTypeAbility choice_p2 = static_cast<MageTypeAbility>(3);*/
+		/*choice_p1 = static_cast<MageTypeAbility>(1);
+		choice_p2 = static_cast<MageTypeAbility>(1);*/
 
 		card_red  = _factory(choice_p1, color::ColorType::RED);
 		card_blue = _factory(choice_p2, color::ColorType::BLUE);

@@ -43,6 +43,12 @@ Card::Card(color::ColorType color, base::CombatCardType type, const QPointF& pos
     red_x = QPixmap("../pictures/red_x.png")
         .scaled(CARD_SIZE - RED_X_PADDING, CARD_SIZE - RED_X_PADDING, Qt::KeepAspectRatio, Qt::SmoothTransformation);
 
+    hand = QPixmap("../pictures/hand.png")
+        .scaled(CARD_SIZE - RED_X_PADDING, CARD_SIZE - RED_X_PADDING, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+
+    check = QPixmap("../pictures/check.png")
+        .scaled(CARD_SIZE - RED_X_PADDING, CARD_SIZE - RED_X_PADDING, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+
     setAcceptHoverEvents(true);
     setPos(start_pos);
     setZValue(5);
@@ -81,6 +87,17 @@ void Card::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWid
         brush.setStyle(Qt::NoBrush);
         break;
 
+    case CardState::ABOUT_TO_CHECK:
+        pen.setColor(QColor(0, 255, 0));
+        brush.setStyle(Qt::NoBrush);
+        break;
+
+    case CardState::CHECK:
+        pen.setColor(QColor(0, 255, 0));
+        brush.setStyle(Qt::NoBrush);
+        painter->drawPixmap(-(CARD_SIZE - RED_X_PADDING) / 2, -(CARD_SIZE - RED_X_PADDING) / 2, check);
+        break;
+
     case CardState::ABOUT_TO_REMOVE:
         pen.setColor(QColor(255, 0, 0));
         brush.setStyle(Qt::NoBrush);
@@ -96,6 +113,17 @@ void Card::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWid
         pen.setColor(QColor(255, 0, 0));
         brush.setStyle(Qt::NoBrush);
         painter->drawPixmap(-(CARD_SIZE - RED_X_PADDING) / 2, -(CARD_SIZE - RED_X_PADDING) / 2, red_x);
+        break;
+
+    case CardState::ABOUT_TO_HAND:
+        pen.setColor(QColor(255, 255, 0));
+        brush.setStyle(Qt::NoBrush);
+        break;
+
+    case CardState::HAND:
+        pen.setColor(QColor(255, 255, 0));
+        brush.setStyle(Qt::NoBrush);
+        painter->drawPixmap(-(CARD_SIZE - RED_X_PADDING) / 2, -(CARD_SIZE - RED_X_PADDING) / 2, hand);
         break;
 
     default:
@@ -167,7 +195,7 @@ void Card::mousePressEvent(QGraphicsSceneMouseEvent* event) {
         lastMousePosition = event->scenePos();
         lastCardPosition = pos();
 
-        if (m_state == CardState::REMOVE) {
+        if (m_state == CardState::REMOVE || m_state == CardState::HAND) {
             emit clickedOnRemove(this);
         }
         else {
@@ -255,11 +283,39 @@ void Card::hoverEnterEvent(QGraphicsSceneHoverEvent* event) {
         emit hoverRemoveEnter(this);
     }
 
+    if (m_state == CardState::ABOUT_TO_HAND) {
+        m_state = CardState::HAND;
+        update();
+
+        emit hoverRemoveEnter(this);
+    }
+
+    if (m_state == CardState::ABOUT_TO_CHECK) {
+        m_state = CardState::CHECK;
+        update();
+
+        emit hoverRemoveEnter(this);
+    }
+
     QGraphicsItem::hoverEnterEvent(event);
 }
 void Card::hoverLeaveEvent(QGraphicsSceneHoverEvent* event) {
     if (m_state == CardState::REMOVE) {
         m_state = CardState::ABOUT_TO_REMOVE;
+        update();
+
+        emit hoverRemoveLeave(this);
+    }
+
+    if (m_state == CardState::HAND) {
+        m_state = CardState::ABOUT_TO_HAND;
+        update();
+
+        emit hoverRemoveLeave(this);
+    }
+
+    if (m_state == CardState::CHECK) {
+        m_state = CardState::ABOUT_TO_CHECK;
         update();
 
         emit hoverRemoveLeave(this);
@@ -882,8 +938,10 @@ void Marker::setPos(const QPointF& pos) {
 
 ///-------------------------------------------------------------------
 
-VictoryScreen::VictoryScreen(QWidget* parent)
+VictoryScreen::VictoryScreen(const QString& redPlayerName, const QString& bluePlayerName, QWidget* parent)
     : QWidget(parent)
+    , redName(redPlayerName)
+    , blueName(bluePlayerName)
 {
     setupUI();
     hide();
@@ -892,30 +950,172 @@ VictoryScreen::VictoryScreen(QWidget* parent)
 void VictoryScreen::setupUI() {
     setFixedSize(WINDOW_WIDTH, WINDOW_HEIGHT);
 
+    // Background with gradient
     backgroundLabel = new QLabel(this);
-    backgroundLabel->setStyleSheet("background-color: rgba(0, 0, 0, 180);");
+    backgroundLabel->setStyleSheet(
+        "QLabel {"
+        "   background-color: rgba(0, 0, 0, 180);"  // Changed to semi-transparent black
+        "}"
+    );
     backgroundLabel->setFixedSize(WINDOW_WIDTH, WINDOW_HEIGHT);
 
+    // Victory Image (keep your existing image handling)
     victoryLabel = new QLabel(this);
     victoryLabel->setFixedSize(VICTORY_IMAGE_WIDTH, VICTORY_IMAGE_HEIGHT);
-    
     int imageX = (WINDOW_WIDTH - VICTORY_IMAGE_WIDTH) / 2;
-    int imageY = (WINDOW_HEIGHT - VICTORY_IMAGE_HEIGHT) / 2;
+    int imageY = (WINDOW_HEIGHT - VICTORY_IMAGE_HEIGHT) / 3;  // Moved up slightly
     victoryLabel->move(imageX, imageY);
 
+    // Score Container
+    QWidget* scoreContainer = new QWidget(this);
+    scoreContainer->setFixedSize(800, 200);  // Adjust size as needed
+
+    // Layout for score container
+    QHBoxLayout* scoreLayout = new QHBoxLayout(scoreContainer);
+    scoreLayout->setSpacing(40);
+    scoreLayout->setContentsMargins(20, 20, 20, 20);
+
+    // Red Score Card
+    QWidget* redCard = new QWidget;
+    redCard->setFixedSize(300, 160);
+    redCard->setStyleSheet(
+        "QWidget {"
+        "   background-color: rgba(31, 41, 55, 255);"
+        "   border: 2px solid #ef4444;"
+        "   border-radius: 12px;"
+        "}"
+    );
+
+    QVBoxLayout* redCardLayout = new QVBoxLayout(redCard);
+    redCardLayout->setAlignment(Qt::AlignCenter);
+
+    redScoreLabel = new QLabel;
+    redScoreLabel->setFont(QFont("Arial", 24, QFont::Bold));
+    redScoreLabel->setStyleSheet(
+        "QLabel {"
+        "   color: #ef4444;"
+        "   border: none;"
+        "   padding: 10px;"
+        "}"
+    );
+    redScoreLabel->setAlignment(Qt::AlignCenter);
+
+    QLabel* redPoints = new QLabel("points");
+    redPoints->setFont(QFont("Arial", 14));
+    redPoints->setStyleSheet("color: #f87171; border: none;");
+    redPoints->setAlignment(Qt::AlignCenter);
+
+    redCardLayout->addWidget(redScoreLabel);
+    redCardLayout->addWidget(redPoints);
+
+    QWidget* dividerContainer = new QWidget;
+    QVBoxLayout* dividerLayout = new QVBoxLayout(dividerContainer);
+    dividerContainer->setFixedWidth(40);  // Fixed width
+    dividerLayout->setSpacing(0);  // Remove extra spacing
+    dividerLayout->setContentsMargins(0, 0, 0, 0);  // Remove margins
+
+    QLabel* vsLabel = new QLabel("VS");
+    vsLabel->setFixedHeight(40);
+    vsLabel->setFont(QFont("Arial", 20, QFont::Bold));
+    vsLabel->setStyleSheet("color: #9ca3af;");
+    vsLabel->setAlignment(Qt::AlignCenter);
+
+    dividerLayout->addWidget(vsLabel);
+    dividerLayout->setAlignment(Qt::AlignCenter);
+
+    // Blue Score Card
+    QWidget* blueCard = new QWidget;
+    blueCard->setFixedSize(300, 160);
+    blueCard->setStyleSheet(
+        "QWidget {"
+        "   background-color: rgba(31, 41, 55, 255);"
+        "   border: 2px solid #3b82f6;"
+        "   border-radius: 12px;"
+        "}"
+    );
+
+    QVBoxLayout* blueCardLayout = new QVBoxLayout(blueCard);
+    blueCardLayout->setAlignment(Qt::AlignCenter);
+
+    blueScoreLabel = new QLabel;
+    blueScoreLabel->setFont(QFont("Arial", 24, QFont::Bold));
+    blueScoreLabel->setStyleSheet(
+        "QLabel {"
+        "   color: #3b82f6;"
+        "   border: none;"
+        "   padding: 10px;"
+        "}"
+    );
+    blueScoreLabel->setAlignment(Qt::AlignCenter);
+
+    QLabel* bluePoints = new QLabel("points");
+    bluePoints->setFont(QFont("Arial", 14));
+    bluePoints->setStyleSheet("color: #60a5fa; border: none;");
+    bluePoints->setAlignment(Qt::AlignCenter);
+
+    blueCardLayout->addWidget(blueScoreLabel);
+    blueCardLayout->addWidget(bluePoints);
+
+    // Add cards and divider to score layout
+    scoreLayout->addWidget(redCard);
+    scoreLayout->addWidget(dividerContainer);
+    scoreLayout->addWidget(blueCard);
+
+    // Position score container
+    int scoreContainerY = imageY + VICTORY_IMAGE_HEIGHT + 40;
+    scoreContainer->move((WINDOW_WIDTH - scoreContainer->width()) / 2, scoreContainerY);
+
+    // Buttons
     nextButton = new NextButton(this);
     nextButton->setFixedSize(BUTTON_WIDTH, BUTTON_HEIGHT);
-    
     nextButton->move(WINDOW_WIDTH - 385, WINDOW_HEIGHT - 122);
+    nextButton->setStyleSheet(
+        "QPushButton {"
+        "   background-color: #4f46e5;"
+        "   color: white;"
+        "   border-radius: 6px;"
+        "   padding: 8px 16px;"
+        "   font-weight: bold;"
+        "}"
+        "QPushButton:hover {"
+        "   background-color: #4338ca;"
+        "}"
+        "QPushButton:pressed {"
+        "   background-color: #3730a3;"
+        "}"
+    );
+
+    mainMenuButton = new QPushButton("Main Menu", this);
+    mainMenuButton->setFixedSize(365, 92);
+    mainMenuButton->move((WINDOW_WIDTH - BUTTON_WIDTH) / 2, WINDOW_HEIGHT - 122);
+    mainMenuButton->setStyleSheet(buttonStyle);
+    mainMenuButton->hide();
+
+    QGraphicsDropShadowEffect* redShadow = new QGraphicsDropShadowEffect(this);
+    redShadow->setBlurRadius(20);
+    redShadow->setColor(QColor(239, 68, 68, 75));
+    redShadow->setOffset(0, 0);
+    redCard->setGraphicsEffect(redShadow);
+
+    QGraphicsDropShadowEffect* blueShadow = new QGraphicsDropShadowEffect(this);
+    blueShadow->setBlurRadius(20);
+    blueShadow->setColor(QColor(59, 130, 246, 75));
+    blueShadow->setOffset(0, 0);
+    blueCard->setGraphicsEffect(blueShadow);
 
     connect(nextButton, &QPushButton::clicked, this, [this]() {
         hide();
         emit nextRoundRequested();
         });
+
+    connect(mainMenuButton, &QPushButton::clicked, this, [this]() {
+        hide();
+        emit mainMenuRequested();
+        });
 }
 
-void VictoryScreen::showVictory(TeamColor color) {
-    QString imagePath = (color == TeamColor::RED)
+void VictoryScreen::showVictory(color::ColorType color, int redScore, int blueScore) {
+    QString imagePath = (color == color::ColorType::RED)
         ? "../pictures/win/red_victory.png"
         : "../pictures/win/blue_victory.png";
 
@@ -933,6 +1133,324 @@ void VictoryScreen::showVictory(TeamColor color) {
     );
 
     victoryLabel->setPixmap(scaledPixmap);
+
+    if (color == color::ColorType::RED) {
+        redScore++;
+    }
+    else {
+        blueScore++;
+    }
+
+    redScoreLabel->setText(QString("%1: %2").arg(redName).arg(redScore));
+    blueScoreLabel->setText(QString("%1: %2").arg(blueName).arg(blueScore));
+
     show();
     raise();
+}
+
+void VictoryScreen::switchToMainMenu() {
+    nextButton->hide();
+    mainMenuButton->show();
+}
+
+QString VictoryScreen::buttonStyle{
+    "QPushButton {"
+    "    font-family: 'Luminari', 'Trattatello', 'Magic School One';"
+    "    font-size: 24px;"
+    "    color: #00A800;"
+    "    font-weight: bold;"
+    "    padding: 8px 15px;"
+    "    background-color: rgba(0, 0, 0, 0.7);"
+    "    border: 1px solid rgba(0, 168, 0, 0.3);"
+    "    border-radius: 8px;"
+    "    min-width: 120px;"  // Ensures minimum button width
+    "    min-height: 45px;"  // Ensures minimum button height
+    "}"
+    "QPushButton:hover {"
+    "    color: #00FF00;"
+    "    background-color: rgba(0, 0, 0, 0.8);"
+    "    border: 1px solid rgba(0, 168, 0, 0.6);"
+    "}"
+    "QPushButton:pressed {"
+    "    color: #008000;"
+    "    background-color: rgba(0, 0, 0, 0.9);"
+    "    border: 2px solid #00A800;"
+    "    padding: 9px 14px;"  // Adjust padding to prevent size change when pressed
+    "}"
+    "QPushButton:disabled {"
+    "    color: rgba(0, 168, 0, 0.4);"
+    "    background-color: rgba(0, 0, 0, 0.5);"
+    "    border: 1px solid rgba(0, 168, 0, 0.1);"
+    "}"
+};
+
+///-------------------------------------------------------
+
+VisualTimer::VisualTimer(const QString& playerName, int initialSeconds, color::ColorType color, QGraphicsItem* parent)
+    : QGraphicsItem(parent)
+    , totalSeconds(initialSeconds)
+    , currentSeconds(initialSeconds)
+    , isActive(false)
+    , colorType(color)
+{
+    // Set the primary color based on ColorType
+    primaryColor = (colorType == color::ColorType::RED) ? "#f44336" : "#2196F3";
+
+    createWidgets();
+    nameLabel->setText(playerName);
+    updateDisplay();
+
+    timer = new QTimer;
+    timer->setInterval(1000);
+    connect(timer, &QTimer::timeout, this, &VisualTimer::updateTimer);
+}
+
+void VisualTimer::createWidgets() {
+    progressBar = new QProgressBar;
+    progressBar->setMinimum(0);
+    progressBar->setMaximum(totalSeconds);
+    progressBar->setValue(currentSeconds);
+    progressBar->setTextVisible(false);
+    progressBar->setFixedSize(WIDTH, 20);
+
+    QString progressStyle = QString(
+        "QProgressBar {"
+        "   border: 2px solid grey;"
+        "   border-radius: 5px;"
+        "   background-color: #f0f0f0;"
+        "}"
+        "QProgressBar::chunk {"
+        "   background-color: %1;"
+        "   width: 1px;"
+        "}"
+    ).arg(primaryColor);
+
+    progressBar->setStyleSheet(progressStyle);
+
+    timeLabel = new QLabel;
+    timeLabel->setAlignment(Qt::AlignCenter);
+    timeLabel->setStyleSheet("QLabel { font-size: 24pt; font-weight: bold; }");
+    timeLabel->setFixedSize(WIDTH, 40);
+
+    nameLabel = new QLabel;
+    nameLabel->setAlignment(Qt::AlignCenter);
+    nameLabel->setStyleSheet("QLabel { font-size: 16pt; font-weight: bold; }");
+    nameLabel->setFixedSize(WIDTH, 30);
+
+    progressBarProxy = new QGraphicsProxyWidget(this);
+    progressBarProxy->setWidget(progressBar);
+    progressBarProxy->setPos(0, 70);
+
+    timeLabelProxy = new QGraphicsProxyWidget(this);
+    timeLabelProxy->setWidget(timeLabel);
+    timeLabelProxy->setPos(0, 30);
+
+    nameLabelProxy = new QGraphicsProxyWidget(this);
+    nameLabelProxy->setWidget(nameLabel);
+    nameLabelProxy->setPos(0, 0);
+}
+
+QRectF VisualTimer::boundingRect() const {
+    return QRectF(0, 0, WIDTH, HEIGHT);
+}
+
+void VisualTimer::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) {
+    Q_UNUSED(painter);
+    Q_UNUSED(option);
+    Q_UNUSED(widget);
+}
+
+void VisualTimer::updateTimer() {
+    if (currentSeconds > 0) {
+        currentSeconds--;
+        progressBar->setValue(currentSeconds);
+
+        updateDisplay();
+
+        if (currentSeconds == 0) {
+            pause();
+            emit timedUp(colorType);
+        }
+    }
+}
+
+void VisualTimer::updateDisplay() {
+    timeLabel->setText(formatTime(currentSeconds));
+}
+
+QString VisualTimer::formatTime(int seconds) const {
+    int minutes = seconds / 60;
+    int remainingSeconds = seconds % 60;
+    return QString("%1:%2")
+        .arg(minutes, 2, 10, QChar('0'))
+        .arg(remainingSeconds, 2, 10, QChar('0'));
+}
+
+void VisualTimer::setTotalTime(int seconds) {
+    totalSeconds = seconds;
+    currentSeconds = seconds;
+    progressBar->setMaximum(totalSeconds);
+    progressBar->setValue(currentSeconds);
+    updateDisplay();
+}
+
+void VisualTimer::start() {
+    if (currentSeconds > 0) {
+        timer->start();
+        isActive = true;
+        nameLabel->setStyleSheet(QString("QLabel { font-size: 16pt; font-weight: bold; color: %1; }").arg(primaryColor));
+
+        QString progressStyle = QString(
+            "QProgressBar {"
+            "   border: 2px solid grey;"
+            "   border-radius: 5px;"
+            "   background-color: #f0f0f0;"
+            "}"
+            "QProgressBar::chunk {"
+            "   background-color: %1;"
+            "   width: 1px;"
+            "}"
+        ).arg(primaryColor);
+
+        progressBar->setStyleSheet(progressStyle);
+    }
+}
+
+void VisualTimer::pause() {
+    timer->stop();
+    isActive = false;
+    nameLabel->setStyleSheet("QLabel { font-size: 16pt; font-weight: bold; color: black; }");
+    progressBar->setStyleSheet(
+        "QProgressBar {"
+        "   border: 2px solid grey;"
+        "   border-radius: 5px;"
+        "   background-color: #f0f0f0;"
+        "}"
+        "QProgressBar::chunk {"
+        "   background-color: grey;"
+        "   width: 1px;"
+        "}"
+    );
+}
+
+void VisualTimer::reset() {
+    pause();
+    currentSeconds = totalSeconds;
+    progressBar->setValue(currentSeconds);
+    updateDisplay();
+}
+
+///-----------------------------------------
+
+Arrow::Arrow(Direction direction, QGraphicsItem* parent)
+    : QGraphicsItem(parent)
+    , m_direction(direction)
+    , m_isPressed(false)
+    , m_isHovered(false)
+{
+    setAcceptHoverEvents(true);
+    QString imagePath;
+    switch (m_direction) {
+    case LEFT:
+        imagePath = "../pictures/left_arrow.png";
+        break;
+    case RIGHT:
+        imagePath = "../pictures/right_arrow.png";
+        break;
+    case UP:
+        imagePath = "../pictures/up_arrow.png";
+        break;
+    case DOWN:
+        imagePath = "../pictures/down_arrow.png";
+        break;
+    }
+    m_pixmap = QPixmap(imagePath).scaled(
+        CARD_SIZE, CARD_SIZE, Qt::KeepAspectRatio, Qt::SmoothTransformation
+    );
+    update();
+}
+
+QRectF Arrow::boundingRect() const
+{
+    return QRectF(-CARD_SIZE / 2, -CARD_SIZE / 2, CARD_SIZE, CARD_SIZE);
+}
+
+void Arrow::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
+{
+    Q_UNUSED(option);
+    Q_UNUSED(widget);
+
+    painter->setOpacity(m_isHovered ? 0.7 : 1.0);
+    painter->drawPixmap(-CARD_SIZE / 2 + 2, -CARD_SIZE / 2 + 2, m_pixmap);
+}
+
+void Arrow::mousePressEvent(QGraphicsSceneMouseEvent* event)
+{
+    if (event->button() == Qt::LeftButton) {
+        m_isPressed = true;
+        update();
+
+        emit clicked();
+    }
+    QGraphicsItem::mousePressEvent(event);
+}
+
+void Arrow::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
+{
+    if (event->button() == Qt::LeftButton && m_isPressed) {
+        m_isPressed = false;
+
+        update();
+    }
+    QGraphicsItem::mouseReleaseEvent(event);
+}
+
+void Arrow::hoverEnterEvent(QGraphicsSceneHoverEvent* event)
+{
+    m_isHovered = true;
+    update();
+    QGraphicsItem::hoverEnterEvent(event);
+}
+
+void Arrow::hoverLeaveEvent(QGraphicsSceneHoverEvent* event)
+{
+    m_isHovered = false;
+    update();
+    QGraphicsItem::hoverLeaveEvent(event);
+}
+
+/// <summary>
+/// 
+/// </summary>
+/// <param name="startPoint"></param>
+/// <param name="parent"></param>
+
+ArrowItem::ArrowItem(const QPointF& startPoint, QGraphicsItem* parent)
+    : QGraphicsLineItem(parent)
+    , m_isDrawing(true)
+    , m_arrowSize(10.0)
+{
+    setLine(QLineF(startPoint, startPoint));
+    setFlags(ItemIsSelectable | ItemIsMovable);
+    QPen thickPen(QColor(0, 170, 0));
+    thickPen.setWidth(4);  // Increase this number to make it even thicker
+    setPen(thickPen);
+}
+
+void ArrowItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
+{
+    QGraphicsLineItem::paint(painter, option, widget);
+
+    QLineF mainLine = line();
+    if (mainLine.length() > 0) {
+        double angle = std::atan2(-mainLine.dy(), mainLine.dx());
+
+        QPointF arrowP1 = mainLine.p2() - QPointF(sin(angle + M_PI / 3) * m_arrowSize,
+            cos(angle + M_PI / 3) * m_arrowSize);
+        QPointF arrowP2 = mainLine.p2() - QPointF(sin(angle + M_PI - M_PI / 3) * m_arrowSize,
+            cos(angle + M_PI - M_PI / 3) * m_arrowSize);
+
+        painter->setBrush(QColor(0, 170, 0));  // Strong green for arrow head
+        painter->drawPolygon(QPolygonF() << mainLine.p2() << arrowP1 << arrowP2);
+    }
 }
